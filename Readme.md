@@ -1,30 +1,47 @@
 # Development environment as a virtual machine
 
-This is a tutorial on how to create a development environment as a virtual machine.
+This tutorial will create a virtual machine that includes Linux with the Ubuntu Desktop distribution.
 
-If I have time, I will translate that into English.
+Why a desktop version? Because it should be as easy as possible for the users.
+
+If I have time, I will translate that into english.
 
 Licence: Public Domain - Feel free to use it, but you can also improve this.
 
+## VirtualBox - Create a new virtual machine
 
-## Virtualbox - neue Virtuelle Maschine erstellen
+* Install VirtualBox: https://virtualbox.org/
+
+VirtalBox > New > (Expert Mode)
+
 * Name: UbuntuDev
-* RAM: 4096 MB
-* Keine Festplatte
+* Type: Linux
+* Version: Ubuntu (64 bit)
+* Memory size: 4096 MB
+* Hard disk: No - Do not add a virtual hard disk
 
-* Allgemein > Erweitert > Gemeinsame Zwischenablage + Drag & Drop: bidirektional
-* System > Hauptplatine > Boot-Reihenfolge > DVD, Platte
-* System > Prozessor > CPU: 4 (Maximale von grün)
-* Massenspeicher > SATA Port 0, HDD, Filename: System, 80 GB, VDMK, dynamisch alloziert, Name: System
-* Massenspeicher > SATA Port 2, Compact Disc, Betriebssystem einlegen
-* Audio deactivated
-* Netzwerk > Network 1, NAT
-* Netzwerk > Network 2, Netzwerkbrücke, eth1
-* Gemeinsamer Ordner setzen
+VirtualBox > Settings
 
-## Ubuntu [16.04 | 18.04] installieren
+* General > Advanced
+  - Shared Clipboard: Bidirectional (optional)
+  - Drag'n'Drop: Bidirectional (optional)
+* System
+  - Motherboard > Boot Order: Optical, Hard Disk
+  - Processor > CPU: 4 (Maximum of green)
+* Storage (Expert mode)
+  - SATA Port 0, Hard disk, File location: System, 80 GB, VDMK, Dynamically allocated
+  - SATA Port 2, Compact Disc, Insert operating system
+* Audio > Enable Audio: false
+* Network
+  - Adapter 1, NAT
+  - Adapter 2, Bridged Adapter, eth1 (Your network device)
 
-* Ubuntu 18.04: Full installation
+## Install Ubuntu (16.04 or 18.04)
+
+Note: Ubuntu 18.04, has no PHP 5.* and docker ready.
+
+* Download Ubuntu: https://ubuntu.com/
+* For Ubuntu 18.04: Full installation
 
 * Your name: user
 * Computer name: dev-vm
@@ -32,8 +49,7 @@ Licence: Public Domain - Feel free to use it, but you can also improve this.
 * Passwort: user
 * Log in automatically = true
 
-* Gast-Erweiterung installieren & neustarten
-* System Settings > Displays > Resolution 1280x800
+* System Settings > Display Resolution: 1280x800
 * Icons: Nautilus, Firefox, Terminal
 
 ```Shell
@@ -42,11 +58,21 @@ sudo passwd root
 
 * Root Passwort: root
 
+### Clone repository
+
+```Shell
+sudo apt -y install git
+git clone https://github.com/Cyb10101/dev-vm-linux.git /home/user/Desktop/dev-vm-linux
+rsync -av /home/user/Desktop/dev-vm-linux/home/user/ /home/user/
+```
+
+### Configure System
+
 ```Shell
 sudo add-apt-repository multiverse
 sudo apt update
 sudo apt -y dist-upgrade
-sudo apt -y install curl git gparted htop meld nautilus-compare openssh-server \
+sudo apt -y install curl gparted htop meld nautilus-compare openssh-server \
   putty-tools vim whois net-tools resolvconf
 
 sudo update-alternatives --config editor
@@ -113,21 +139,6 @@ mv etc/nginx/snippets/php-7.0.29.conf etc/nginx/snippets/php-7.0.30.conf
 mv etc/nginx/snippets/php-5.6.34.conf etc/nginx/snippets/php-5.6.36.conf
 ```
 
-## Achiv erstellen
-Zu kopierende Dateien Archiv erstellen.
-
-```Shell
-tar cfz install-development.tar.gz install-development
-```
-
-## Achiv entpacken
- Dateien in die Virtuelle Maschine kopieren & entpacken, bei Neustarts Terminal in dem Ordner öffnen.
-
-```Shell
-tar xf install-development.tar.gz && rm install-development.tar.gz && cd install-development
-rsync -av home/user/ /home/user/
-```
-
 ## Betriebssystem konfigurieren
 
 ```Shell
@@ -170,7 +181,7 @@ gsettings list-recursively | grep search
 ## Configure Bash (User & Root)
 
 ```Shell
-sudo cp home/user/.bashrc-user /root/
+sudo cp /home/user/Desktop/dev-vm-linux/home/user/.bashrc-user /root/
 gedit ~/.bashrc && sudo gedit /root/.bashrc
 ```
 
@@ -184,8 +195,8 @@ source ~/.bashrc-user
 
 ```Shell
 sudo apt -y install zsh
-sudo rsync -av home/user/.zshrc /root/
-sudo rsync -av home/user/.oh-my-zsh/ /root/.oh-my-zsh/
+sudo rsync -av /home/user/Desktop/dev-vm-linux/home/user/.zshrc /root/
+sudo rsync -av /home/user/Desktop/dev-vm-linux/home/user/.oh-my-zsh/ /root/.oh-my-zsh/
 git clone https://github.com/robbyrussell/oh-my-zsh.git /tmp/.oh-my-zsh
 
 rsync -av /tmp/.oh-my-zsh/ ~/.oh-my-zsh/
@@ -231,9 +242,9 @@ sudo a2enmod actions alias deflate expires headers macro rewrite proxy proxy_fcg
 sudo apt -y install imagemagick graphicsmagick
 # sudo apt -y install graphicsmagick graphicsmagick-imagemagick-compat
 
-sudo rsync -av etc/apache2/conf-available/ /etc/apache2/conf-available/
-sudo rsync -av etc/apache2/sites-available/ /etc/apache2/sites-available/
-sudo cp etc/apache2/ports.conf /etc/apache2/
+sudo rsync -av /home/user/Desktop/dev-vm-linux/etc/apache2/conf-available/ /etc/apache2/conf-available/
+sudo rsync -av /home/user/Desktop/dev-vm-linux/etc/apache2/sites-available/ /etc/apache2/sites-available/
+sudo cp /home/user/Desktop/dev-vm-linux/etc/apache2/ports.conf /etc/apache2/
 sudo chown -R user:user /etc/apache2/sites-available
 sudo chown -R user:user /etc/apache2/sites-enabled
 sudo usermod -aG adm ${USER}
@@ -270,8 +281,8 @@ sudo apache2ctl configtest && sudo systemctl restart apache2
 
 ```Shell
 sudo apt -y install nginx nginx-extras
-sudo rsync -av etc/nginx/sites-available/ /etc/nginx/sites-available/
-sudo rsync -av etc/nginx/snippets/ /etc/nginx/snippets/
+sudo rsync -av /home/user/Desktop/dev-vm-linux/etc/nginx/sites-available/ /etc/nginx/sites-available/
+sudo rsync -av /home/user/Desktop/dev-vm-linux/etc/nginx/snippets/ /etc/nginx/snippets/
 sudo chown -R user:user /etc/nginx/sites-available
 sudo chown -R user:user /etc/nginx/sites-enabled
 sudo chown -R user:user /etc/nginx/snippets
@@ -718,7 +729,7 @@ FLUSH PRIVILEGES;
 ## FakeMail
 ```Shell
 sudo apt -y install tofrodos ack-grep
-sudo cp usr/sbin/sendmailfake /usr/sbin/
+sudo cp /home/user/Desktop/dev-vm-linux/usr/sbin/sendmailfake /usr/sbin/
 ```
 
 ## MailCachter
@@ -971,6 +982,8 @@ gsettings set org.gnome.desktop.screensaver picture-options 'zoom'
 
 ## Cleanups
 
+* Gemeinsame Ordner: entfernen
+
 ```Shell
 sudo chown -R user:user /etc/apache2/sites-available
 sudo chown -R user:user /etc/apache2/sites-enabled
@@ -979,18 +992,15 @@ sudo chown -R user:user /etc/nginx/sites-enabled
 
 sudo rm /home/user/.local/share/recently-used.xbel
 
-sudo apt update && sudo apt -y dist-upgrade && sudo apt -y autoremove
-```
+rm -rf /home/user/Desktop/dev-vm-linux
 
-* Remove install-development folder
-* Gemeinsame Ordner: entfernen
-
-```Shell
 # Ubuntu 18.04
 gio trash --empty
 
 # Ubuntu 16.04
 gvfs-trash --empty
+
+sudo apt update && sudo apt -y dist-upgrade && sudo apt -y autoremove
 
 # Both Ubuntu...
 sudo /opt/VBoxGuestAdditions-*/uninstall.sh
@@ -1097,7 +1107,7 @@ ssh-keygen -t rsa -b 4096 -C 'user@example.org'
 Ist nacher erreichbar über Windows Freigabe, zum Beispiel für Putty oder HeidiSQL.
 
 ```Shell
-puttygen ~/.ssh/id_rsa -o /var/www/id_rsa.ppk
+puttygen /home/user/.ssh/id_rsa -o /var/www/id_rsa.ppk
 ```
 
 ### Git konfigurieren
