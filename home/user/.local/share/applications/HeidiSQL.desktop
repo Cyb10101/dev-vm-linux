@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=HeidiSQL
+Comment=PlayOnLinux
+Exec=/usr/share/playonlinux/playonlinux --run "HeidiSQL" %F
+Icon=/home/user/.PlayOnLinux/wineprefix/HeidiSQL/drive_c/Program Files/HeidiSQL/heidisql.ico
+StartupWMClass=heidisql.exe
+Encoding=UTF-8
+Categories=

@@ -1,0 +1,53 @@
+# Set Terminal title
+function userTerminalTitle {
+    echo -e '\033]2;'$1'\007'
+}
+
+# Set Terminal title - current folder
+function userTerminalTitlePwd {
+    echo -e '\033]2;'$(pwd)'\007'
+}
+
+# Set current user color
+function userColorUser {
+    if [[ $EUID -eq 0 ]]; then
+        echo -e '\e[1;31m';
+    else
+        echo -e '\e[1;32m';
+    fi
+}
+
+alias grep='grep --color=auto'
+alias egrep='egrep --color=auto'
+alias fgrep='fgrep --color=auto'
+
+# pretty mount
+alias mount='mount | column -t'
+
+alias unixtime='date +"%s"'
+
+alias less='less -FSRX'
+#alias todos="ack-grep --nogroup '(TODO|FIX(ME)?):'"
+
+# find biggest files
+alias diskspace='du -hS | sort -n -r | less'
+
+alias l='ls -CF --color=auto'
+alias la='ls -A --color=auto'
+alias ll='ls -ahlF --color=auto'
+alias ls='ls --color=auto'
+
+# Run SSH Agent and add key 10h
+if [ -f ~/.ssh/id_rsa ] && [ -z "$SSH_AUTH_SOCK" ] ; then
+  eval `ssh-agent -s`
+  ssh-add -t 36000 ~/.ssh/id_rsa
+fi
+
+PS1='$(userTerminalTitlePwd)\[\e[0;36m\][$(userColorUser)\u\[\e[0;36m\]@\[\e[1;34m\]\h\[\e[0;36m\]: \[\e[0m\]\w\[\e[0;36m\]]\[\e[0;36m\]> $(userColorUser)\n\$\[\e[0m\] ';
+if [ -f $(which git) ]; then
+    # Git include for root user
+    if [[ $EUID -eq 0 ]]; then
+        source /etc/bash_completion.d/git-prompt
+    fi
+    PS1='$(userTerminalTitlePwd)\[\e[0;36m\][$(userColorUser)\u\[\e[0;36m\]@\[\e[1;34m\]\h\[\e[0;36m\]: \[\e[0m\]\w\[\e[0;36m\]]\[\e[0;33m\]$(__git_ps1)\[\e[0;36m\]> $(userColorUser)\n\$\[\e[0m\] ';
+fi

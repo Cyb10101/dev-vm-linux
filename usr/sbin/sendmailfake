@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+filePath="/var/www/fakemail"
+fileName="`date +%F_%H-%M-%S`"
+binTodos=$(which todos)
+
+test -f ${filePath} || mkdir -p ${filePath}
+
+i=0
+while [[ -e ${filePath}/${fileName}_${i}.eml ]]; do
+	let i++
+done
+fileName=${fileName}_${i}
+
+cat /dev/stdin >> "${filePath}/${fileName}.eml"
+
+if [ -f ${binTodos} ]; then
+	${binTodos} "${filePath}/${fileName}.eml"
+fi

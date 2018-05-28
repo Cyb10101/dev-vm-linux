@@ -1,0 +1,131 @@
+# www.example.org.dev.vm
+# www.example.org.dev.vm00.example.org
+server {
+	listen 80;
+	listen [::]:80;
+
+	listen 443 ssl http2;
+	listen [::]:443 ssl http2;
+	include snippets/snakeoil.conf;
+
+	server_name ~^(?<xsubname>.+)\.(?<xservername>.+)\.(?<xtoplevel>.+)\.dev\.(vm|vm00\.example\.org)$;
+
+	set $lastFolder /public;
+	if (!-d /var/www/$xservername.$xtoplevel/$xsubname/public) {
+			set $lastFolder '';
+	}
+	root /var/www/$xservername.$xtoplevel/$xsubname$lastFolder;
+
+	include snippets/virtual-host-defaults.conf;
+
+	location / {
+		# try to serve file directly, fallback to index.php
+		try_files $uri $uri/ $uri/index.php$is_args$args /index.php$is_args$args;
+	}
+
+	#include snippets/php-5.4.45.conf;
+	#include snippets/php-5.5.38.conf;
+	#include snippets/php-5.6.36.conf;
+	#include snippets/php-7.0.30.conf;
+	#include snippets/php-7.1.17.conf;
+	include snippets/php-7.2.5.conf;
+}
+
+# example.org.dev.vm
+# example.org.dev.vm00.example.org
+server {
+	listen 80;
+	listen [::]:80;
+
+	listen 443 ssl http2;
+	listen [::]:443 ssl http2;
+	include snippets/snakeoil.conf;
+
+	server_name ~^(?<xservername>.+)\.(?<xtoplevel>.+)\.dev\.(vm|vm00\.example\.org)$;
+
+	set $lastFolder /public;
+	if (!-d /var/www/$xservername.$xtoplevel/public) {
+			set $lastFolder '';
+	}
+	root /var/www/$xservername.$xtoplevel$lastFolder;
+
+	include snippets/virtual-host-defaults.conf;
+
+	location / {
+		# try to serve file directly, fallback to index.php
+		try_files $uri $uri/ $uri/index.php$is_args$args /index.php$is_args$args;
+	}
+
+	#include snippets/php-5.4.45.conf;
+	#include snippets/php-5.5.38.conf;
+	#include snippets/php-5.6.36.conf;
+	#include snippets/php-7.0.30.conf;
+	#include snippets/php-7.1.17.conf;
+	include snippets/php-7.2.5.conf;
+}
+
+# www.example.vm
+# www.example.vm00.example.org
+server {
+	listen 80;
+	listen [::]:80;
+
+	listen 443 ssl http2;
+	listen [::]:443 ssl http2;
+	include snippets/snakeoil.conf;
+
+	server_name ~^(?<xsubname>.+)\.(?<xservername>.+)\.(vm|vm00\.example\.org)$;
+
+	set $lastFolder /public;
+	if (!-d /var/www/$xservername/$xsubname/public) {
+			set $lastFolder '';
+	}
+	root /var/www/$xservername/$xsubname$lastFolder;
+
+	include snippets/virtual-host-defaults.conf;
+
+	location / {
+		# try to serve file directly, fallback to index.php
+		try_files $uri $uri/ $uri/index.php$is_args$args /index.php$is_args$args;
+	}
+
+	#include snippets/php-5.4.45.conf;
+	#include snippets/php-5.5.38.conf;
+	#include snippets/php-5.6.36.conf;
+	#include snippets/php-7.0.30.conf;
+	#include snippets/php-7.1.17.conf;
+	include snippets/php-7.2.5.conf;
+}
+
+# example.vm
+# example.vm00.example.org
+server {
+	listen 80;
+	listen [::]:80;
+
+	listen 443 ssl http2;
+	listen [::]:443 ssl http2;
+	include snippets/snakeoil.conf;
+
+	server_name ~^(?<xservername>.+)\.(vm|vm00\.example\.org)$;
+
+	set $lastFolder /public;
+	if (!-d /var/www/$xservername/public) {
+			set $lastFolder '';
+	}
+	root /var/www/$xservername$lastFolder;
+
+	include snippets/virtual-host-defaults.conf;
+
+	location / {
+		# try to serve file directly, fallback to index.php
+		try_files $uri $uri/ $uri/index.php$is_args$args /index.php$is_args$args;
+	}
+
+	#include snippets/php-5.4.45.conf;
+	#include snippets/php-5.5.38.conf;
+	#include snippets/php-5.6.36.conf;
+	#include snippets/php-7.0.30.conf;
+	#include snippets/php-7.1.17.conf;
+	include snippets/php-7.2.5.conf;
+}

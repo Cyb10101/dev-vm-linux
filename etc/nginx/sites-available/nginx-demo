@@ -1,0 +1,27 @@
+server {
+	listen 80;
+	listen [::]:80;
+
+	listen 443 ssl http2;
+	listen [::]:443 ssl http2;
+	include snippets/snakeoil.conf;
+
+	server_name ~^(.+\.)?nginx-demo\.(vm|vm00\.example\.org)$;
+	root /var/www/typo3demo/public;
+
+	include snippets/virtual-host-defaults.conf;
+
+	location / {
+		# try to serve file directly, fallback to index.php
+		try_files $uri $uri/ $uri/index.php$is_args$args /index.php$is_args$args;
+	}
+
+	#include snippets/php-5.4.45.conf;
+	#include snippets/php-5.5.38.conf;
+	#include snippets/php-5.6.36.conf;
+	#include snippets/php-7.0.30.conf;
+	#include snippets/php-7.1.17.conf;
+	include snippets/php-7.2.5.conf;
+
+	#include snippets/typo3-staticfilecache.conf;
+}
