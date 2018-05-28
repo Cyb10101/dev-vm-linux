@@ -1,4 +1,11 @@
-# Entwicklungsumgebung als Virtuelle Maschine
+# Development environment as a virtual machine
+
+This is a tutorial on how to create a development environment as a virtual machine.
+
+If I have time, I will translate that into English.
+
+Licence: Public Domain - Feel free to use it, but you can also improve this.
+
 
 ## Virtualbox - neue Virtuelle Maschine erstellen
 * Name: UbuntuDev
