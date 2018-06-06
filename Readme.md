@@ -1307,46 +1307,73 @@ Die Passwörter der Linux Benutzer heißen genauso wie die Benutzernamen.
 Der MySQL Zugang:
 * Benutzer: root | Passwort: root
 
-### Samba/Windows Freigabe
-Der /var/www Ordner ist erreichbar über www.
-IP-Adresse muss außerhalb der virtuellen Maschine angepasst werden.
+### SSHFS share - Linux configuration
 
-#### Samba/Windows Freigabe - Windows konfiguration
-Command öffnen (STRG + R -> cmd)
+Connect over SSH from Linux host to Linux guest.
+IP address must be adapted for the virtual machine.
+
+Run in a terminal window:
 
 ```Shell
-net use Z: \\127.0.0.1\www /PERSISTENT:YES
+sudo apt install sshfs
+sudo mkdir -p /mnt/ssh/vm
+
+gedit ~/.bashrc && gedit ~/.zshrc
 ```
 
-#### Samba/Windows Freigabe - Linux konfiguration
+Append to file ~/.bashrc and ~/.zshrc:
 
 ```Shell
-sudo apt install sshfs cifs-utils
+alias vm-on='sshfs -o IdentitiesOnly=yes -o compression=no -o cache=yes -o kernel_cache -o allow_other -o IdentityFile=~/.ssh/id_rsa -o idmap=user -o uid=1000 -o gid=1000 user@123.123.123.123:/mnt/data/var/www /mnt/ssh/vm'
+
+alias vm-off='fusermount -u /mnt/ssh/vm'
+```
+
+### Samba/Windows share
+
+Connect over Samba from Windows/Linux host to Linux guest.
+The folder /var/www is accessible over Samba share "www".
+IP address must be adapted for the virtual machine.
+
+#### Samba/Windows share - Windows configuration
+
+Run in a command window:
+
+```Shell
+net use Z: \\123.123.123.123\www /PERSISTENT:YES
+```
+
+#### Samba/Windows share - Linux configuration
+
+Run in a terminal window:
+
+```Shell
+sudo apt install cifs-utils
 sudo mkdir -p /mnt/samba/vm
 sudo chmod 777 /mnt/samba/vm
 
 sudo /etc/fstab
 ```
 
-* Zur Datei /etc/fstab hinzufügen:
+Append to file /etc/fstab with your virtual machine IP:
 
 ```Text
-//127.0.0.1/www /mnt/samba/vm cifs uid=localUsername,username=user,password=user 0 0
+//123.123.123.123/www /mnt/samba/vm cifs uid=localUsername,username=user,password=user 0 0
 ```
 
-### Php Version wechseln
+### Switch PHP Version
 
 ```Shell
-# Installierte PHP Versionen anzeigen
+# List installed PHP versions
 phpbrew list
 
-# PHP Version dauerhaft im Terminal wechseln
+# Switch PHP version permanent
 phpbrew switch php-7.2.3
 
-# PHP Version temporär im Terminal wechseln
+# Switch PHP version temporary only for current enviroment in terminal
 phpbrew use php-7.2.3
 
-# PHP Version anzeigen
+# Show current PHP version
 php -v
 ```
 
