@@ -219,14 +219,14 @@ rsync -av /tmp/.oh-my-zsh/ ~/.oh-my-zsh/
 sudo rsync -av /tmp/.oh-my-zsh/ /root/.oh-my-zsh/
 ```
 
-## DNS (example.vm)
+## DNS Server (example.vm)
 
 ```Shell
 # sudo apt install resolvconf
 sudo gedit /etc/NetworkManager/NetworkManager.conf
 ```
 
-* Zur Datei hinzufügen: /etc/NetworkManager/NetworkManager.conf
+Append to file: /etc/NetworkManager/NetworkManager.conf
 
 ```ini
 [main]
@@ -1333,7 +1333,7 @@ alias vm-off='fusermount -u /mnt/ssh/vm'
 
 Connect over Samba from Windows/Linux host to Linux guest.
 The folder /var/www is accessible over Samba share "www".
-IP address must be adapted for the virtual machine.
+IP address (123.123.123.123) must be adapted for the virtual machine.
 
 #### Samba/Windows share - Windows configuration
 
@@ -1376,6 +1376,54 @@ phpbrew use php-7.2.3
 # Show current PHP version
 php -v
 ```
+
+### DNS Server (example.vm)
+
+You can use DNS Server for the example.vm domains to work.
+IP address (123.123.123.123) must be adapted for the virtual machine.
+
+#### Linux DNS Server
+
+```Shell
+# sudo apt install resolvconf
+sudo gedit /etc/NetworkManager/NetworkManager.conf
+```
+
+Append to file: /etc/NetworkManager/NetworkManager.conf
+
+```ini
+[main]
+dns=dnsmasq
+```
+
+```Shell
+sudo sh -c 'echo "nameserver 127.0.1.1" >> /etc/resolvconf/resolv.conf.d/head'
+sudo sh -c 'echo "nameserver 8.8.8.8" >> /etc/resolvconf/resolv.conf.d/head'
+sudo sh -c 'echo "address=/.vm/123.123.123.123" >> /etc/NetworkManager/dnsmasq.d/development'
+sudo systemctl restart network-manager
+sudo resolvconf -u
+```
+
+#### Windows DNS Server (Acrylic DNS Proxy)
+
+Download and install: http://mayakron.altervista.org/wikibase/show.php?id=AcrylicHome
+
+Open Systemsteuerung > Netzwerk und Internet > Netzwerkverbindungen
+
+Edit network > Internetprotocol, Version 4 (TCP/IPv4) > Folgende DNS-Serveradressen verwenden
+* Bevorzugter DNS-Server: 127.0.0.1
+
+Startmenü > Acrylic DNS Proxy > Edit Acrylic Hosts File
+
+Append with your virtual machine IP:
+
+```Text
+123.123.123.123 /.*\.vm$
+```
+
+Startmenü > Acrylic DNS Proxy
+* Stop Acrylic Service
+* Start Acrylic Service
 
 ### E-Mail - MailCachter
 Wird der MailCachter verwendet. Können E-Mails zu dieser SMTP Adresse versendet werden:
