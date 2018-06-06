@@ -827,23 +827,39 @@ php /var/www/typo3demo/vendor/bin/typo3cms install:setup \
 * TYPO3-Demo (Apache)
     - http://apache-demo.vm
 
-## Ubuntu 16.04: Docker
+## Docker
 https://docs.docker.com/install/linux/docker-ce/ubuntu/
 
 ```Shell
 sudo apt -y install apt-transport-https ca-certificates curl software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+```
 
-# stable, edge, nightly
-#sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+* Ubuntu 18.04
+
+```Shell
+# Stable is in development, use edge
+# sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) edge"
+```
+
+* Ubuntu 16.04
+
+```Shell
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+```
+
+* Both Ubuntu
+
+```Shell
 sudo apt update
 sudo apt -y install docker-ce
 sudo usermod -aG docker ${USER}
 sudo reboot
 ```
 
-# Ubuntu 16.04: Docker Compose
+## Docker Compose
 https://docs.docker.com/compose/install/#install-compose
 https://github.com/docker/compose/releases
 
@@ -852,14 +868,17 @@ sudo curl -L https://github.com/docker/compose/releases/download/1.20.1/docker-c
 sudo chmod +x /usr/local/bin/docker-compose
 ```
 
-### Ubuntu 16.04: Docker Test
+## Optional: Test Docker
 
 ```Shell
+# Run hello world test
 docker run hello-world
-docker ps -a
-docker rm 4e68562f6510
-docker images -a
-docker rmi 05a3bd381fc2
+
+# Delete all container
+docker rm $(docker ps -a -q)
+
+# Delete all images
+docker rmi $(docker images -q)
 ```
 
 ## Samba
