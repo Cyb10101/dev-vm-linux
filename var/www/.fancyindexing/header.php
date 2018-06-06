@@ -129,6 +129,10 @@ a:hover {
     background-color: #CCECFF;
 }
 
+table td a {
+  display: block;
+}
+
 hr {
     margin: 8px 0;
     border: 0;
