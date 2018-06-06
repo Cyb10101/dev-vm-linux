@@ -1047,16 +1047,28 @@ rm /root/.zsh_history
 reboot
 ```
 
+## Recommended: Shrink hard disk for export
+
+Boot with a Ubuntu Live ISO and fill empty space on hard disk with zeros.
+
+```Shell
+sudo su
+apt install zerofree
+blkid
+zerofree -v /dev/sda1
+poweroff
+```
+
 ## Virtualbox export
+
 * Virtualbox > Datei > Appliance exportieren
-* Hersteller: Hot Example
-* Hersteller-URL: https://example.org/
-* Open Virtualization Format 2.0
+  - Open Virtualization Format 2.0
 
 ## Virtualbox import
+
 * Virtualbox > Datei > Appliance importieren
-* CPU: 4 (Maximale von grün)
-* RAM: 2048 oder 4096 MB
+  - CPU: 4 (Maximale von grün)
+  - RAM: 2048 oder 4096 MB
 
 * Allgemein > Erweitert > Sicherungspunkte > verschieben
 * Massenspeicher > Festplatte 2 erstellen > Sata 1 > VMDK, dynamisch alloziert, Max available size, Name: Data
