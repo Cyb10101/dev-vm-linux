@@ -29,4 +29,4 @@ To develop a own virtual machine from scratch see file [create.md](create.md).
 
 ## Usage of virtual machine
 
-To import a OVA file and configure the virtual machine see file [usage.md](create.md).
+To import a OVA file and configure the virtual machine see file [usage.md](usage.md).
