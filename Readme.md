@@ -8,6 +8,21 @@ If I have time, I will translate that into english.
 
 Licence: Public Domain - Feel free to use it, but you can also improve this.
 
+## Try it
+
+Notes:
+
+* URL and VM can change through development
+* Keyboard layout is set to german
+
+Downloads:
+
+* Ubuntu 18.04, PHP <= 7.0, Docker edge:
+  - https://netslum.de/download/dev-vm-linux/UbuntuDev2018.ova
+
+* Ubuntu 16.04, PHP <= 5.4, Docker stable:
+  - https://netslum.de/download/dev-vm-linux/UbuntuDev2016.ova
+
 ## VirtualBox - Create a new virtual machine
 
 * Install VirtualBox: https://virtualbox.org/
