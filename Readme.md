@@ -154,6 +154,8 @@ gsettings set org.gnome.nautilus.preferences default-folder-viewer 'list-view'
 gsettings set org.gnome.nautilus.preferences executable-text-activation 'ask'
 ```
 
+gsettings set org.gnome.nautilus.list-view default-visible-columns "['name', 'owner', 'group', 'permissions']"
+
 ### Ubuntu 18.04
 ```Shell
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'nothing'
@@ -1041,7 +1043,7 @@ reboot
 * Startmenü > Terminal
 
 ```Shell
-sudo mkdir /media/data
+sudo mkdir /mnt/data
 sudo blkid | grep sdb
 
 sudo gedit /etc/fstab
@@ -1050,36 +1052,36 @@ sudo gedit /etc/fstab
 * Datei fstab anpassen
 
 ```Text
-UUID=288132af-be1e-4a3a-a2b6-1210c9816f50 /media/data               ext4    errors=remount-ro 0       1
+UUID=288132af-be1e-4a3a-a2b6-1210c9816f50 /mnt/data               ext4    errors=remount-ro 0       1
 ```
 
 * Startmenü > Terminal
 
 ```Shell
-sudo mount /media/data
-sudo chmod 777 /media/data
+sudo mount /mnt/data
+sudo chmod 777 /mnt/data
 ```
 
 ### HDD2 - Move Webserver
 
 ```Shell
-sudo mkdir -p /media/data/var/www
-sudo chown -R user:user /media/data/var
-sudo chmod 775 /media/data/var/www
-sudo chmod g+s /media/data/var/www
+sudo mkdir -p /mnt/data/var/www
+sudo chown -R user:user /mnt/data/var
+sudo chmod 775 /mnt/data/var/www
+sudo chmod g+s /mnt/data/var/www
 
-sudo mv /var/www/!(.|..) /media/data/var/www/
+sudo mv /var/www/!(.|..) /mnt/data/var/www/
 sudo rmdir /var/www
-sudo ln -s /media/data/var/www /var/
+sudo ln -s /mnt/data/var/www /var/
 ```
 
 ### HDD2 - Move MySQL
 
 ```Shell
 sudo service mysql stop
-sudo mkdir -p /media/data/var/lib
-sudo mv /var/lib/mysql /media/data/var/lib/
-sudo ln -s /media/data/var/lib/mysql /var/lib/mysql
+sudo mkdir -p /mnt/data/var/lib
+sudo mv /var/lib/mysql /mnt/data/var/lib/
+sudo ln -s /mnt/data/var/lib/mysql /var/lib/mysql
 
 sudo gedit /etc/apparmor.d/tunables/alias
 ```
@@ -1087,7 +1089,7 @@ sudo gedit /etc/apparmor.d/tunables/alias
 * Datei alias anpassen
 
 ```Text
-alias /var/lib/mysql/ -> /media/data/var/lib/mysql/,
+alias /var/lib/mysql/ -> /mnt/data/var/lib/mysql/,
 ```
 
 ```Shell
@@ -1263,8 +1265,8 @@ net use Z: \\127.0.0.1\www /PERSISTENT:YES
 
 ```Shell
 sudo apt install sshfs cifs-utils
-sudo mkdir -p /media/samba/vm
-sudo chmod 777 /media/samba/vm
+sudo mkdir -p /mnt/samba/vm
+sudo chmod 777 /mnt/samba/vm
 
 sudo /etc/fstab
 ```
@@ -1272,7 +1274,7 @@ sudo /etc/fstab
 * Zur Datei /etc/fstab hinzufügen:
 
 ```Text
-//127.0.0.1/www /media/samba/vm cifs uid=localUsername,username=user,password=user 0 0
+//127.0.0.1/www /mnt/samba/vm cifs uid=localUsername,username=user,password=user 0 0
 ```
 
 ### Php Version wechseln
@@ -1356,3 +1358,9 @@ PhpStorm > Run > Edit Configurations > (+) Add > PHP Remote Debug
 - Filter debug connection by IDE key: true
 - Server (anlegen) > 127.0.0.1:9001 - /var/www/example (IP & Port so lassen!)
 - IDE key (Session ID): PHPSTORM
+
+## Troubleshooting
+
+### MySQL not working
+
+Set host "localhost" to "127.0.0.1".
