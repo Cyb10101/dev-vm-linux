@@ -1049,7 +1049,6 @@ zerofree -v /dev/sda1
 poweroff
 ```
 
-## Virtualbox export
+## Virtualbox import
 
-* Virtualbox > Datei > Appliance exportieren
-  - Open Virtualization Format 2.0
+To import a OVA file and configure the virtual machine see file [usage.md](create.md).
