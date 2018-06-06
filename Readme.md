@@ -152,9 +152,8 @@ gsettings set org.gnome.desktop.interface buttons-have-icons true
 gsettings set org.gtk.Settings.FileChooser show-hidden true
 gsettings set org.gnome.nautilus.preferences default-folder-viewer 'list-view'
 gsettings set org.gnome.nautilus.preferences executable-text-activation 'ask'
-```
-
 gsettings set org.gnome.nautilus.list-view default-visible-columns "['name', 'owner', 'group', 'permissions']"
+```
 
 ### Ubuntu 18.04
 ```Shell
