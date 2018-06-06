@@ -938,7 +938,7 @@ wget -O ~/Downloads/putty.msi https://the.earth.li/~sgtatham/putty/latest/w64/pu
 sudo apt -y install playonlinux
 ```
 
-* Startmenü > PlayOnLinux
+Open PlayOnLinux and create a new virtual drive
 
 * Tools > Manage Wine versions > Install latest 64 bit Wine version (current: 3.7)
 
@@ -948,7 +948,7 @@ sudo apt -y install playonlinux
     - Miscellaneous > Run a .exe file in this virtual drive > Install HeidiSQL & Putty
 	- General > Make a new shortcut from this virtual drive > heidisql.exe > Shortcut name: HeidiSQL
 
-* Remove HeidiSQL created Shortcut, Convert icon from executable
+Remove HeidiSQL created Shortcut and convert icon from executable
 
 ```Shell
 rm ~/Downloads/HeidiSQL.exe ~/Desktop/HeidiSQL.desktop ~/Desktop/HeidiSQL.lnk ~/Downloads/putty.msi
@@ -956,6 +956,18 @@ rm ~/Downloads/HeidiSQL.exe ~/Desktop/HeidiSQL.desktop ~/Desktop/HeidiSQL.lnk ~/
 # Maybe Bug on Ubuntu 16.04
 wrestool -x -t14 --name=MAINICON ~/.PlayOnLinux/wineprefix/HeidiSQL/drive_c/Program\ Files/HeidiSQL/heidisql.exe > ~/.PlayOnLinux/wineprefix/HeidiSQL/drive_c/Program\ Files/HeidiSQL/heidisql.ico
 ```
+
+Open HeidiSQL and create new session
+
+* Session Name: Localhost
+* Hostname / IP: 127.0.0.1
+* User: root
+* Password: root
+* Port: 3306
+
+Connect Server Localhost in HeidiSQL and configure it
+
+* Tools > Preferences > SQL > Editor font: Liberation Mono, 10pt
 
 ## Ubuntu 16.04: Keine Dialogbox bei automatischem Herunterfahren anzeigen
 sudo gedit /etc/acpi/powerbtn.sh
