@@ -353,6 +353,7 @@ $website = new Website();
 		-moz-box-shadow: 0 2px 0 0 rgba(0,0,0,0.1), inset 0 -2px 0 0 rgba(0,0,0,0.2);
 		box-shadow: 0 2px 0 0 rgba(0,0,0,0.1), inset 0 -2px 0 0 rgba(0,0,0,0.2);
 		border: 0;
+		outline: none;
 		cursor: pointer;
 
 		text-decoration: none;
