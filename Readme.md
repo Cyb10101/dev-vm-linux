@@ -18,10 +18,12 @@ Notes:
 Downloads:
 
 * Ubuntu 18.04, PHP <= 7.0, Docker edge:
-  - https://netslum.de/download/dev-vm-linux/UbuntuDev2018.ova
+  - https://netslum.de/download/dev-vm-linux/UbuntuDev2018Server.ova
+  - https://netslum.de/download/dev-vm-linux/UbuntuDev2018Desktop.ova
 
 * Ubuntu 16.04, PHP <= 5.4, Docker stable:
-  - https://netslum.de/download/dev-vm-linux/UbuntuDev2016.ova
+  - https://netslum.de/download/dev-vm-linux/UbuntuDev2016Server.ova
+  - https://netslum.de/download/dev-vm-linux/UbuntuDev2016Desktop.ova
 
 ## Create a virtual machine
 

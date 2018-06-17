@@ -1,37 +1,66 @@
 ## Virtualbox import
 
-* Virtualbox > Datei > Appliance importieren
-  - CPU: 4 (Maximale von grün)
-  - RAM: 2048 oder 4096 MB
+* Expert mode
+* Virtualbox > File > Import Appliance
 
-* Allgemein > Erweitert > Sicherungspunkte > verschieben
-* Massenspeicher > Festplatte 2 erstellen > Sata 1 > VMDK, dynamisch alloziert, Max available size, Name: Data
-* Netzwerk konfigurieren
-* Virtualbox Extension Pack installieren
+VirtualBox > Settings
+
+* General
+  - Advanced > Snapshot Folder: (Maybe move to other folder)
+* System
+  - Motherboard > Memory: 2048 or 4096 MB
+  - Processor > CPU: 4 (Maximum of green)
+* Storage
+  - Create new hard disk > Expert mode
+    - File location: Data (Should be on your biggest drive)
+    - File size: 1TB (Maximum of available space)
+    - Hard disk file type: VMDK
+    - Storage on physical hard disk: Dynamically allocated
+    - Sata Port 1
+* Network
+  - Configure Adapter 1
+  - Configure Adapter 2
+
+Optional: Install Virtualbox Extension Pack
 
 ## HDD2 - GParted
-* Startmenü > GParted
-* Device > Create Partition Table > GPT
+
+A second hard disk will be created to match the host system.
+For the server, I recommend doing this via an Ubuntu Desktop Live Disk
+
+* Start menu > GParted
+* Select device (/dev/sdb)
+* Device > Create Partition Table > msdos or gpt
 * Partition > New
     - File system: ext4
     - Label: Data
 
-* Startmenü > Terminal
+Reboot if you use a live disk.
+
+## HDD2 - Fstab
+
+* Start menu > Terminal
 
 ```Shell
 sudo mkdir /mnt/data
 sudo blkid | grep sdb
 
-sudo gedit /etc/fstab
+sudo vim /etc/fstab
 ```
 
-* Datei fstab anpassen
+* Ubuntu 18.04: Append to fstab
 
 ```Text
-UUID=288132af-be1e-4a3a-a2b6-1210c9816f50 /mnt/data               ext4    errors=remount-ro 0       1
+UUID=288132af-be1e-4a3a-a2b6-1210c9816f50 /mnt/data ext4 defaults 0 0
 ```
 
-* Startmenü > Terminal
+* Other Ubuntu: Append to fstab
+
+```Text
+UUID=288132af-be1e-4a3a-a2b6-1210c9816f50 /mnt/data ext4 errors=remount-ro 0 1
+```
+
+* Execute in Terminal
 
 ```Shell
 sudo mount /mnt/data
@@ -59,14 +88,16 @@ sudo mkdir -p /mnt/data/var/lib
 sudo mv /var/lib/mysql /mnt/data/var/lib/
 sudo ln -s /mnt/data/var/lib/mysql /var/lib/mysql
 
-sudo gedit /etc/apparmor.d/tunables/alias
+sudo vim /etc/apparmor.d/tunables/alias
 ```
 
-* Datei alias anpassen
+Append to file alias.
 
 ```Text
 alias /var/lib/mysql/ -> /mnt/data/var/lib/mysql/,
 ```
+
+Restart AppArmor and MySQL.
 
 ```Shell
 sudo service apparmor restart
@@ -75,14 +106,18 @@ sudo service mysql start
 
 ## Virtualbox import - Konfigurieren
 
-### SSH Key generieren (Eigene E-Mail eintragen)
+### Generate SSH Key
+
+Use your own e-mail address.
 
 ```Shell
 ssh-keygen -t rsa -b 4096 -C 'user@example.org'
 ```
 
 ### Convert SSH Key to Putty Key
-Ist nacher erreichbar über Windows Freigabe, zum Beispiel für Putty oder HeidiSQL.
+
+Can be accessed via Windows Share, for example for Putty or HeidiSQL.
+
 
 ```Shell
 puttygen /home/user/.ssh/id_rsa -o /var/www/id_rsa.ppk
@@ -90,7 +125,7 @@ puttygen /home/user/.ssh/id_rsa -o /var/www/id_rsa.ppk
 
 ### Git konfigurieren
 
-Eigener Name & E-Mail eintragen.
+Enter your own name & e-mail.
 
 ```Shell
 git config --global user.name 'Your Name'
@@ -99,16 +134,16 @@ git config --global user.email 'user@example.org'
 
 ### Development Context (User & Root)
 
-Suche nach "Development/YourName" und ersetze es in eigenen Namen.
+Search for "Development/YourName" and replace it in your own name.
 
 ```Shell
-sudo gedit /etc/apache2/conf-available/macro-virtual-host-defaults.conf
-sudo gedit /etc/nginx/snippets/fastcgi-php.conf
+sudo vim /etc/apache2/conf-available/macro-virtual-host-defaults.conf
+sudo vim /etc/nginx/snippets/fastcgi-php.conf
 ```
 
 ## Add enviroment variables
 
-Ersetze "Development/YourName" mit eigenen Namen.
+Replace "Development/YourName" with your own name.
 
 ```Shell
 sudo sh -c 'echo "TYPO3_CONTEXT=Development/YourName" >> /etc/environment'
@@ -116,8 +151,9 @@ sudo sh -c 'echo "FLOW_CONTEXT=Development/YourName" >> /etc/environment'
 sudo sh -c 'echo "WWW_CONTEXT=Development/YourName" >> /etc/environment'
 ```
 
-### Domain setzen
-Suche nach "vm00.example.org" und ersetze es in deiner Domain.
+### Set domain
+
+Search for "vm00.example.org" and replace it in your domain.
 
 ```Shell
 find /etc/apache2/sites-available /etc/nginx/sites-available -type f -exec sed -i '' \
@@ -129,27 +165,57 @@ sudo apache2ctl configtest && sudo systemctl restart apache2
 sudo nginx -t && sudo systemctl restart nginx
 ```
 
-### Hostname setzen
-Suche nach dev-vm" und ersetze es in deinem Namen.
+### Set hostname
 
-Erlaubt: a-z 0-9 - (Bindestrich)
+Search for "dev-vm" and replace it in your name.
 
-Großschreibung verzichten! Zum Beispiel: dev-your-name
+allowed: a-z 0-9 - (H1yphen)
+
+Omit capitalization! For example: dev-your-name
 
 ```Shell
-sudo gedit /etc/hostname
-sudo gedit /etc/hosts
-sudo gedit /etc/apache2/conf-available/server-name.conf
+sudo vim /etc/hostname
+sudo vim /etc/hosts
+sudo vim /etc/apache2/conf-available/server-name.conf
 ```
 
-### Optional: Set static IP in network configuration
+### Optional Ubuntu 18.04 Server: Set static IP in network configuration
+
+Edit Netplan file.
+
+```Shell
+ls /etc/netplan
+sudo vim /etc/netplan/50-cloud-init.yaml
+```
+
+Change enp0s8 in 50-cloud-init.yaml.
+
+```yaml
+network:
+    ethernets:
+        enp0s8:
+            addresses: [192.168.178.50/24]
+            gateway4: 192.168.178.1
+            nameservers:
+                addresses: [127.0.1.1, 8.8.8.8]
+```
+
+Restart network.
+
+```Shell
+sudo netplan generate && sudo netplan apply
+```
+
+### Optional Other Ubuntu: Set static IP in network configuration
+
+Get and configure interfaces.
 
 ```Shell
 ip a
-sudo gedit /etc/network/interfaces
+sudo vim /etc/network/interfaces
 ```
 
-* Datei interfaces anpassen (unten drunter dran hängen)
+Adapt file interfaces.
 
 ```text
 # Localhost configuration
@@ -164,13 +230,13 @@ iface enp0s8 inet static
 	gateway 192.168.178.1
 ```
 
-* Netzwerkkarte neu verbinden (Im Zweifelfall reboot)
+Reconnect network card, restart in case of doubt.
 
 ```Shell
 sudo ifdown -a && sudo ifup -a
 ```
 
-### Optional: Install Software
+### Optional Ubuntu Desktop: Install Software
 
  * https://atom.io/
 
@@ -178,8 +244,9 @@ sudo ifdown -a && sudo ifup -a
 sudo apt -y install terminator
 ```
 
-### Optional: Login Shell dauerhaft wechseln
-Welchsel von "bash" zu "zsh" für den aktuellen Benutzer.
+### Optional: Change login shell permanently
+
+Change from "bash" to "zsh" for the current user.
 
 ```Shell
 chsh -s $(which zsh)
@@ -187,21 +254,22 @@ chsh -s $(which zsh)
 ```
 
 ### Optional: Switch from MailCachter to Fakemail
-Nicht empfehlenswert, aber möglich.
+
+Not recommended, but possible.
 
 ```Shell
-gedit /home/user/.phpbrew/php/php-7.2.5/etc/php.ini
-gedit /home/user/.phpbrew/php/php-7.1.17/etc/php.ini
-gedit /home/user/.phpbrew/php/php-7.0.30/etc/php.ini
-gedit /home/user/.phpbrew/php/php-5.6.36/etc/php.ini
-gedit /home/user/.phpbrew/php/php-5.5.38/etc/php.ini
-gedit /home/user/.phpbrew/php/php-5.4.45/etc/php.ini
+vim /home/user/.phpbrew/php/php-7.2.5/etc/php.ini
+vim /home/user/.phpbrew/php/php-7.1.17/etc/php.ini
+vim /home/user/.phpbrew/php/php-7.0.30/etc/php.ini
+vim /home/user/.phpbrew/php/php-5.6.36/etc/php.ini
+vim /home/user/.phpbrew/php/php-5.5.38/etc/php.ini
+vim /home/user/.phpbrew/php/php-5.4.45/etc/php.ini
 
 # Ubuntu 18.04
-sudo gedit /etc/php/7.2/mods-available/mailcatcher.ini
+sudo vim /etc/php/7.2/mods-available/mailcatcher.ini
 
 # Ubuntu 16.04
-sudo gedit /etc/php/7.0/mods-available/mailcatcher.ini
+sudo vim /etc/php/7.0/mods-available/mailcatcher.ini
 ```
 
 ```INI
@@ -218,13 +286,15 @@ sudo reboot
 ## Documentation - What can i do?
 
 ### Passwörter
-Die Passwörter der Linux Benutzer heißen genauso wie die Benutzernamen.
 
-* Benutzer: root | Passwort: root
-* Benutzer: user | Passwort: user
+The passwords of Linux users are the same as the user names.
 
-Der MySQL Zugang:
-* Benutzer: root | Passwort: root
+* Username: root | Password: root
+* Username: user | Password: user
+
+The MySQL access:
+
+* Username: root | Password: root
 
 ### SSHFS share - Linux configuration
 
@@ -237,7 +307,7 @@ Run in a terminal window:
 sudo apt install sshfs
 sudo mkdir -p /mnt/ssh/vm
 
-gedit ~/.bashrc && gedit ~/.zshrc
+vim ~/.bashrc && vim ~/.zshrc
 ```
 
 Append to file ~/.bashrc and ~/.zshrc:
@@ -301,11 +371,11 @@ php -v
 You can use DNS Server for the example.vm domains to work.
 IP address (123.123.123.123) must be adapted for the virtual machine.
 
-#### Linux DNS Server
+#### DNS Server - Linux Ubuntu Desktop
 
 ```Shell
 # sudo apt install resolvconf
-sudo gedit /etc/NetworkManager/NetworkManager.conf
+sudo vim /etc/NetworkManager/NetworkManager.conf
 ```
 
 Append to file: /etc/NetworkManager/NetworkManager.conf
@@ -330,9 +400,10 @@ Download and install: http://mayakron.altervista.org/wikibase/show.php?id=Acryli
 Open Systemsteuerung > Netzwerk und Internet > Netzwerkverbindungen
 
 Edit network > Internetprotocol, Version 4 (TCP/IPv4) > Folgende DNS-Serveradressen verwenden
+
 * Bevorzugter DNS-Server: 127.0.0.1
 
-Startmenü > Acrylic DNS Proxy > Edit Acrylic Hosts File
+Start menu > Acrylic DNS Proxy > Edit Acrylic Hosts File
 
 Append with your virtual machine IP:
 
@@ -340,40 +411,44 @@ Append with your virtual machine IP:
 123.123.123.123 /.*\.vm$
 ```
 
-Startmenü > Acrylic DNS Proxy
+Start menu > Acrylic DNS Proxy
+
 * Stop Acrylic Service
 * Start Acrylic Service
 
 ### E-Mail - MailCachter
-Wird der MailCachter verwendet. Können E-Mails zu dieser SMTP Adresse versendet werden:
+
+If the MailCachter is used, e-mails can be sent to this SMTP address:
 
 ```Text
 smtp://127.0.0.1:1025
 ```
 
-Um zu sehen, ob eine E-Mail versendet wurde, kann man auf diese Webseite gehen.
-IP-Adresse muss außerhalb der virtuellen Maschine angepasst werden.
+To see if an e-mail has been sent, you can go to this website.
+IP address must be adjusted outside the virtual machine.
 
 ```Text
 http://127.0.0.1:1080/
 ```
 
 ### Apache & Nginx
-Alle Seiten welche normal aufgerufen werden, also über die Ports 80 & 443, gehen auf den Nginx.
-Für den Apache gibt es die Ports 8080 & 4430.
 
-Über einen apache-proxy (siehe config) im Nginx, kann man den Verkehr durchleiten zum Apache,
-falls es über die Standardports 80 & 443 gehen soll.
+All pages which are called normally, ie via the ports 80 & 443, go to the nginx.
+Apache has ports 8080 & 4430.
 
-In der Regel wird pro Domain eine Konfiguration angelegt.
-Beispiel Dateien sind nginx-demo oder apache-demo.
+Via an apache-proxy (see config) in nginx, one can pass the traffic to Apache,
+if it should go over the standard ports 80 & 443.
 
-### Apache & Nginx - Wildcard Domain
-Für verrückte oder faule gibt es die Möglichkeit Wildcard Domains zu verwenden.
-Der Nachteil ist, dass die PHP Version für alle Domains gleich ist.
-In den Dateien zzz-wildcard-* kann man das konfigurieren.
+As a rule, a configuration is created per domain.
+Example files are nginx-demo or apache-demo.
 
-* Wildcard für Lokale Domains
+### Apache & Nginx - Wildcard domain
+
+For crazy or lazy there is the possibility to use wildcard domains.
+The downside is that the PHP version is the same for all domains.
+In zzz-wildcard-* you can configure this.
+
+Wildcard for local domains:
 
 ```Text
 *.*.*.dev.vm -> www.example.org.dev.vm -> /var/www/example.org/www/public
@@ -383,7 +458,7 @@ In den Dateien zzz-wildcard-* kann man das konfigurieren.
 *.vm -> example.vm -> /var/www/example/public
 ```
 
-* Wildcard für externe Domains
+* Wildcard for extern domains:
 
 ```Text
 *.*.*.dev.vm00.example.org -> www.example.org.dev.vm00.example.org -> /var/www/example.org/www/public
@@ -394,14 +469,15 @@ In den Dateien zzz-wildcard-* kann man das konfigurieren.
 ```
 
 ### PHP extension xDebug & IDE (PhpStorm)
+
 PhpStorm > Run > Start Listening for PHP Debug Connections
 
 @todo
-PhpStorm reagiert automatisch, wenn die Seite neu geladen wird.
-Der Server muss dann zu PhpStorm hinzugefügt werden.
+PhpStorm responds automatically when the page is reloaded.
+The server must then be added to PhpStorm.
 
-Macht das hier überflüssig: xdebug.remote_host=192.168.56.1
-Würde sowieso wegen anderer Einstellung nicht funktionieren.
+Make this unnecessary: xdebug.remote_host=192.168.56.1
+Would not work anyway because of other settings.
 
 @deprecated
 PhpStorm > Run > Edit Configurations > Defaults > PHP Remote Debug
