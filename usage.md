@@ -169,7 +169,7 @@ sudo nginx -t && sudo systemctl restart nginx
 
 Search for "dev-vm" and replace it in your name.
 
-allowed: a-z 0-9 - (H1yphen)
+Allowed: a-z 0-9 - (Hyphen)
 
 Omit capitalization! For example: dev-your-name
 
