@@ -26,11 +26,19 @@ VirtualBox > Settings
   - Adapter 1, NAT
   - Adapter 2, Bridged Adapter, eth1 (Your network device)
 
-## Install Ubuntu (16.04 or 18.04)
+## Choose Ubuntu Desktop or Server
+
+Desktop and servers both have their advantages and disadvantages.
+The desktop has a user interface that is easy for newbies.
+The server consumes less disk space, memory and so on.
+Choose your version wisely.
+
+* Download Ubuntu: https://ubuntu.com/
+
+### Install Ubuntu Desktop (16.04 or 18.04)
 
 Note: Ubuntu 18.04, has no PHP 5.* and docker ready.
 
-* Download Ubuntu: https://ubuntu.com/
 * For Ubuntu 18.04: Full installation
 
 * Your name: user
@@ -42,73 +50,191 @@ Note: Ubuntu 18.04, has no PHP 5.* and docker ready.
 * System Settings > Display Resolution: 1280x800
 * Icons: Nautilus, Firefox, Terminal
 
+
+### Install Ubuntu Server 16.04
+
+Note: Ubuntu 18.04, has no PHP 5.* and docker ready.
+
+* Language: English
+* Install Ubuntu Server
+
+* Language: English
+* Country: United States
+* Optional: Detect Keyboard Layout
+* Select Primary Network interface
+
+* Hostname: dev-vm
+* Full name: user
+* Username: user
+* Passwort: user
+
+* Encrypt home directory: No (Your preference)
+* Time zone: Europe/Berlin (Your preference)
+* Partition method: Guided - use the entire disk
+  - SCSI1 (0,0,0) (sda) - 80 GB ATA VBOX HARDDISK
+
+* HTTP proxy: (empty)
+* No automatic updates
+* Software
+  - standard system utilities
+  - OpenSSH server
+* Install GRUB boot loader = Yes
+* Reboot
+
+### Install Ubuntu Server 18.04
+
+Note: Ubuntu 18.04, has no PHP 5.* and docker ready.
+
+* Page 1:
+  - Language: English
+* Page 2: (Your preference)
+  - Layout: English (US)
+  - Variant: English (US)
+* Page 3: (Install Ubuntu)
+* Page 4:
+  - Network configuration
+  - Proxy address: (empty)
+* Page 5: (bypassed)
+* Page 6:
+  - Use an Entire Disk
+  - VBOX_HARDDISK_...
+
+  * Your name: user
+  * Your Server's name: dev-vm
+  * Username: user
+  * Passwort: user
+* Page 7: (bypassed)
+* Page 8: (Installation running)
+* Page 9: (Reboot)
+
+## Procceed the installation
+
+Set password for root account with password: root
+
 ```Shell
 sudo passwd root
 ```
 
-* Root Passwort: root
-
-### Clone repository
-
-```Shell
-sudo apt -y install git
-git clone https://github.com/Cyb10101/dev-vm-linux.git /home/user/Desktop/dev-vm-linux
-rsync -av /home/user/Desktop/dev-vm-linux/home/user/ /home/user/
-```
-
-### Configure System
+Enable repository, update system and install software.
 
 ```Shell
 sudo add-apt-repository multiverse
 sudo apt update
 sudo apt -y dist-upgrade
-sudo apt -y install curl gparted htop meld nautilus-compare openssh-server \
-  putty-tools vim whois net-tools resolvconf
 
+sudo apt -y install openssh-server \
+  curl gparted git htop meld nautilus-compare \
+  putty-tools vim whois net-tools resolvconf
+```
+
+Configure prefered editor (vim.basic).
+
+```Shell
 sudo update-alternatives --config editor
 ```
 
-* Editor ändern, zum Beispiel auf vim.basic
+Optional: Add german language pack.
+
+```Shell
+sudo apt-get install language-pack-de
+```
+
+### Visudo: No password for user
 
 ```Shell
 sudo visudo
 ```
 
-* Datei visudo, am Ende hinzufügen
+Append in file visudo:
 
 ```text
 user ALL=(ALL) NOPASSWD: ALL
 ```
+
+### Ubuntu Desktop: VirtualBox Group
+
+Set VirtualBox group to user.
 
 ```Shell
 sudo usermod -aG vboxsf ${USER}
 sudo reboot
 ```
 
-## Grub konfigurieren
+### Ubuntu 16.04 Server: Configure network interfaces
 
 ```Shell
-sudo gedit /etc/default/grub
+ip a
+sudo vim /etc/network/interfaces
 ```
 
-* Remove quiet splash
+File: interfaces
+
+```Shell
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# Network 1
+auto enp0s3
+iface enp0s3 inet dhcp
+
+# Network 2
+auto enp0s8
+iface enp0s8 inet dhcp
+```
+
+Restart network interfaces.
+
+```Shell
+sudo ifdown -a && sudo ifup -a
+```
+
+### Repository
+
+Clone Reository.
+
+```Shell
+git clone https://github.com/Cyb10101/dev-vm-linux.git /home/user/dev-vm-linux
+```
+
+#### Ubuntu Desktop
+
+```Shell
+rsync -av /home/user/dev-vm-linux/home/user/ /home/user/
+```
+
+#### Ubuntu Server
+
+```Shell
+rsync -av /home/user/dev-vm-linux/home/user/.* /home/user/
+cp /home/user/dev-vm-linux/home/user/xdebug.sh /home/user/
+```
+
+## Ubuntu Desktop: Configure Grub
+
+```Shell
+sudo vim /etc/default/grub
+```
+
+Remove "quiet splash" in grub file.
 
 ```INI
 GRUB_CMDLINE_LINUX_DEFAULT=""
 ```
 
-* Grub aktualisieren
+Update Grub and write new entries.
 
 ```Shell
 sudo update-grub
 ```
 
 ### Optional: Pretest PhpBrew Versions and update PHP
-Im Script die PHP Versionen für die Installation aktualisieren.
 
-* Snapshot erstellen, PHP installieren, PhpBrew installieren
-* Verfügbare PHP Versionen abfragen und aktualisieren
-* Snapshot zurücksetzen
+In the script update the PHP versions for the installation.
+
+* Create Snapshot, install PHP, install PhpBrew
+* Query and update available PHP versions
+* Reset snapshot
 
 ```Shell
 sudo apt -y install php
@@ -129,7 +255,7 @@ mv etc/nginx/snippets/php-7.0.29.conf etc/nginx/snippets/php-7.0.30.conf
 mv etc/nginx/snippets/php-5.6.34.conf etc/nginx/snippets/php-5.6.36.conf
 ```
 
-## Betriebssystem konfigurieren
+## Ubuntu Desktop: Configure operating system
 
 ```Shell
 gsettings set org.gnome.desktop.session idle-delay 0
@@ -145,23 +271,24 @@ gsettings set org.gnome.nautilus.preferences executable-text-activation 'ask'
 gsettings set org.gnome.nautilus.list-view default-visible-columns "['name', 'owner', 'group', 'permissions']"
 ```
 
-### Ubuntu 18.04
+### Ubuntu 18.04 Desktop
 ```Shell
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'nothing'
 gsettings set org.gnome.nautilus.preferences executable-text-activation 'ask'
 ```
 
-### Ubuntu 16.04
+### Ubuntu 16.04 Desktop
 ```Shell
 gsettings set org.gnome.desktop.interface clock-show-date true
 gsettings set com.canonical.indicator.session show-real-name-on-panel true
 gsettings set com.canonical.Unity integrated-menus true
 ```
 
-* Ubuntu 16.04: System Settings > Security & Privacy > Files & Applications > Record file and application usage = Off
+* Ubuntu 16.04 Desktop: System Settings > Security & Privacy > Files & Applications > Record file and application usage = Off
 
-### Optional: Watcher für Änderungen an der Konfiguration
-Für weitere Konfiguration, kann man diese Tools verwenden.
+### Optional: Watcher for changes to the configuration
+
+For further configuration, you can use these tools.
 
 ```Shell
 dconf watch /
@@ -172,8 +299,8 @@ gsettings list-recursively | grep search
 ## Configure Bash (User & Root)
 
 ```Shell
-sudo cp /home/user/Desktop/dev-vm-linux/home/user/.bashrc-user /root/
-gedit ~/.bashrc && sudo gedit /root/.bashrc
+sudo cp /home/user/dev-vm-linux/home/user/.bashrc-user /root/
+vim ~/.bashrc && sudo vim /root/.bashrc
 ```
 
 * Zur .bashrc hinzufügen
@@ -186,8 +313,8 @@ source ~/.bashrc-user
 
 ```Shell
 sudo apt -y install zsh
-sudo rsync -av /home/user/Desktop/dev-vm-linux/home/user/.zshrc /root/
-sudo rsync -av /home/user/Desktop/dev-vm-linux/home/user/.oh-my-zsh/ /root/.oh-my-zsh/
+sudo rsync -av /home/user/dev-vm-linux/home/user/.zshrc /root/
+sudo rsync -av /home/user/dev-vm-linux/home/user/.oh-my-zsh/ /root/.oh-my-zsh/
 git clone https://github.com/robbyrussell/oh-my-zsh.git /tmp/.oh-my-zsh
 
 rsync -av /tmp/.oh-my-zsh/ ~/.oh-my-zsh/
@@ -196,9 +323,35 @@ sudo rsync -av /tmp/.oh-my-zsh/ /root/.oh-my-zsh/
 
 ## DNS Server (example.vm)
 
+Add own machine to hosts file.
+
 ```Shell
+sudo vim /etc/hosts
+```
+
+Edit or append to hosts file.
+
+```Shell
+127.0.1.1    dev-vm
+```
+
+Install Dnsmasq and configure resolv.conf.
+
+```Shell
+sudo apt -y install dnsmasq
+sudo sh -c 'echo "nameserver 127.0.1.1" >> /etc/resolvconf/resolv.conf.d/head'
+sudo sh -c 'echo "nameserver 8.8.8.8" >> /etc/resolvconf/resolv.conf.d/head'
+```
+
+### Ubuntu Desktop
+
+Configure Dnsmasq and NetworkManager.
+
+```Shell
+sudo sh -c 'echo "address=/.vm/127.0.0.1" >> /etc/NetworkManager/dnsmasq.d/development'
+
 # sudo apt install resolvconf
-sudo gedit /etc/NetworkManager/NetworkManager.conf
+sudo vim /etc/NetworkManager/NetworkManager.conf
 ```
 
 Append to file: /etc/NetworkManager/NetworkManager.conf
@@ -209,11 +362,71 @@ dns=dnsmasq
 ```
 
 ```Shell
-sudo sh -c 'echo "nameserver 127.0.1.1" >> /etc/resolvconf/resolv.conf.d/head'
-sudo sh -c 'echo "nameserver 8.8.8.8" >> /etc/resolvconf/resolv.conf.d/head'
-sudo sh -c 'echo "address=/.vm/127.0.0.1" >> /etc/NetworkManager/dnsmasq.d/development'
 sudo systemctl restart network-manager
 sudo resolvconf -u
+```
+
+### Ubuntu 16.04 Server
+
+Configure Dnsmasq.
+
+```Shell
+sudo sh -c 'echo "address=/.vm/127.0.0.1" >> /etc/dnsmasq.conf'
+
+sudo service dnsmasq restart
+sudo resolvconf -u
+```
+
+### Ubuntu 18.04 Server
+
+Configure Dnsmasq.
+
+```Shell
+sudo sh -c 'echo "address=/.vm/127.0.0.1" >> /etc/dnsmasq.conf'
+```
+
+Edit Netplan file.
+
+```Shell
+ls /etc/netplan
+sudo vim /etc/netplan/50-cloud-init.yaml
+```
+
+Edit 50-cloud-init.yaml.
+
+```yaml
+network:
+    version: 2
+    ethernets:
+        enp0s3:
+            addresses: []
+            dhcp4: true
+            optional: true
+            nameservers:
+                addresses: [127.0.1.1, 8.8.8.8]
+        enp0s8:
+            addresses: []
+            dhcp4: true
+            optional: true
+            nameservers:
+                addresses: [127.0.1.1, 8.8.8.8]
+```
+
+Configure Dnsmasq and restart network.
+
+```Shell
+sudo service dnsmasq restart
+sudo netplan generate && sudo netplan apply
+sudo resolvconf -u
+```
+
+### All Ubuntu: DNS Server Status
+
+```Shell
+cat /etc/resolv.conf
+ping example.vm
+
+systemd-resolve --status
 ```
 
 ## System Webserver (Apache)
@@ -233,9 +446,9 @@ sudo a2enmod actions alias deflate expires headers macro rewrite proxy proxy_fcg
 sudo apt -y install imagemagick graphicsmagick
 # sudo apt -y install graphicsmagick graphicsmagick-imagemagick-compat
 
-sudo rsync -av /home/user/Desktop/dev-vm-linux/etc/apache2/conf-available/ /etc/apache2/conf-available/
-sudo rsync -av /home/user/Desktop/dev-vm-linux/etc/apache2/sites-available/ /etc/apache2/sites-available/
-sudo cp /home/user/Desktop/dev-vm-linux/etc/apache2/ports.conf /etc/apache2/
+sudo rsync -av /home/user/dev-vm-linux/etc/apache2/conf-available/ /etc/apache2/conf-available/
+sudo rsync -av /home/user/dev-vm-linux/etc/apache2/sites-available/ /etc/apache2/sites-available/
+sudo cp /home/user/dev-vm-linux/etc/apache2/ports.conf /etc/apache2/
 sudo chown -R user:user /etc/apache2/sites-available
 sudo chown -R user:user /etc/apache2/sites-enabled
 sudo usermod -aG adm ${USER}
@@ -246,15 +459,17 @@ sudo find /var/www -type d -exec chmod 775 {} \;
 sudo find /var/www -type f -exec chmod 664 {} \;
 sudo find /var/www -type d -exec chmod g+s {} \;
 
-sudo gedit /etc/apache2/envvars
+sudo vim /etc/apache2/envvars
 ```
 
-* Datei envvars anpassen
+Configure file envvars.
 
 ```Text
 export APACHE_RUN_USER=user
 export APACHE_RUN_GROUP=user
 ```
+
+Enable configuration and websites.
 
 ```Shell
 sudo a2enconf macro-fancy-indexing.conf
@@ -272,13 +487,13 @@ sudo apache2ctl configtest && sudo systemctl restart apache2
 
 ```Shell
 sudo apt -y install nginx nginx-extras
-sudo rsync -av /home/user/Desktop/dev-vm-linux/etc/nginx/sites-available/ /etc/nginx/sites-available/
-sudo rsync -av /home/user/Desktop/dev-vm-linux/etc/nginx/snippets/ /etc/nginx/snippets/
+sudo rsync -av /home/user/dev-vm-linux/etc/nginx/sites-available/ /etc/nginx/sites-available/
+sudo rsync -av /home/user/dev-vm-linux/etc/nginx/snippets/ /etc/nginx/snippets/
 sudo chown -R user:user /etc/nginx/sites-available
 sudo chown -R user:user /etc/nginx/sites-enabled
 sudo chown -R user:user /etc/nginx/snippets
 
-sudo gedit /etc/nginx/nginx.conf
+sudo vim /etc/nginx/nginx.conf
 ```
 
 * Datei nginx.conf anpassen
@@ -298,7 +513,7 @@ http {
 ```
 
 ```Shell
-sudo gedit /etc/nginx/snippets/fastcgi-php.conf
+sudo vim /etc/nginx/snippets/fastcgi-php.conf
 ```
 
 * Datei fastcgi-php.conf am ende hinzufügen
@@ -333,16 +548,16 @@ phpbrew known
 
 ### PhpBrew - Add configuration to bash or zsh
 ```Shell
-gedit ~/.bashrc && gedit ~/.zshrc
+vim ~/.bashrc && vim ~/.zshrc
 ```
 
-* Dateien .bashrc & .zshrc am Ende hinzufügen
+Append on end to files .bashrc & .zshrc
 
 ```Shell
 source /home/user/.phpbrew/bashrc
 ```
 
-* Reboot
+Reboot operating system.
 
 ### PhpBrew - Requirements
 
@@ -571,12 +786,12 @@ phpbrew ext install xdebug 2.4.1
 ```Shell
 phpbrew switch php-7.2.5
 
-gedit /home/user/.phpbrew/php/php-7.2.5/etc/php.ini
-gedit /home/user/.phpbrew/php/php-7.1.17/etc/php.ini
-gedit /home/user/.phpbrew/php/php-7.0.30/etc/php.ini
-gedit /home/user/.phpbrew/php/php-5.6.36/etc/php.ini
-gedit /home/user/.phpbrew/php/php-5.5.38/etc/php.ini
-gedit /home/user/.phpbrew/php/php-5.4.45/etc/php.ini
+vim /home/user/.phpbrew/php/php-7.2.5/etc/php.ini
+vim /home/user/.phpbrew/php/php-7.1.17/etc/php.ini
+vim /home/user/.phpbrew/php/php-7.0.30/etc/php.ini
+vim /home/user/.phpbrew/php/php-5.6.36/etc/php.ini
+vim /home/user/.phpbrew/php/php-5.5.38/etc/php.ini
+vim /home/user/.phpbrew/php/php-5.4.45/etc/php.ini
 ```
 
 * PHP all
@@ -612,34 +827,43 @@ always_populate_raw_post_data = -1
 ### PhpBrew - Configure PHP extension xDebug
 
 ```Shell
-cp snippets/xdebug.ini /home/user/.phpbrew/php/php-7.2.5/var/db/
-cp snippets/xdebug.ini /home/user/.phpbrew/php/php-7.1.17/var/db/
-cp snippets/xdebug.ini /home/user/.phpbrew/php/php-7.0.30/var/db/
-cp snippets/xdebug.ini /home/user/.phpbrew/php/php-5.6.36/var/db/
-cp snippets/xdebug.ini /home/user/.phpbrew/php/php-5.5.38/var/db/
-cp snippets/xdebug.ini /home/user/.phpbrew/php/php-5.4.45/var/db/
+cp /home/user/dev-vm-linux/snippets/xdebug.ini /home/user/.phpbrew/php/php-7.2.5/var/db/
+cp /home/user/dev-vm-linux/snippets/xdebug.ini /home/user/.phpbrew/php/php-7.1.17/var/db/
+cp /home/user/dev-vm-linux/snippets/xdebug.ini /home/user/.phpbrew/php/php-7.0.30/var/db/
+cp /home/user/dev-vm-linux/snippets/xdebug.ini /home/user/.phpbrew/php/php-5.6.36/var/db/
+cp /home/user/dev-vm-linux/snippets/xdebug.ini /home/user/.phpbrew/php/php-5.5.38/var/db/
+cp /home/user/dev-vm-linux/snippets/xdebug.ini /home/user/.phpbrew/php/php-5.4.45/var/db/
 
-gedit /home/user/.phpbrew/php/php-5.4.45/var/db/xdebug.ini
+vim /home/user/.phpbrew/php/php-5.4.45/var/db/xdebug.ini
 ```
 
-* Konfiguration für PHP 5.4 anpassen
+Change configuration for PHP 5.4.
 
 ```INI
 zend_extension=/home/user/.phpbrew/php/php-5.4.45/lib/php/extensions/no-debug-non-zts-20100525/xdebug.so
 ```
 
-* Disable xDebug (N)
+Disable xDebug (Type: N).
 
 ```Shell
-/home/user/Desktop/xdebug.sh
+/home/user/xdebug.sh
+```
+
+### PhpBrew cleanups
+
+Ubuntu 18.04: Find not used php versions and remove them.
+
+```Shell
+grep -linrE '5.6.36|5.5.38|5.4.45' /etc/apache2 /etc/nginx /home/user/.start-php-fpm.sh /home/user/Desktop/xdebug.sh
 ```
 
 ### PhpBrew autostart
+
 ```Shell
-sudo gedit /etc/crontab
+sudo vim /etc/crontab
 ```
 
-* Datei crontab anpassen
+Append on end in file crontab.
 
 ```Text
 @reboot user /home/user/.start-php-fpm.sh
@@ -671,10 +895,10 @@ sudo apt -y install mysql-server php-mysql
 ### MySQL - Configuration
 
 ```Shell
-sudo gedit /etc/mysql/my.cnf
+sudo vim /etc/mysql/my.cnf
 ```
 
-* Datei my.cnf hinzufügen
+Append on end in file my.cnf:
 
 ```INI
 [client]
@@ -695,16 +919,19 @@ sql_mode=""
 default-character-set=utf8
 ```
 
+Restart MySQL.
+
 ```Shell
 sudo service mysql restart
 ```
 
-###  MySQL - Zugriff von normalen Benutzer ermöglichen
+###  MySQL - Allow access from normal users
+
 ```Shell
 sudo mysql
 ```
 
-* SQL ausführen
+* Run SQL code
 
 ```sql
 SELECT host, user FROM mysql.user;
@@ -718,12 +945,14 @@ FLUSH PRIVILEGES;
 ```
 
 ## FakeMail
+
 ```Shell
 sudo apt -y install tofrodos ack-grep
-sudo cp /home/user/Desktop/dev-vm-linux/usr/sbin/sendmailfake /usr/sbin/
+sudo cp /home/user/dev-vm-linux/usr/sbin/sendmailfake /usr/sbin/
 ```
 
 ## MailCachter
+
 https://mailcatcher.me/
 
 ```Shell
@@ -731,10 +960,10 @@ sudo apt -y install build-essential libsqlite3-dev ruby-dev
 
 sudo gem install mailcatcher
 
-sudo gedit /etc/crontab
+sudo vim /etc/crontab
 ```
 
-* Datei crontab hinzufügen
+Add at the end of the crontab file.
 
 ```Text
 @reboot root $(which mailcatcher) --ip=0.0.0.0
@@ -744,24 +973,26 @@ sudo gedit /etc/crontab
 
 ```Shell
 # Ubuntu 18.04
-sudo gedit /etc/php/7.2/mods-available/mailcatcher.ini
+sudo vim /etc/php/7.2/mods-available/mailcatcher.ini
 
 # Ubuntu 16.04
-sudo gedit /etc/php/7.0/mods-available/mailcatcher.ini
+sudo vim /etc/php/7.0/mods-available/mailcatcher.ini
 ```
 
-* Datei mailcatcher.ini hinzufügen
+Append to file mailcatcher.ini:
 
 ```Text
 sendmail_path = /usr/bin/env /usr/local/bin/catchmail -t -f 'www-data@localhost'
 ;sendmail_path = /usr/sbin/sendmailfake
 ```
 
+Activate MailCachter.
+
 ```Shell
 sudo phpenmod mailcatcher
 ```
 
-* Reboot
+Reboot operating system.
 
 ## Composer
 https://getcomposer.org/download/
@@ -779,7 +1010,7 @@ https://packagist.org/packages/typo3/cms-base-distribution
 
 ```Shell
 sudo rm -rf /var/www/html
-sudo rsync -av var/www/ /var/www/
+sudo rsync -av /home/user/dev-vm-linux/var/www/ /var/www/
 
 # PHP <= 7.2 - No LTS version - Long term support
 # composer create-project typo3/cms-base-distribution /var/www/typo3demo ^9
@@ -799,7 +1030,7 @@ php /var/www/typo3demo/vendor/bin/typo3cms install:setup \
     --site-setup-type=site
 ```
 
-## Firefox Browser
+## Ubuntu Desktop: Firefox Browser
 * Activate Bookmarks Toolbar
 
 * MailCachter
@@ -875,13 +1106,11 @@ docker rmi $(docker images -q)
 
 ```Shell
 sudo apt -y install samba
-sudo gedit /etc/samba/smb.conf
-sudo smbpasswd -a user
-# Password: user
-sudo service smbd restart
+
+sudo vim /etc/samba/smb.conf
 ```
 
-### Samba /etc/samba/smb.conf
+Configure Samba /etc/samba/smb.conf:
 
 ```Text
 [global]
@@ -903,6 +1132,13 @@ sudo service smbd restart
   wide links = yes
   force user = user
   force group = user
+```
+
+```Shell
+sudo smbpasswd -a user
+# Password: user
+
+sudo service smbd restart
 ```
 
 ## NPM - Node Package Manager
@@ -935,7 +1171,7 @@ sudo apt update
 sudo apt install --no-install-recommends yarn
 ```
 
-## HeidiSQL
+## Ubuntu Desktop: HeidiSQL
 
 * https://www.heidisql.com/
 * https://www.chiark.greenend.org.uk/~sgtatham/putty/
@@ -947,7 +1183,7 @@ wget -O ~/Downloads/putty.msi https://the.earth.li/~sgtatham/putty/latest/w64/pu
 sudo apt -y install playonlinux
 ```
 
-Open PlayOnLinux and create a new virtual drive
+Open PlayOnLinux and create a new virtual drive.
 
 * Tools > Manage Wine versions > Install latest 64 bit Wine version (current: 3.7)
 
@@ -957,7 +1193,7 @@ Open PlayOnLinux and create a new virtual drive
     - Miscellaneous > Run a .exe file in this virtual drive > Install HeidiSQL & Putty
 	- General > Make a new shortcut from this virtual drive > heidisql.exe > Shortcut name: HeidiSQL
 
-Remove HeidiSQL created Shortcut and convert icon from executable
+Remove HeidiSQL created Shortcut and convert icon from executable.
 
 ```Shell
 rm ~/Downloads/HeidiSQL.exe ~/Desktop/HeidiSQL.desktop ~/Desktop/HeidiSQL.lnk ~/Downloads/putty.msi
@@ -966,7 +1202,7 @@ rm ~/Downloads/HeidiSQL.exe ~/Desktop/HeidiSQL.desktop ~/Desktop/HeidiSQL.lnk ~/
 wrestool -x -t14 --name=MAINICON ~/.PlayOnLinux/wineprefix/HeidiSQL/drive_c/Program\ Files/HeidiSQL/heidisql.exe > ~/.PlayOnLinux/wineprefix/HeidiSQL/drive_c/Program\ Files/HeidiSQL/heidisql.ico
 ```
 
-Open HeidiSQL and create new session
+Open HeidiSQL and create new session.
 
 * Session Name: Localhost
 * Hostname / IP: 127.0.0.1
@@ -974,19 +1210,25 @@ Open HeidiSQL and create new session
 * Password: root
 * Port: 3306
 
-Connect Server Localhost in HeidiSQL and configure it
+Connect Server Localhost in HeidiSQL and configure it.
 
 * Tools > Preferences > SQL > Editor font: Liberation Mono, 10pt
 
-## Ubuntu 16.04: Keine Dialogbox bei automatischem Herunterfahren anzeigen
-sudo gedit /etc/acpi/powerbtn.sh
-Am Anfang vom Script:
+## Ubuntu 16.04 Desktop: Do not display a dialog box on ACPI shutdown
+
+```Shell
+sudo vim /etc/acpi/powerbtn.sh
+```
+
+At the top of the file:
+
 ```Shell
 /sbin/shutdown -h now 'Power button pressed' && exit 0
 ```
 
-### Optional: Set Wallpaper
-Kann selbstverständlich auch über Einstellungen konfiguriert werden.
+### Optional Ubuntu Desktop: Set Wallpaper
+
+Can of course also be configured via settings.
 
 ```Shell
 ls /home/user/Pictures
@@ -995,7 +1237,7 @@ gsettings set org.gnome.desktop.background picture-uri "file:///home/user/Pictur
 gsettings set org.gnome.desktop.background picture-options 'zoom'
 ```
 
-* Ubuntu 18.04 zusätzlich für Sperrbildschirm
+Ubuntu 18.04: Additionally for lock screen
 
 ```Shell
 gsettings set org.gnome.desktop.screensaver picture-uri "file:///home/user/Pictures/wallpaper.jpg"
@@ -1004,7 +1246,7 @@ gsettings set org.gnome.desktop.screensaver picture-options 'zoom'
 
 ## Cleanups
 
-* Gemeinsame Ordner: entfernen
+* Shared folders: remove
 
 ```Shell
 sudo chown -R user:user /etc/apache2/sites-available
@@ -1014,7 +1256,7 @@ sudo chown -R user:user /etc/nginx/sites-enabled
 
 sudo rm /home/user/.local/share/recently-used.xbel
 
-rm -rf /home/user/Desktop/dev-vm-linux
+rm -rf /home/user/dev-vm-linux
 
 # Ubuntu 18.04
 gio trash --empty
@@ -1034,7 +1276,7 @@ rm /home/user/.zsh_history
 rm /root/.mysql_history
 rm /root/.bash_history
 rm /root/.zsh_history
-reboot
+poweroff
 ```
 
 ## Recommended: Shrink hard disk for export
@@ -1048,6 +1290,12 @@ blkid
 zerofree -v /dev/sda1
 poweroff
 ```
+
+## Virtualbox export
+
+* Expert mode
+* Virtualbox > File > Export Appliance
+  - Open Virtualization Format 2.0
 
 ## Virtualbox import
 
