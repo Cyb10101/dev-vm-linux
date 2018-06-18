@@ -216,10 +216,10 @@ cp /home/user/dev-vm-linux/home/user/xdebug.sh /home/user/
 sudo vim /etc/default/grub
 ```
 
-Remove "quiet splash" in grub file.
+Remove "quiet splash" add "" in grub file.
 
 ```INI
-GRUB_CMDLINE_LINUX_DEFAULT=""
+GRUB_CMDLINE_LINUX_DEFAULT="consoleblank=0"
 ```
 
 Update Grub and write new entries.
@@ -319,6 +319,8 @@ git clone https://github.com/robbyrussell/oh-my-zsh.git /tmp/.oh-my-zsh
 
 rsync -av /tmp/.oh-my-zsh/ ~/.oh-my-zsh/
 sudo rsync -av /tmp/.oh-my-zsh/ /root/.oh-my-zsh/
+sudo chown -R root:root /root/.oh-my-zsh
+sudo chown root:root /root/.zshrc
 ```
 
 ## DNS Server (example.vm)
