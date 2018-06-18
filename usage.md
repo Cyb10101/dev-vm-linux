@@ -20,6 +20,12 @@ VirtualBox > Settings
 * Network
   - Configure Adapter 1
   - Configure Adapter 2
+  - Configure Adapter 3
+    - Enable Network Adapter = True
+    - Attached to: Host-only Adapter
+    - Name: (Virtualbox)
+    - Adapter Type: Intel PRO/1000 MT Desktop (82540EM)
+    - Promiscuous Mode: Allow All
 
 Optional: Install Virtualbox Extension Pack
 
