@@ -817,6 +817,9 @@ date.timezone = Europe/Berlin
 [mail function]
 sendmail_path = /usr/bin/env /usr/local/bin/catchmail -t -f 'www-data@localhost'
 ;sendmail_path = /usr/sbin/sendmailfake
+
+[Session]
+session.gc_maxlifetime = 86400
 ```
 
 * PHP <= 5.6
@@ -1256,8 +1259,6 @@ sudo chown -R user:user /etc/apache2/sites-enabled
 sudo chown -R user:user /etc/nginx/sites-available
 sudo chown -R user:user /etc/nginx/sites-enabled
 
-sudo rm /home/user/.local/share/recently-used.xbel
-
 rm -rf /home/user/dev-vm-linux
 
 # Ubuntu 18.04
@@ -1272,6 +1273,7 @@ sudo apt update && sudo apt -y dist-upgrade && sudo apt -y autoremove
 sudo /opt/VBoxGuestAdditions-*/uninstall.sh
 
 sudo su
+rm /home/user/.local/share/recently-used.xbel
 rm /home/user/.mysql_history
 rm /home/user/.bash_history
 rm /home/user/.zsh_history
