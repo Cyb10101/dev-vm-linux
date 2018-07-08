@@ -1,5 +1,10 @@
 ## Virtualbox import
 
+Import the virtual machine and add a new hard disk.
+
+The second hard disk is for your MySQL and Website data.
+This allows you to variably adjust the storage space and even move it to another hard drive in the host system.
+
 * Expert mode
 * Virtualbox > File > Import Appliance
 
@@ -29,10 +34,135 @@ VirtualBox > Settings
 
 Optional: Install Virtualbox Extension Pack
 
-## HDD2 - GParted
+## Optional: Change keyboard layout
 
-A second hard disk will be created to match the host system.
-For the server, I recommend doing this via an Ubuntu Desktop Live Disk
+Example:
+* Generic 105-key keyboard
+* English (US)
+
+```Shell
+sudo dpkg-reconfigure keyboard-configuration
+```
+
+## Optional Ubuntu Server: I need a desktop!
+
+Maybe not recommended.
+
+For those who need a desktop on the server, you can install one of the following packages.
+
+Choose if you wan't a minimal or a full desktop.
+
+### Install the minimal desktop (XFCE4)
+
+Install the minimal XFCE4 Desktop:
+
+```Shell
+sudo apt install xfce4
+```
+
+To start the desktop type in terminal:
+
+```Shell
+startx
+```
+
+#### Add autostart after login for the minimal XFCE4 desktop
+
+If you don't want to type on every login startx, you can add a autostart.
+
+Edit file .bashrc & .zshrc:
+
+```Shell
+vim /home/user/.bashrc
+vim /home/user/.zshrc
+```
+
+Add at end of .bashrc & .zshrc file:
+
+```Shell
+if [[ ! ${DISPLAY} && ${XDG_VTNR} -eq 1 ]]; then
+  exec startx
+fi
+```
+
+### Install the minimal desktop (Gnome)
+
+```Shell
+# For the real Gnome Desktop
+sudo apt install gnome-core
+
+# At finish installation
+sudo reboot
+```
+
+### Install the full desktop (Xubuntu, Unity, Gnome)
+
+```Shell
+# For a XFCE4 Desktop
+sudo apt install xubuntu-desktop
+
+# Ubuntu 18.04: For a Ubuntu Unity Desktop
+sudo apt install ubuntu-unity-desktop
+
+# Ubuntu 16.04: For a Ubuntu Unity Desktop
+sudo apt install ubuntu-desktop
+
+# For a Ubuntu Gnome Desktop
+sudo apt install ubuntu-gnome-desktop
+
+# For the real Gnome Desktop
+sudo apt install gnome
+
+# At finish installation
+sudo reboot
+```
+
+## Optional Autologin:
+
+Forces auto login. Maybe not recommended.
+
+```Shell
+sudo systemctl edit getty@tty1
+```
+
+Add in "getty@tty1" file:
+
+```ini
+[Service]
+Type=idle
+ExecStart=
+ExecStart=-/sbin/agetty --autologin user --noclear %I 38400 linux
+```
+
+## HDD2 - Format second hard disk
+
+Format the second hard disk.
+
+### HDD2 - Format second hard disk (Terminal - recommended)
+
+Format the second hard disk by using a terminal.
+
+* Start menu > Terminal
+
+```Shell
+sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | sudo fdisk /dev/sdb ${TGTDEV}
+  g # create a new empty GPT partition table
+  n # new partition
+  1 # partition number 1
+    # first sector (default)
+    # last sector (default)
+  p # print the partition table
+  w # write table to disk and exit
+EOF
+
+sudo mkfs.ext4 /dev/sdb1
+```
+
+### HDD2 - Format second hard disk (GParted - alternative)
+
+Format the second hard disk by using GParted (GUI).
+
+For a server you need a Ubuntu Desktop Live CD.
 
 * Start menu > GParted
 * Select device (/dev/sdb)
@@ -43,7 +173,7 @@ For the server, I recommend doing this via an Ubuntu Desktop Live Disk
 
 Reboot if you use a live disk.
 
-## HDD2 - Fstab
+## HDD2 - Mount second hard disk (Fstab)
 
 * Start menu > Terminal
 
@@ -157,7 +287,7 @@ sudo sh -c 'echo "FLOW_CONTEXT=Development/YourName" >> /etc/environment'
 sudo sh -c 'echo "WWW_CONTEXT=Development/YourName" >> /etc/environment'
 ```
 
-### Set domain
+### Optional: Set domain
 
 Search for "vm00.example.org" and replace it in your domain.
 
@@ -476,21 +606,48 @@ Wildcard for local domains:
 
 ### PHP extension xDebug & IDE (PhpStorm)
 
+To activate or disable xDebug run in console:
+
+```Shell
+xdebug
+```
+
+#### Configure xDebug in PhpStorm
+
+Go to the menu:
+
 PhpStorm > Run > Start Listening for PHP Debug Connections
 
-@todo
-PhpStorm responds automatically when the page is reloaded.
-The server must then be added to PhpStorm.
+then reload website.
+PhpStorm should responds automatically and ask if your want to add a server.
 
+##### Configure xDebug in PhpStorm - Add Server and path mapping
+
+For some projects you must add a server and a path mapping.
+
+PhpStorm > Run > Edit Configurations > (+) Add > PHP Remote Debug
+- Filter debug connection by IDE key: true
+- Add a Server (...) - Example: Nginx https
+  - Name: www.example.vm:443
+  - Host: www.example.vm
+  - Port: 443
+  - Use path mappings = true
+  - Project files/mnt/vm/example/www = /mnt/data/var/www/example/www (Connection between host and guest system)
+- Add a Server (...) - Example: Apache https
+  - Name: www.example.vm:4430
+  - Host: www.example.vm
+  - Port: 4430
+  - Use path mappings = true
+  - Project files/mnt/vm/example/www = /mnt/data/var/www/example/www (Connection between host and guest system)
+- IDE key (Session ID): PHPSTORM
+
+@todo
 Make this unnecessary: xdebug.remote_host=192.168.56.1
 Would not work anyway because of other settings.
 
-@deprecated
+@deprecated Maybe not. Works with symfony
 PhpStorm > Run > Edit Configurations > Defaults > PHP Remote Debug
-PhpStorm > Run > Edit Configurations > (+) Add > PHP Remote Debug
-- Filter debug connection by IDE key: true
-- Server (anlegen) > 127.0.0.1:9001 - /var/www/example (IP & Port so lassen!)
-- IDE key (Session ID): PHPSTORM
+- Name: example_www (Just a name)
 
 ## Troubleshooting
 

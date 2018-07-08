@@ -197,6 +197,12 @@ Clone Reository.
 git clone https://github.com/Cyb10101/dev-vm-linux.git /home/user/dev-vm-linux
 ```
 
+#### Copy files
+
+```Shell
+cp /home/user/dev-vm-linux/usr/local/bin/xdebug /usr/local/bin/
+```
+
 #### Ubuntu Desktop
 
 ```Shell
@@ -207,7 +213,6 @@ rsync -av /home/user/dev-vm-linux/home/user/ /home/user/
 
 ```Shell
 rsync -av /home/user/dev-vm-linux/home/user/.* /home/user/
-cp /home/user/dev-vm-linux/home/user/xdebug.sh /home/user/
 ```
 
 ## Ubuntu Desktop: Configure Grub
@@ -262,9 +267,6 @@ gsettings set org.gnome.desktop.session idle-delay 0
 gsettings set org.gnome.desktop.screensaver lock-enabled false
 gsettings set org.gnome.desktop.screensaver ubuntu-lock-on-suspend false
 
-gsettings set org.gnome.desktop.interface menus-have-icons true
-gsettings set org.gnome.desktop.interface buttons-have-icons true
-
 gsettings set org.gtk.Settings.FileChooser show-hidden true
 gsettings set org.gnome.nautilus.preferences default-folder-viewer 'list-view'
 gsettings set org.gnome.nautilus.preferences executable-text-activation 'ask'
@@ -279,6 +281,8 @@ gsettings set org.gnome.nautilus.preferences executable-text-activation 'ask'
 
 ### Ubuntu 16.04 Desktop
 ```Shell
+gsettings set org.gnome.desktop.interface menus-have-icons true
+gsettings set org.gnome.desktop.interface buttons-have-icons true
 gsettings set org.gnome.desktop.interface clock-show-date true
 gsettings set com.canonical.indicator.session show-real-name-on-panel true
 gsettings set com.canonical.Unity integrated-menus true
@@ -851,7 +855,25 @@ zend_extension=/home/user/.phpbrew/php/php-5.4.45/lib/php/extensions/no-debug-no
 Disable xDebug (Type: N).
 
 ```Shell
-/home/user/xdebug.sh
+xdebug
+```
+
+### PhpBrew FPM configuration
+
+```Shell
+vim /home/user/.phpbrew/php/php-7.2.5/etc/php-fpm.d/www.conf
+vim /home/user/.phpbrew/php/php-7.1.17/etc/php-fpm.d/www.conf
+vim /home/user/.phpbrew/php/php-7.0.30/etc/php-fpm.d/www.conf
+vim /home/user/.phpbrew/php/php-5.6.36/etc/php-fpm.conf
+vim /home/user/.phpbrew/php/php-5.5.38/etc/php-fpm.conf
+vim /home/user/.phpbrew/php/php-5.4.45/etc/php-fpm.conf
+```
+
+Comment user and group out:
+
+```ini
+;user = nobody
+;group = nobody
 ```
 
 ### PhpBrew cleanups
@@ -859,7 +881,7 @@ Disable xDebug (Type: N).
 Ubuntu 18.04: Find not used php versions and remove them.
 
 ```Shell
-grep -linrE '5.6.36|5.5.38|5.4.45' /etc/apache2 /etc/nginx /home/user/.start-php-fpm.sh /home/user/Desktop/xdebug.sh
+grep -linrE '5.6.36|5.5.38|5.4.45' /etc/apache2 /etc/nginx /home/user/.start-php-fpm.sh /usr/local/bin/xdebug
 ```
 
 ### PhpBrew autostart
@@ -1247,6 +1269,24 @@ Ubuntu 18.04: Additionally for lock screen
 ```Shell
 gsettings set org.gnome.desktop.screensaver picture-uri "file:///home/user/Pictures/wallpaper.jpg"
 gsettings set org.gnome.desktop.screensaver picture-options 'zoom'
+```
+
+## Optional: Change keyboard layout
+
+Example:
+* Generic 105-key keyboard
+* English (US)
+
+```Shell
+sudo dpkg-reconfigure keyboard-configuration
+```
+
+## Clean Apport crash
+
+Send it or cancel with button "c":
+
+```Shell
+sudo apport-cli
 ```
 
 ## Cleanups
