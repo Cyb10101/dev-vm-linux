@@ -197,6 +197,12 @@ Clone Reository.
 git clone https://github.com/Cyb10101/dev-vm-linux.git /home/user/dev-vm-linux
 ```
 
+#### Copy files
+
+```Shell
+cp /home/user/dev-vm-linux/usr/local/bin/xdebug /usr/local/bin/
+```
+
 #### Ubuntu Desktop
 
 ```Shell
@@ -207,7 +213,6 @@ rsync -av /home/user/dev-vm-linux/home/user/ /home/user/
 
 ```Shell
 rsync -av /home/user/dev-vm-linux/home/user/.* /home/user/
-cp /home/user/dev-vm-linux/home/user/xdebug.sh /home/user/
 ```
 
 ## Ubuntu Desktop: Configure Grub
@@ -850,7 +855,7 @@ zend_extension=/home/user/.phpbrew/php/php-5.4.45/lib/php/extensions/no-debug-no
 Disable xDebug (Type: N).
 
 ```Shell
-/home/user/xdebug.sh
+xdebug
 ```
 
 ### PhpBrew FPM configuration
@@ -876,7 +881,7 @@ Comment user and group out:
 Ubuntu 18.04: Find not used php versions and remove them.
 
 ```Shell
-grep -linrE '5.6.36|5.5.38|5.4.45' /etc/apache2 /etc/nginx /home/user/.start-php-fpm.sh /home/user/Desktop/xdebug.sh
+grep -linrE '5.6.36|5.5.38|5.4.45' /etc/apache2 /etc/nginx /home/user/.start-php-fpm.sh /usr/local/bin/xdebug
 ```
 
 ### PhpBrew autostart

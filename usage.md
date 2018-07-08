@@ -157,7 +157,7 @@ sudo sh -c 'echo "FLOW_CONTEXT=Development/YourName" >> /etc/environment'
 sudo sh -c 'echo "WWW_CONTEXT=Development/YourName" >> /etc/environment'
 ```
 
-### Set domain
+### Optional: Set domain
 
 Search for "vm00.example.org" and replace it in your domain.
 
@@ -476,21 +476,48 @@ Wildcard for local domains:
 
 ### PHP extension xDebug & IDE (PhpStorm)
 
+To activate or disable xDebug run in console:
+
+```Shell
+xdebug
+```
+
+#### Configure xDebug in PhpStorm
+
+Go to the menu:
+
 PhpStorm > Run > Start Listening for PHP Debug Connections
 
-@todo
-PhpStorm responds automatically when the page is reloaded.
-The server must then be added to PhpStorm.
+then reload website.
+PhpStorm should responds automatically and ask if your want to add a server.
 
+##### Configure xDebug in PhpStorm - Add Server and path mapping
+
+For some projects you must add a server and a path mapping.
+
+PhpStorm > Run > Edit Configurations > (+) Add > PHP Remote Debug
+- Filter debug connection by IDE key: true
+- Add a Server (...) - Example: Nginx https
+  - Name: www.example.vm:443
+  - Host: www.example.vm
+  - Port: 443
+  - Use path mappings = true
+  - Project files/mnt/vm/example/www = /mnt/data/var/www/example/www (Connection between host and guest system)
+- Add a Server (...) - Example: Apache https
+  - Name: www.example.vm:4430
+  - Host: www.example.vm
+  - Port: 4430
+  - Use path mappings = true
+  - Project files/mnt/vm/example/www = /mnt/data/var/www/example/www (Connection between host and guest system)
+- IDE key (Session ID): PHPSTORM
+
+@todo
 Make this unnecessary: xdebug.remote_host=192.168.56.1
 Would not work anyway because of other settings.
 
-@deprecated
+@deprecated Maybe not. Works with symfony
 PhpStorm > Run > Edit Configurations > Defaults > PHP Remote Debug
-PhpStorm > Run > Edit Configurations > (+) Add > PHP Remote Debug
-- Filter debug connection by IDE key: true
-- Server (anlegen) > 127.0.0.1:9001 - /var/www/example (IP & Port so lassen!)
-- IDE key (Session ID): PHPSTORM
+- Name: example_www (Just a name)
 
 ## Troubleshooting
 
