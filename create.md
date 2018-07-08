@@ -262,9 +262,6 @@ gsettings set org.gnome.desktop.session idle-delay 0
 gsettings set org.gnome.desktop.screensaver lock-enabled false
 gsettings set org.gnome.desktop.screensaver ubuntu-lock-on-suspend false
 
-gsettings set org.gnome.desktop.interface menus-have-icons true
-gsettings set org.gnome.desktop.interface buttons-have-icons true
-
 gsettings set org.gtk.Settings.FileChooser show-hidden true
 gsettings set org.gnome.nautilus.preferences default-folder-viewer 'list-view'
 gsettings set org.gnome.nautilus.preferences executable-text-activation 'ask'
@@ -279,6 +276,8 @@ gsettings set org.gnome.nautilus.preferences executable-text-activation 'ask'
 
 ### Ubuntu 16.04 Desktop
 ```Shell
+gsettings set org.gnome.desktop.interface menus-have-icons true
+gsettings set org.gnome.desktop.interface buttons-have-icons true
 gsettings set org.gnome.desktop.interface clock-show-date true
 gsettings set com.canonical.indicator.session show-real-name-on-panel true
 gsettings set com.canonical.Unity integrated-menus true
