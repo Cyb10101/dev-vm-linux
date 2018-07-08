@@ -1281,6 +1281,14 @@ Example:
 sudo dpkg-reconfigure keyboard-configuration
 ```
 
+## Clean Apport crash
+
+Send it or cancel with button "c":
+
+```Shell
+sudo apport-cli
+```
+
 ## Cleanups
 
 * Shared folders: remove
