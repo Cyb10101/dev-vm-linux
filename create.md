@@ -1271,6 +1271,16 @@ gsettings set org.gnome.desktop.screensaver picture-uri "file:///home/user/Pictu
 gsettings set org.gnome.desktop.screensaver picture-options 'zoom'
 ```
 
+## Optional: Change keyboard layout
+
+Example:
+* Generic 105-key keyboard
+* English (US)
+
+```Shell
+sudo dpkg-reconfigure keyboard-configuration
+```
+
 ## Cleanups
 
 * Shared folders: remove

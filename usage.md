@@ -29,6 +29,16 @@ VirtualBox > Settings
 
 Optional: Install Virtualbox Extension Pack
 
+## Optional: Change keyboard layout
+
+Example:
+* Generic 105-key keyboard
+* English (US)
+
+```Shell
+sudo dpkg-reconfigure keyboard-configuration
+```
+
 ## HDD2 - GParted
 
 A second hard disk will be created to match the host system.
