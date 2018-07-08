@@ -853,6 +853,24 @@ Disable xDebug (Type: N).
 /home/user/xdebug.sh
 ```
 
+### PhpBrew FPM configuration
+
+```Shell
+vim /home/user/.phpbrew/php/php-7.2.5/etc/php-fpm.d/www.conf
+vim /home/user/.phpbrew/php/php-7.1.17/etc/php-fpm.d/www.conf
+vim /home/user/.phpbrew/php/php-7.0.30/etc/php-fpm.d/www.conf
+vim /home/user/.phpbrew/php/php-5.6.36/etc/php-fpm.conf
+vim /home/user/.phpbrew/php/php-5.5.38/etc/php-fpm.conf
+vim /home/user/.phpbrew/php/php-5.4.45/etc/php-fpm.conf
+```
+
+Comment user and group out:
+
+```ini
+;user = nobody
+;group = nobody
+```
+
 ### PhpBrew cleanups
 
 Ubuntu 18.04: Find not used php versions and remove them.
