@@ -1,5 +1,10 @@
 ## Virtualbox import
 
+Import the virtual machine and add a new hard disk.
+
+The second hard disk is for your MySQL and Website data.
+This allows you to variably adjust the storage space and even move it to another hard drive in the host system.
+
 * Expert mode
 * Virtualbox > File > Import Appliance
 
@@ -39,10 +44,35 @@ Example:
 sudo dpkg-reconfigure keyboard-configuration
 ```
 
-## HDD2 - GParted
+## HDD2 - Format second hard disk
 
-A second hard disk will be created to match the host system.
-For the server, I recommend doing this via an Ubuntu Desktop Live Disk
+Format the second hard disk.
+
+### HDD2 - Format second hard disk (Terminal - recommended)
+
+Format the second hard disk by using a terminal.
+
+* Start menu > Terminal
+
+```Shell
+sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | sudo fdisk /dev/sdb ${TGTDEV}
+  g # create a new empty GPT partition table
+  n # new partition
+  1 # partition number 1
+    # first sector (default)
+    # last sector (default)
+  p # print the partition table
+  w # write table to disk and exit
+EOF
+
+sudo mkfs.ext4 /dev/sdb1
+```
+
+### HDD2 - Format second hard disk (GParted - alternative)
+
+Format the second hard disk by using GParted (GUI).
+
+For a server you need a Ubuntu Desktop Live CD.
 
 * Start menu > GParted
 * Select device (/dev/sdb)
@@ -53,7 +83,7 @@ For the server, I recommend doing this via an Ubuntu Desktop Live Disk
 
 Reboot if you use a live disk.
 
-## HDD2 - Fstab
+## HDD2 - Mount second hard disk (Fstab)
 
 * Start menu > Terminal
 
