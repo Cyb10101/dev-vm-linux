@@ -932,7 +932,6 @@ Append on end in file my.cnf:
 user=root
 password=root
 default-character-set=utf8
-pager=less -FSRX
 
 [mysqld]
 collation-server=utf8_unicode_ci
@@ -944,6 +943,7 @@ sql_mode=""
 
 [mysql]
 default-character-set=utf8
+pager=less -FSRX
 ```
 
 Restart MySQL.
