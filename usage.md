@@ -1,19 +1,34 @@
-## Virtualbox import
+## Virtualbox import - General
 
-Import the virtual machine and add a new hard disk.
+Here is explained step by step how to import the VirtualBox OVA file and configure the virtual machine.
 
-The second hard disk is for your MySQL and Website data.
-This allows you to variably adjust the storage space and even move it to another hard drive in the host system.
+### Import OVA file
 
-* Expert mode
+First import the VirtualBox OVA file.
+I recommend to switch on the expert mode, because my explanation builds on it.
+
 * Virtualbox > File > Import Appliance
+* Click on button "Expert mode"
+* Choose your OVA file and import it
 
-VirtualBox > Settings
+If the OVA has been imported, the virtual machine has to be adjusted a bit.
+
+Create a network for host-only adapter, if not exists one:
+
+* VirtualBox > File > Host Network Manager
+* Network > Create
+
+Change the settings in the virtual machine and add a new second hard disk.
+The first virtual hard disk with the system should be on the system disk (SSD).
+The second virtual disk with the data should be on a second hard disk (HDD).
+If snapshots are created, they may also be stored on the second hard disk (HDD).
+
+VirtualBox > Machine > Settings
 
 * General
-  - Advanced > Snapshot Folder: (Maybe move to other folder)
+  - Advanced > Snapshot Folder: (Only if snapshots are created. Best on second hard drive.)
 * System
-  - Motherboard > Memory: 2048 or 4096 MB
+  - Motherboard > Memory: 2048 or 4096 MB (Server, Desktop or what you like)
   - Processor > CPU: 4 (Maximum of green)
 * Storage
   - Create new hard disk > Expert mode
@@ -23,122 +38,191 @@ VirtualBox > Settings
     - Storage on physical hard disk: Dynamically allocated
     - Sata Port 1
 * Network
-  - Configure Adapter 1
-  - Configure Adapter 2
-  - Configure Adapter 3
+  - Configure Adapter 1 (Just get Internet connection)
+    - Enable Network Adapter = True
+    - Attached to: NAT
+    - Adapter Type: Intel PRO/1000 MT Desktop (82540EM)
+    - Generate new MAC Address
+  - Configure Adapter 2 (A new computer in your Network)
+    - Enable Network Adapter = True
+    - Attached to: Bridged Adapter
+    - Name: (Your host network card)
+    - Adapter Type: Intel PRO/1000 MT Desktop (82540EM)
+    - Promiscuous Mode: Deny
+    - Generate new MAC Address
+  - Configure Adapter 3 (I don't need a Network, only host to guest)
     - Enable Network Adapter = True
     - Attached to: Host-only Adapter
     - Name: (Virtualbox)
     - Adapter Type: Intel PRO/1000 MT Desktop (82540EM)
     - Promiscuous Mode: Allow All
+    - Generate new MAC Address
 
-Optional: Install Virtualbox Extension Pack
+Optional for Desktop Version: Install Virtualbox Extension Pack
 
-## Optional: Change keyboard layout
+#### Explanation of the network configuration
 
-Example:
-* Generic 105-key keyboard
-* English (US)
+This is a simple configuration of the network and theoretically should work well on all machines.
+Depending on usage and system, this should be personalized.
+
+Adapter 1, Just open a connection to the internet. You can not access directly though.
+
+Adapter 2, To come from another computer into the virtual machine.
+
+Adapter 3, To get from the host directly to the virtual machine.
+This is useful when wired and WIFI connection is switched.
+
+## Configure virtual machine
+
+Start the virtual machine.
+
+The instructions are designed to do everything with the user "user".
+In general, you should never need the user "root".
+
+### Passwords
+
+The passwords of Linux users are the same as the user names.
+Note: You can't connect your ssh with the user "root".
+
+* Username: root | Password: root
+* Username: user | Password: user
+
+The MySQL access:
+
+* Username: root | Password: root
+
+### Optional: Change keyboard layout
+
+You may want to change the layout of your keyboard.
+Current keyboard layout is set to german.
 
 ```Shell
 sudo dpkg-reconfigure keyboard-configuration
 ```
 
-## Optional Ubuntu Server: I need a desktop!
+Example:virtual
+* Generic 105-key keyboard
+* English (US)
 
-Maybe not recommended.
+### Configure Network
 
-For those who need a desktop on the server, you can install one of the following packages.
+I recommend configuring the network because it can be different for everyone.
 
-Choose if you wan't a minimal or a full desktop.
+### Set hostname
 
-### Install the minimal desktop (XFCE4)
+Search for "dev-vm" and replace it in your name.
 
-Install the minimal XFCE4 Desktop:
+Allowed: a-z 0-9 - (Hyphen)
 
-```Shell
-sudo apt install xfce4
-```
-
-To start the desktop type in terminal:
+No capitalization! For example: dev-your-name
 
 ```Shell
-startx
+sudo vim /etc/hostname
+sudo vim /etc/hosts
+sudo vim /etc/apache2/conf-available/server-name.conf
 ```
 
-#### Add autostart after login for the minimal XFCE4 desktop
+### Configure network
 
-If you don't want to type on every login startx, you can add a autostart.
+With the command "ip a" you can check your current network configuration.
 
-Edit file .bashrc & .zshrc:
+Check if the interfaces "en0s8" are assigned to the correct MAC addresses.
+If that's not the case, you'll need to adjust those values.
 
 ```Shell
-vim /home/user/.bashrc
-vim /home/user/.zshrc
+sudo vim /etc/network/interfaces
 ```
 
-Add at end of .bashrc & .zshrc file:
+#### Optional Ubuntu 18.04 Server: Set static IP in network configuration
+
+Edit Netplan file.
 
 ```Shell
-if [[ ! ${DISPLAY} && ${XDG_VTNR} -eq 1 ]]; then
-  exec startx
-fi
+ls /etc/netplan
+sudo vim /etc/netplan/50-cloud-init.yaml
 ```
 
-### Install the minimal desktop (Gnome)
+Change enp0s8 in 50-cloud-init.yaml.
+
+```yaml
+network:
+    version: 2
+    ethernets:
+        enp0s3:
+            addresses: []
+            dhcp4: true
+            optional: true
+            nameservers:
+                addresses: [127.0.1.1, 8.8.8.8]
+        enp0s8:
+            addresses: [192.168.178.50/24]
+            gateway4: 192.168.178.1
+            nameservers:
+                addresses: [127.0.1.1, 8.8.8.8]
+        enp0s9:
+            addresses: [192.168.56.101/24]
+            gateway4: 192.168.56.1
+            nameservers:
+                addresses: [127.0.1.1, 8.8.8.8]
+```
+
+Restart network.
 
 ```Shell
-# For the real Gnome Desktop
-sudo apt install gnome-core
-
-# At finish installation
-sudo reboot
+sudo netplan generate && sudo netplan apply
 ```
 
-### Install the full desktop (Xubuntu, Unity, Gnome)
+#### Optional Other Ubuntu: Set static IP in network configuration
+
+Get and configure interfaces.
 
 ```Shell
-# For a XFCE4 Desktop
-sudo apt install xubuntu-desktop
-
-# Ubuntu 18.04: For a Ubuntu Unity Desktop
-sudo apt install ubuntu-unity-desktop
-
-# Ubuntu 16.04: For a Ubuntu Unity Desktop
-sudo apt install ubuntu-desktop
-
-# For a Ubuntu Gnome Desktop
-sudo apt install ubuntu-gnome-desktop
-
-# For the real Gnome Desktop
-sudo apt install gnome
-
-# At finish installation
-sudo reboot
+sudo vim /etc/network/interfaces
 ```
 
-## Optional Autologin:
+Adapt file interfaces. Example configuration:
 
-Forces auto login. Maybe not recommended.
+```text
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# Network 1
+auto enp0s3
+iface enp0s3 inet dhcp
+
+# Network 2
+auto enp0s8
+iface enp0s8 inet static
+  address 192.168.178.50
+  netmask 255.255.255.0
+  gateway 192.168.178.1
+
+# Network 3
+auto enp0s9
+iface enp0s9 inet static
+  address 192.168.56.101
+  netmask 255.255.255.0
+  gateway 192.168.56.1
+
+auto enp0s8
+iface enp0s8 inet static
+```
+
+Reconnect network card, restart in case of doubt.
 
 ```Shell
-sudo systemctl edit getty@tty1
+sudo ifdown -a && sudo ifup -a
 ```
 
-Add in "getty@tty1" file:
+### HDD2 - Format second hard disk
 
-```ini
-[Service]
-Type=idle
-ExecStart=
-ExecStart=-/sbin/agetty --autologin user --noclear %I 38400 linux
-```
+The second hard disk is for your Website and MySQL data.
+This allows you to variably adjust the storage space and even move it to another hard drive in the host system.
 
-## HDD2 - Format second hard disk
+Partition and format the second hard disk in terminal or with gparted.
 
-Format the second hard disk.
-
-### HDD2 - Format second hard disk (Terminal - recommended)
+#### HDD2 - Format second hard disk (Terminal - recommended)
 
 Format the second hard disk by using a terminal.
 
@@ -158,7 +242,7 @@ EOF
 sudo mkfs.ext4 /dev/sdb1
 ```
 
-### HDD2 - Format second hard disk (GParted - alternative)
+#### HDD2 - Format second hard disk (GParted - alternative)
 
 Format the second hard disk by using GParted (GUI).
 
@@ -173,7 +257,7 @@ For a server you need a Ubuntu Desktop Live CD.
 
 Reboot if you use a live disk.
 
-## HDD2 - Mount second hard disk (Fstab)
+### HDD2 - Mount second hard disk (Fstab)
 
 * Start menu > Terminal
 
@@ -203,7 +287,7 @@ sudo mount /mnt/data
 sudo chmod 777 /mnt/data
 ```
 
-### HDD2 - Move Webserver
+#### HDD2 - Move Webserver
 
 ```Shell
 sudo mkdir -p /mnt/data/var/www
@@ -216,7 +300,7 @@ sudo rmdir /var/www
 sudo ln -s /mnt/data/var/www /var/
 ```
 
-### HDD2 - Move MySQL
+#### HDD2 - Move MySQL
 
 ```Shell
 sudo service mysql stop
@@ -240,7 +324,9 @@ sudo service apparmor restart
 sudo service mysql start
 ```
 
-## Virtualbox import - Konfigurieren
+## Configure system
+
+At this point you configure your system.
 
 ### Generate SSH Key
 
@@ -252,14 +338,16 @@ ssh-keygen -t rsa -b 4096 -C 'user@example.org'
 
 ### Convert SSH Key to Putty Key
 
-Can be accessed via Windows Share, for example for Putty or HeidiSQL.
+Generate a putty key.
+Is useful if you want to connect later using Putty or HeidiSQL.
+You can later use the windows release or copy it to your computer via SSH.
 
 
 ```Shell
 puttygen /home/user/.ssh/id_rsa -o /var/www/id_rsa.ppk
 ```
 
-### Git konfigurieren
+### Configure Git
 
 Enter your own name & e-mail.
 
@@ -301,85 +389,6 @@ sudo apache2ctl configtest && sudo systemctl restart apache2
 sudo nginx -t && sudo systemctl restart nginx
 ```
 
-### Set hostname
-
-Search for "dev-vm" and replace it in your name.
-
-Allowed: a-z 0-9 - (Hyphen)
-
-Omit capitalization! For example: dev-your-name
-
-```Shell
-sudo vim /etc/hostname
-sudo vim /etc/hosts
-sudo vim /etc/apache2/conf-available/server-name.conf
-```
-
-### Optional Ubuntu 18.04 Server: Set static IP in network configuration
-
-Edit Netplan file.
-
-```Shell
-ls /etc/netplan
-sudo vim /etc/netplan/50-cloud-init.yaml
-```
-
-Change enp0s8 in 50-cloud-init.yaml.
-
-```yaml
-network:
-    ethernets:
-        enp0s8:
-            addresses: [192.168.178.50/24]
-            gateway4: 192.168.178.1
-            nameservers:
-                addresses: [127.0.1.1, 8.8.8.8]
-```
-
-Restart network.
-
-```Shell
-sudo netplan generate && sudo netplan apply
-```
-
-### Optional Other Ubuntu: Set static IP in network configuration
-
-Get and configure interfaces.
-
-```Shell
-ip a
-sudo vim /etc/network/interfaces
-```
-
-Adapt file interfaces.
-
-```text
-# Localhost configuration
-auto lo
-iface lo inet loopback
-
-# Network card eth0 configuration (eth0 & ip anpassen)
-auto enp0s8
-iface enp0s8 inet static
-	address 192.168.178.50
-	netmask 255.255.255.0
-	gateway 192.168.178.1
-```
-
-Reconnect network card, restart in case of doubt.
-
-```Shell
-sudo ifdown -a && sudo ifup -a
-```
-
-### Optional Ubuntu Desktop: Install Software
-
- * https://atom.io/
-
-```Shell
-sudo apt -y install terminator
-```
-
 ### Optional: Change login shell permanently
 
 Change from "bash" to "zsh" for the current user.
@@ -419,20 +428,16 @@ sendmail_path = /usr/sbin/sendmailfake
 sudo reboot
 ```
 
-## Documentation - What can i do?
+## Documentation
 
-### Passwörter
+What can i do?
 
-The passwords of Linux users are the same as the user names.
+### Connect file browser to virtual machine
 
-* Username: root | Password: root
-* Username: user | Password: user
+The /var/www can be accessed via Windows sharing or SSH.
+This will allow you to easily develop an IDE.
 
-The MySQL access:
-
-* Username: root | Password: root
-
-### SSHFS share - Linux configuration
+#### SSHFS share - Linux configuration
 
 Connect over SSH from Linux host to Linux guest.
 IP address must be adapted for the virtual machine.
@@ -449,26 +454,26 @@ vim ~/.bashrc && vim ~/.zshrc
 Append to file ~/.bashrc and ~/.zshrc:
 
 ```Shell
-alias vm-on='sshfs -o IdentitiesOnly=yes -o compression=no -o cache=yes -o kernel_cache -o allow_other -o IdentityFile=~/.ssh/id_rsa -o idmap=user -o uid=1000 -o gid=1000 user@123.123.123.123:/mnt/data/var/www /mnt/ssh/vm'
+alias vm-on='sshfs -o IdentitiesOnly=yes -o compression=no -o cache=yes -o kernel_cache -o allow_other -o IdentityFile=~/.ssh/id_rsa -o idmap=user -o uid=1000 -o gid=1000 user@192.168.56.101:/mnt/data/var/www /mnt/ssh/vm'
 
 alias vm-off='fusermount -u /mnt/ssh/vm'
 ```
 
-### Samba/Windows share
+#### Samba/Windows share
 
 Connect over Samba from Windows/Linux host to Linux guest.
 The folder /var/www is accessible over Samba share "www".
-IP address (123.123.123.123) must be adapted for the virtual machine.
+IP address (192.168.56.101) must be adapted for the virtual machine.
 
-#### Samba/Windows share - Windows configuration
+##### Samba/Windows share - Windows configuration
 
 Run in a command window:
 
 ```Shell
-net use Z: \\123.123.123.123\www /PERSISTENT:YES
+net use Z: \\192.168.56.101\www /PERSISTENT:YES
 ```
 
-#### Samba/Windows share - Linux configuration
+##### Samba/Windows share - Linux configuration
 
 Run in a terminal window:
 
@@ -483,7 +488,7 @@ sudo /etc/fstab
 Append to file /etc/fstab with your virtual machine IP:
 
 ```Text
-//123.123.123.123/www /mnt/samba/vm cifs uid=localUsername,username=user,password=user 0 0
+//192.168.56.101/www /mnt/samba/vm cifs uid=localUsername,username=user,password=user 0 0
 ```
 
 ### Switch PHP Version
@@ -505,7 +510,7 @@ php -v
 ### DNS Server (example.vm)
 
 You can use DNS Server for the example.vm domains to work.
-IP address (123.123.123.123) must be adapted for the virtual machine.
+IP address (192.168.56.101) must be adapted for the virtual machine.
 
 #### DNS Server - Linux Ubuntu Desktop
 
@@ -524,7 +529,7 @@ dns=dnsmasq
 ```Shell
 sudo sh -c 'echo "nameserver 127.0.1.1" >> /etc/resolvconf/resolv.conf.d/head'
 sudo sh -c 'echo "nameserver 8.8.8.8" >> /etc/resolvconf/resolv.conf.d/head'
-sudo sh -c 'echo "address=/.vm/123.123.123.123" >> /etc/NetworkManager/dnsmasq.d/development'
+sudo sh -c 'echo "address=/.vm/192.168.56.101" >> /etc/NetworkManager/dnsmasq.d/development'
 sudo systemctl restart network-manager
 sudo resolvconf -u
 ```
@@ -544,7 +549,7 @@ Start menu > Acrylic DNS Proxy > Edit Acrylic Hosts File
 Append with your virtual machine IP:
 
 ```Text
-123.123.123.123 /.*\.vm$
+192.168.56.101 /.*\.vm$
 ```
 
 Start menu > Acrylic DNS Proxy
@@ -654,3 +659,97 @@ PhpStorm > Run > Edit Configurations > Defaults > PHP Remote Debug
 ### MySQL not working
 
 Set host "localhost" to "127.0.0.1".
+
+## I am crazy! Lazy or whatever...
+
+If you are in any way crazier, that may interest you.
+
+### I need a desktop!
+
+Maybe not recommended.
+
+For those who need a desktop on the server, you can install one of the following packages.
+
+Choose if you wan't a minimal or a full desktop.
+
+#### Install the minimal desktop (XFCE4)
+
+Install the minimal XFCE4 Desktop:
+
+```Shell
+sudo apt install xfce4
+```
+
+To start the desktop type in terminal:
+
+```Shell
+startx
+```
+
+##### Add autostart after login for the minimal XFCE4 desktop
+
+If you don't want to type on every login startx, you can add a autostart.
+
+Edit file .bashrc & .zshrc:
+
+```Shell
+vim /home/user/.bashrc
+vim /home/user/.zshrc
+```
+
+Add at end of .bashrc & .zshrc file:
+
+```Shell
+if [[ ! ${DISPLAY} && ${XDG_VTNR} -eq 1 ]]; then
+  exec startx
+fi
+```
+
+#### Install the minimal desktop (Gnome)
+
+```Shell
+# For the real Gnome Desktop
+sudo apt install gnome-core
+
+# At finish installation
+sudo reboot
+```
+
+#### Install the full desktop (Xubuntu, Unity, Gnome)
+
+```Shell
+# For a XFCE4 Desktop
+sudo apt install xubuntu-desktop
+
+# Ubuntu 18.04: For a Ubuntu Unity Desktop
+sudo apt install ubuntu-unity-desktop
+
+# Ubuntu 16.04: For a Ubuntu Unity Desktop
+sudo apt install ubuntu-desktop
+
+# For a Ubuntu Gnome Desktop
+sudo apt install ubuntu-gnome-desktop
+
+# For the real Gnome Desktop
+sudo apt install gnome
+
+# At finish installation
+sudo reboot
+```
+
+### Autologin
+
+Forces auto login. Maybe not recommended.
+
+```Shell
+sudo systemctl edit getty@tty1
+```
+
+Add in "getty@tty1" file:
+
+```ini
+[Service]
+Type=idle
+ExecStart=
+ExecStart=-/sbin/agetty --autologin user --noclear %I 38400 linux
+```
