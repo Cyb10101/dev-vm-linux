@@ -10,6 +10,7 @@ I recommend to switch on the expert mode, because my explanation builds on it.
 * Virtualbox > File > Import Appliance
 * Click on button "Expert mode"
 * Choose your OVA file and import it
+* Reinitialize the MAC address of all network cards = true (Create new MAC Addresses)
 
 If the OVA has been imported, the virtual machine has to be adjusted a bit.
 
@@ -130,7 +131,7 @@ Check if the interfaces "en0s8" are assigned to the correct MAC addresses.
 If that's not the case, you'll need to adjust those values.
 
 ```Shell
-sudo vim /etc/network/interfaces
+ip a
 ```
 
 #### Optional Ubuntu 18.04 Server: Set static IP in network configuration
@@ -204,9 +205,6 @@ iface enp0s9 inet static
   address 192.168.56.101
   netmask 255.255.255.0
   gateway 192.168.56.1
-
-auto enp0s8
-iface enp0s8 inet static
 ```
 
 Reconnect network card, restart in case of doubt.
