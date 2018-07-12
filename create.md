@@ -1313,6 +1313,7 @@ sudo apt update && sudo apt -y dist-upgrade && sudo apt -y autoremove
 sudo /opt/VBoxGuestAdditions-*/uninstall.sh
 
 sudo su
+rm -rd /var/www/html
 rm /home/user/.local/share/recently-used.xbel
 rm /home/user/.mysql_history
 rm /home/user/.bash_history
