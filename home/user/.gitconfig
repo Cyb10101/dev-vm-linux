@@ -40,7 +40,6 @@
 	# Show branch already merged into master
 	bm = !git branch --merged master
 
-
 #	# List changed files of als commit
 #	showme = show --pretty="format:" --name-only
 
