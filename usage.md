@@ -536,13 +536,15 @@ sudo resolvconf -u
 
 Download and install: http://mayakron.altervista.org/wikibase/show.php?id=AcrylicHome
 
-Open Systemsteuerung > Netzwerk und Internet > Netzwerkverbindungen
+Start menu > Control Panel > Network and Internet > Network and Sharing Center > Change adapter settings
 
-Edit network > Internetprotocol, Version 4 (TCP/IPv4) > Folgende DNS-Serveradressen verwenden
+Edit network > Internet Protocol Version 4 (TCP/IPv4) > Properties > Use the following DNS server addresses:
 
-* Bevorzugter DNS-Server: 127.0.0.1
+* Preferred DNS server: 127.0.0.1
 
-Start menu > Acrylic DNS Proxy > Edit Acrylic Hosts File
+Start menu > Acrylic DNS Proxy > Acrylic UI
+
+* File > Open Acrylic Hosts
 
 Append with your virtual machine IP:
 
@@ -550,10 +552,9 @@ Append with your virtual machine IP:
 192.168.56.101 /.*\.vm$
 ```
 
-Start menu > Acrylic DNS Proxy
+Maybe you must restart the Service:
 
-* Stop Acrylic Service
-* Start Acrylic Service
+* Actions > Restart Acrylic Service
 
 ### E-Mail - MailCachter
 
