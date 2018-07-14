@@ -457,6 +457,12 @@ alias vm-on='sshfs -o IdentitiesOnly=yes -o compression=no -o cache=yes -o kerne
 alias vm-off='fusermount -u /mnt/ssh/vm'
 ```
 
+Add 'user_allow_other' in file /etc/fuse.conf:
+
+```Shell
+sudo vim /etc/fuse.conf
+```
+
 #### Samba/Windows share
 
 Connect over Samba from Windows/Linux host to Linux guest.
