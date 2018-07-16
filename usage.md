@@ -49,14 +49,12 @@ VirtualBox > Machine > Settings
     - Attached to: Bridged Adapter
     - Name: (Your host network card)
     - Adapter Type: Intel PRO/1000 MT Desktop (82540EM)
-    - Promiscuous Mode: Deny
     - Generate new MAC Address
   - Configure Adapter 3 (I don't need a Network, only host to guest)
     - Enable Network Adapter = True
     - Attached to: Host-only Adapter
     - Name: (Virtualbox)
     - Adapter Type: Intel PRO/1000 MT Desktop (82540EM)
-    - Promiscuous Mode: Allow All
     - Generate new MAC Address
 
 Optional for Desktop Version: Install Virtualbox Extension Pack
@@ -165,6 +163,11 @@ network:
             gateway4: 192.168.56.1
             nameservers:
                 addresses: [127.0.1.1, 8.8.8.8]
+
+        # Maybe better for Host-only Adapter
+        enp0s9:
+            addresses: [192.168.56.101/24]
+            dhcp4: no
 ```
 
 Restart network.
@@ -188,23 +191,29 @@ Adapt file interfaces. Example configuration:
 auto lo
 iface lo inet loopback
 
-# Network 1
+# Network 1 (NAT)
 auto enp0s3
 iface enp0s3 inet dhcp
 
-# Network 2
+# Network 2 (Bridged Adapter)
 auto enp0s8
 iface enp0s8 inet static
   address 192.168.178.50
   netmask 255.255.255.0
   gateway 192.168.178.1
 
-# Network 3
+# Network 3 (Host-only Adapter)
 auto enp0s9
 iface enp0s9 inet static
   address 192.168.56.101
   netmask 255.255.255.0
-  gateway 192.168.56.1
+
+  # Maybe not needed because it works automatically
+  #network 192.168.56.0
+  #broadcast 192.168.56.255
+
+  # Is not needed because there is no internet
+  #gateway 192.168.56.1
 ```
 
 Reconnect network card, restart in case of doubt.
