@@ -303,14 +303,18 @@ gsettings list-recursively | grep search
 ## Configure Bash (User & Root)
 
 ```Shell
-sudo cp /home/user/dev-vm-linux/home/user/.bashrc-user /root/
+sudo cp /home/user/dev-vm-linux/home/user/.shell-methods /root/
 vim ~/.bashrc && sudo vim /root/.bashrc
 ```
 
 * Zur .bashrc hinzufügen
 
 ```Shell
-source ~/.bashrc-user
+source ~/.shell-methods
+#sshAgentRestart
+#sshAgentAddKey 24h ~/.ssh/id_rsa
+addAlias
+stylePS1
 ```
 
 ## Configure Zsh (User & Root)

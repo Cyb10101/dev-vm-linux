@@ -47,11 +47,7 @@ source $ZSH/oh-my-zsh.sh
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
 
-# ssh
-# export SSH_KEY_PATH="~/.ssh/rsa_id"
-
-# Run SSH Agent and add key 10h
-if [ -f ~/.ssh/id_rsa ] ; then
-  eval `ssh-agent -s`
-  ssh-add -t 36000 ~/.ssh/id_rsa
-fi
+source ~/.shell-methods
+#sshAgentRestart
+#sshAgentAddKey 24h ~/.ssh/id_rsa
+addAlias
