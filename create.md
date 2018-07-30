@@ -1222,7 +1222,7 @@ sudo apt -y install playonlinux
 
 Open PlayOnLinux and create a new virtual drive.
 
-* Tools > Manage Wine versions > Install latest 64 bit Wine version (current: 3.7)
+* Tools > Manage Wine versions > Install latest 64 bit Wine version (current: 3.13)
 
 * Configure > New > 64 bit latest Wine Version (Container name: HeidiSQL)
 * Select Container
