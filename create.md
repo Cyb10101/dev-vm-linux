@@ -822,6 +822,9 @@ post_max_size = 200M
 [Date]
 date.timezone = Europe/Berlin
 
+[MySQLi]
+mysqli.default_host = 127.0.0.1
+
 [mail function]
 sendmail_path = /usr/bin/env /usr/local/bin/catchmail -t -f 'www-data@localhost'
 ;sendmail_path = /usr/sbin/sendmailfake
@@ -835,6 +838,9 @@ session.gc_maxlifetime = 86400
 ```INI
 [PHP]
 always_populate_raw_post_data = -1
+
+[MySQL]
+mysql.default_host = 127.0.0.1
 ```
 
 ### PhpBrew - Configure PHP extension xDebug
@@ -1216,7 +1222,7 @@ sudo apt -y install playonlinux
 
 Open PlayOnLinux and create a new virtual drive.
 
-* Tools > Manage Wine versions > Install latest 64 bit Wine version (current: 3.7)
+* Tools > Manage Wine versions > Install latest 64 bit Wine version (current: 3.13)
 
 * Configure > New > 64 bit latest Wine Version (Container name: HeidiSQL)
 * Select Container
