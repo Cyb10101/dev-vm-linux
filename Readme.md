@@ -4,8 +4,6 @@ This tutorial will create a virtual machine that includes Linux with the Ubuntu 
 
 Why a desktop version? Because it should be as easy as possible for the users.
 
-If I have time, I will translate that into english.
-
 Licence: Public Domain - Feel free to use it, but you can also improve this.
 
 ## Try it
