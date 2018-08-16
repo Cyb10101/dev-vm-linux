@@ -51,3 +51,4 @@ source ~/.shell-methods
 #sshAgentRestart
 #sshAgentAddKey 24h ~/.ssh/id_rsa
 addAlias
+#terminalMotd

@@ -315,6 +315,7 @@ source ~/.shell-methods
 #sshAgentAddKey 24h ~/.ssh/id_rsa
 addAlias
 stylePS1
+#terminalMotd
 ```
 
 ## Configure Zsh (User & Root)
@@ -329,6 +330,43 @@ rsync -av /tmp/.oh-my-zsh/ ~/.oh-my-zsh/
 sudo rsync -av /tmp/.oh-my-zsh/ /root/.oh-my-zsh/
 sudo chown -R root:root /root/.oh-my-zsh
 sudo chown root:root /root/.zshrc
+```
+
+## Message of the day
+
+### Optional: Disable to much information
+
+```Shell
+sudo chmod -x /etc/update-motd.d/10-help-text
+
+# Ubuntu 16.04:
+sudo chmod -x /etc/update-motd.d/91-release-upgrade
+```
+
+### Optional: Keep me from working
+
+Yes, you wan't it! Your boss would kill you, but your soul thanks you.
+Each new Terminal you opening on desktop or with ssh, you get a new message.
+
+Install required packages:
+
+```Shell
+sudo apt install boxes lolcat fortune-mod fortunes fortunes-min fortunes-de fortunes-ubuntu-server fortunes-bofh-excuses
+
+sudo chmod -x /etc/update-motd.d/60-ubuntu-server-tip
+```
+
+Show which fortunes are available and configure it at function "terminalMotd" in .shell-methods file:
+
+```Shell
+ls /usr/share/games/fortunes
+vim /home/user/.shell-methods
+```
+
+Enable "terminalMotd" in bash & zsh:
+
+```Shell
+vim ~/.bashrc && vim ~/.zshrc
 ```
 
 ## DNS Server (example.vm)
@@ -1284,6 +1322,7 @@ gsettings set org.gnome.desktop.screensaver picture-options 'zoom'
 ## Optional: Change keyboard layout
 
 Example:
+
 * Generic 105-key keyboard
 * English (US)
 

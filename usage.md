@@ -99,7 +99,8 @@ Current keyboard layout is set to german.
 sudo dpkg-reconfigure keyboard-configuration
 ```
 
-Example:virtual
+Example:
+
 * Generic 105-key keyboard
 * English (US)
 
