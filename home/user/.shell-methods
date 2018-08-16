@@ -99,3 +99,39 @@ function addAlias {
   alias halt='sudo /sbin/shutdown -h now'
   alias shutdown='sudo /sbin/shutdown'
 }
+
+# Message of the day in a new terminal
+function terminalMotd {
+  if [ ${SHLVL} -eq 1 ]; then
+		fortuneData=(
+			bofh-excuses
+			ubuntu-server-tips
+
+			de/computer
+			de/gedichte
+			de/holenlassen
+			de/letzteworte
+			de/lieberals
+			de/mathematiker
+			de/ms
+			de/murphy
+			de/namen
+			de/regeln
+			de/sicherheitshinweise
+			de/sprichworte
+			de/sprichwortev
+			de/sprueche
+			de/stilblueten
+			de/tips
+			de/translations
+			de/unfug
+			de/vornamen
+			de/warmduscher
+			de/witze
+			de/woerterbuch
+			de/wusstensie
+			de/zitate
+		)
+    /usr/games/fortune -lse ${fortuneData[*]} | /usr/bin/boxes -d javadoc | /usr/games/lolcat
+  fi
+}
