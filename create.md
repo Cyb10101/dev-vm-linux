@@ -366,7 +366,8 @@ vim /home/user/.shell-methods
 Enable "terminalMotd" in bash & zsh:
 
 ```Shell
-vim ~/.bashrc && vim ~/.zshrc
+vim ~/.bashrc && sudo vim /root/.bashrc
+vim ~/.zshrc && sudo vim /root/.zshrc
 ```
 
 ## DNS Server (example.vm)
