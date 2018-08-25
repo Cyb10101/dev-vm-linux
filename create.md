@@ -1339,6 +1339,15 @@ Send it or cancel with button "c":
 sudo apport-cli
 ```
 
+## Updates
+
+```Shell
+sudo apt update && sudo apt -y dist-upgrade && sudo apt -y autoremove
+
+npm -g outdated
+sudo npm install -g npm grunt-cli
+```
+
 ## Cleanups
 
 * Shared folders: remove
@@ -1356,8 +1365,6 @@ gio trash --empty
 
 # Ubuntu 16.04
 gvfs-trash --empty
-
-sudo apt update && sudo apt -y dist-upgrade && sudo apt -y autoremove
 
 # Both Ubuntu...
 sudo /opt/VBoxGuestAdditions-*/uninstall.sh
