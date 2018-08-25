@@ -1344,7 +1344,7 @@ sudo apport-cli
 ```Shell
 sudo apt update && sudo apt -y dist-upgrade && sudo apt -y autoremove
 
-npm -g outdated
+sudo npm -g outdated
 sudo npm install -g npm grunt-cli
 ```
 
