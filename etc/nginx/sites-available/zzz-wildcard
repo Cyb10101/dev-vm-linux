@@ -19,8 +19,19 @@ server {
 	include snippets/virtual-host-defaults.conf;
 
 	location / {
+		if (-f $document_root/.maintenance) {
+			return 503;
+		}
+
 		# try to serve file directly, fallback to index.php
 		try_files $uri $uri/ $uri/index.php$is_args$args /index.php$is_args$args;
+	}
+
+	error_page 503 @maintenance;
+	location @maintenance {
+		if ($uri !~ ^/maintenance/) {
+			rewrite ^(.*)$ /maintenance/ break;
+		}
 	}
 
 	#include snippets/php-5.4.45.conf;
@@ -52,8 +63,19 @@ server {
 	include snippets/virtual-host-defaults.conf;
 
 	location / {
+		if (-f $document_root/.maintenance) {
+			return 503;
+		}
+
 		# try to serve file directly, fallback to index.php
 		try_files $uri $uri/ $uri/index.php$is_args$args /index.php$is_args$args;
+	}
+
+	error_page 503 @maintenance;
+	location @maintenance {
+		if ($uri !~ ^/maintenance/) {
+			rewrite ^(.*)$ /maintenance/ break;
+		}
 	}
 
 	#include snippets/php-5.4.45.conf;
@@ -85,8 +107,19 @@ server {
 	include snippets/virtual-host-defaults.conf;
 
 	location / {
+		if (-f $document_root/.maintenance) {
+			return 503;
+		}
+
 		# try to serve file directly, fallback to index.php
 		try_files $uri $uri/ $uri/index.php$is_args$args /index.php$is_args$args;
+	}
+
+	error_page 503 @maintenance;
+	location @maintenance {
+		if ($uri !~ ^/maintenance/) {
+			rewrite ^(.*)$ /maintenance/ break;
+		}
 	}
 
 	#include snippets/php-5.4.45.conf;
@@ -118,8 +151,19 @@ server {
 	include snippets/virtual-host-defaults.conf;
 
 	location / {
+		if (-f $document_root/.maintenance) {
+			return 503;
+		}
+
 		# try to serve file directly, fallback to index.php
 		try_files $uri $uri/ $uri/index.php$is_args$args /index.php$is_args$args;
+	}
+
+	error_page 503 @maintenance;
+	location @maintenance {
+		if ($uri !~ ^/maintenance/) {
+			rewrite ^(.*)$ /maintenance/ break;
+		}
 	}
 
 	#include snippets/php-5.4.45.conf;
