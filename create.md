@@ -617,9 +617,34 @@ sudo chmod -R oga+rw /etc/apache2
 sudo apt -y install autoconf apache2-dev libxml2-dev libcurl4-openssl-dev pkg-config libssl-dev libbz2-dev libjpeg-turbo8-dev libpng-dev libxpm-dev libfreetype6-dev libmcrypt4 libmcrypt-dev libpq-dev libreadline-dev libtidy-dev libxslt1-dev
 ```
 
-### PhpBrew - Install PHP 7.2.5
+Argon2 Password Hash:
 
 ```Shell
+#  Ubuntu 18.04, PHP 7.2+
+sudo apt install argon2 libargon2-0 libargon2-0-dev
+```
+
+### PhpBrew - Install PHP 7.2.5
+```Shell
+
+# Ubuntu 18.04 (+argon2)
+phpbrew install -j $(nproc) php-7.2.5 \
+    +apxs2 +bcmath +bz2 +calendar +cli +ctype +curl +dom \
+    +fileinfo +filter +fpm +ftp +gd +gettext +iconv +intl +ipc +json +ldap \
+    +mbregex +mbstring +mhash +mcrypt +mysql +opcache +openssl \
+    +pcntl +pcre +pdo +pear +pgsql +phar +posix +readline +session +soap +sockets +sqlite +tidy +tokenizer +xml +zip \
+    -- \
+    --enable-gd-native-ttf \
+    --with-gd=shared \
+    --with-freetype-dir=/usr/include/freetype2/freetype \
+    --with-jpeg-dir=/usr \
+    --with-libdir=lib/x86_64-linux-gnu \
+    --with-png-dir=/usr \
+    --with-vpx-dir=/usr \
+    --with-xpm-dir=/usr \
+    --with-password-argon2
+
+# Ubuntu 16.04
 phpbrew install -j $(nproc) php-7.2.5 \
     +apxs2 +bcmath +bz2 +calendar +cli +ctype +curl +dom \
     +fileinfo +filter +fpm +ftp +gd +gettext +iconv +intl +ipc +json +ldap \
@@ -653,7 +678,7 @@ phpbrew extension install gd -- \
 
 phpbrew extension install opcache
 phpbrew extension install apcu
-phpbrew ext install xdebug 2.6.0
+phpbrew extension install xdebug 2.6.0
 ```
 
 ### PhpBrew - Install PHP 7.1.17
@@ -676,7 +701,7 @@ phpbrew install -j $(nproc) php-7.1.17 \
 
 phpbrew use php-7.1.17
 
-phpbrew ext install gd -- \
+phpbrew extension install gd -- \
 	--enable-gd-native-ttf \
 	--with-gd=shared \
 	--with-freetype-dir=/usr/include/freetype2/freetype \
@@ -686,9 +711,9 @@ phpbrew ext install gd -- \
 	--with-vpx-dir=/usr \
 	--with-xpm-dir=/usr
 
-phpbrew ext install opcache
-phpbrew ext install apcu
-phpbrew ext install xdebug 2.6.0
+phpbrew extension install opcache
+phpbrew extension install apcu
+phpbrew extension install xdebug 2.6.0
 ```
 
 ### PhpBrew - Install PHP 7.0.30
@@ -711,7 +736,7 @@ phpbrew install -j $(nproc) php-7.0.30 \
 
 phpbrew use php-7.0.30
 
-phpbrew ext install gd -- \
+phpbrew extension install gd -- \
 	--enable-gd-native-ttf \
 	--with-gd=shared \
 	--with-freetype-dir=/usr/include/freetype2/freetype \
@@ -721,9 +746,9 @@ phpbrew ext install gd -- \
 	--with-vpx-dir=/usr \
 	--with-xpm-dir=/usr
 
-phpbrew ext install opcache
-phpbrew ext install apcu
-phpbrew ext install xdebug 2.6.0
+phpbrew extension install opcache
+phpbrew extension install apcu
+phpbrew extension install xdebug 2.6.0
 ```
 
 ### Ubuntu 16.04: PhpBrew - Install PHP 5.6.36
@@ -752,7 +777,7 @@ phpbrew install -j $(nproc) php-5.6.36 \
 ```Shell
 phpbrew use php-5.6.36
 
-phpbrew ext install gd -- \
+phpbrew extension install gd -- \
 	--enable-gd-native-ttf \
 	--with-gd=shared \
 	--with-freetype-dir=/usr/include/freetype2/freetype \
@@ -762,8 +787,8 @@ phpbrew ext install gd -- \
 	--with-vpx-dir=/usr \
 	--with-xpm-dir=/usr
 
-phpbrew ext install opcache
-phpbrew ext install xdebug 2.5.5
+phpbrew extension install opcache
+phpbrew extension install xdebug 2.5.5
 ```
 
 ### Ubuntu 16.04: PhpBrew - Install PHP 5.5.38
@@ -786,7 +811,7 @@ phpbrew install -j $(nproc) php-5.5.38 \
 
 phpbrew use php-5.5.38
 
-phpbrew ext install gd -- \
+phpbrew extension install gd -- \
 	--enable-gd-native-ttf \
 	--with-gd=shared \
 	--with-freetype-dir=/usr/include/freetype2/freetype \
@@ -796,8 +821,8 @@ phpbrew ext install gd -- \
 	--with-vpx-dir=/usr \
 	--with-xpm-dir=/usr
 
-phpbrew ext install opcache
-phpbrew ext install xdebug 2.5.5
+phpbrew extension install opcache
+phpbrew extension install xdebug 2.5.5
 ```
 
 ### Ubuntu 16.04: PhpBrew - Install PHP 5.4.45
@@ -818,7 +843,7 @@ phpbrew install -j $(nproc) php-5.4.45 \
 
 phpbrew use php-5.4.45
 
-phpbrew ext install gd -- \
+phpbrew extension install gd -- \
 	--enable-gd-native-ttf \
 	--with-gd=shared \
 	--with-freetype-dir=/usr/include/freetype2/freetype \
@@ -827,7 +852,7 @@ phpbrew ext install gd -- \
 	--with-png-dir=/usr \
 	--with-xpm-dir=/usr
 
-phpbrew ext install xdebug 2.4.1
+phpbrew extension install xdebug 2.4.1
 ```
 
 ### PhpBrew - Configure PHP
