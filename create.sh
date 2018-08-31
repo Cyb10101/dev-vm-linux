@@ -1,45 +1,6 @@
 #!/bin/bash
 
-rebootRequired() {
-	echo '';
-	echo "Reboot required: ${1}";
-	read -p 'Reboot? [y/N] ' -n 1 -r
-	echo
-	if [[ $REPLY =~ ^[Yy]$ ]]; then
-		sudo reboot
-	fi
-}
-
-rebootRequiredForce() {
-	echo '';
-	echo "Reboot required: ${1}";
-	read -p 'Reboot? [Y/n] ' -n 1 -r
-	echo
-	if [[ ! $REPLY =~ ^[Nn]$ ]]; then
-		sudo reboot
-	fi
-}
-
-appendBashRcFile() {
-	array=(
-		'source ~/.shell-methods'
-		'#sshAgentRestart'
-		'#sshAgentAddKey 24h ~/.ssh/id_rsa'
-		'addAlias'
-		'stylePS1'
-		'#terminalMotd'
-	)
-	for id in ${!array[*]}; do
-		if [[ ${1} == 'root' ]]; then
-			sudo sh -c "echo \"${array[$id]}\" >> ${2}"
-		else
-			echo "${array[$id]}" >> ${2}
-		fi
-	done
-}
-
-runInstallRequirements() {
-	# Install requirements
+installSystem() {
 	sudo add-apt-repository -y multiverse
 	sudo apt update
 
@@ -71,6 +32,24 @@ configureGrub() {
 		sudo sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT=".*"/GRUB_CMDLINE_LINUX_DEFAULT="consoleblank=0"/' /etc/default/grub
 	fi;
 	sudo update-grub
+}
+
+appendBashRcFile() {
+	array=(
+		'source ~/.shell-methods'
+		'#sshAgentRestart'
+		'#sshAgentAddKey 24h ~/.ssh/id_rsa'
+		'addAlias'
+		'stylePS1'
+		'#terminalMotd'
+	)
+	for id in ${!array[*]}; do
+		if [[ ${1} == 'root' ]]; then
+			sudo sh -c "echo \"${array[$id]}\" >> ${2}"
+		else
+			echo "${array[$id]}" >> ${2}
+		fi
+	done
 }
 
 configureBash() {
@@ -144,7 +123,7 @@ installZsh() {
 
 installApache2() {
 	# System Webserver (Apache)
-	sudo apt -y install apache2 php libapache2-mod-php php-fpm
+	sudo apt -y install apache2 php libapache2-mod-php php-fpm php-curl php-xml
 
 	if [[ $(lsb_release -rs) == '18.04' ]]; then
 		sudo a2enconf php7.2-fpm
@@ -211,6 +190,9 @@ installNginx() {
 }
 
 installPhpBrew() {
+	# http://phpbrew.github.io/phpbrew/
+	# https://github.com/phpbrew/phpbrew/wiki/Requirement
+
 	curl -L -O https://github.com/phpbrew/phpbrew/raw/master/phpbrew
 	chmod +x phpbrew
 	sudo mv phpbrew /usr/local/bin/phpbrew
@@ -354,7 +336,7 @@ configurePhpXdebug-php-5.4.45() {
 	sed -i 's/^zend_extension=.*/zend_extension=\/home\/user\/.phpbrew\/php\/php-5.4.45\/lib\/php\/extensions\/no-debug-non-zts-20100525\/xdebug.so/' /home/user/.phpbrew/php/php-5.4.45/var/db/xdebug.ini
 }
 
-### PhpBrew FPM configuration
+# PhpBrew FPM configuration
 configurePhpFpm7() {
 	sed -i 's/^user = nobody$/;user = nobody/' /home/user/.phpbrew/php/${1}/etc/php-fpm.d/www.conf
 	sed -i 's/^group = nobody$/;group = nobody/' /home/user/.phpbrew/php/${1}/etc/php-fpm.d/www.conf
@@ -497,6 +479,8 @@ installFakeMail() {
 }
 
 installMailCatcher() {
+	# https://mailcatcher.me/
+
 	sudo apt -y install build-essential libsqlite3-dev ruby-dev
 	sudo gem install mailcatcher
 	sudo sh -c 'echo "@reboot root \$(which mailcatcher) --ip=0.0.0.0" >> /etc/crontab'
@@ -512,6 +496,8 @@ installMailCatcher() {
 }
 
 installComposer() {
+	# https://getcomposer.org/download/
+
 	php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 	php -r "if (hash_file('SHA384', 'composer-setup.php') === '544e09ee996cdf60ece3804abc52599c22b1f40f4323403c44d44fdfdd586475ca9813a858088ffbc1f233e9b180f061') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
 	php composer-setup.php
@@ -522,8 +508,12 @@ installComposer() {
 installWebsite() {
 	sudo rm -rf /var/www/html
 	sudo rsync -a /home/user/dev-vm-linux/var/www/ /var/www/
+}
 
-	# PHP <= 7.2 - No LTS version - Long term support
+installWebsiteTypo3() {
+	# https://packagist.org/packages/typo3/cms-base-distribution
+
+	# @todo PHP <= 7.2 - No LTS version - Long term support
 	# composer create-project typo3/cms-base-distribution /var/www/typo3demo ^9
 
 	# PHP <= 7.0
@@ -561,13 +551,13 @@ runDockerTest() {
 	echo
 	if [[ ! $REPLY =~ ^[Nn]$ ]]; then
 		# Run hello world test
-		docker run hello-world
+		sudo docker run hello-world
 
 		# Delete all container
-		docker rm $(docker ps -a -q)
+		sudo docker rm $(sudo docker ps -a -q)
 
 		# Delete all images
-		docker rmi $(docker images -q)
+		sudo docker rmi $(sudo docker images -q)
 
 		read -n 1 -s -r -p 'Press any key to continue...'
 		echo
@@ -636,6 +626,15 @@ runCleanup() {
 	sudo rm /root/.zsh_history
 }
 
+rebootRequired() {
+	echo '';
+	read -p 'Reboot? [Y/n] ' -n 1 -r
+	echo
+	if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+		sudo reboot
+	fi
+}
+
 menu() {
 	echo ''
 	echo '1) Install requirements'
@@ -646,7 +645,7 @@ menu() {
 
 	case "$choice" in
 		'1')
-			runInstallRequirements
+			installSystem
 		;;
 		'2')
 			copyFiles
@@ -668,6 +667,7 @@ menu() {
 			installMailCatcher
 			installComposer
 			installWebsite
+			installWebsiteTypo3
 		;;
 		'5')
 			installDocker
@@ -683,9 +683,9 @@ menu() {
 			runApportCli
 			runSystemUpdate
 			runCleanup
+			rebootRequired
 		;;
 		'9')
-			rebootRequiredForce '-'
 		;;
 
 		'0')
@@ -698,8 +698,8 @@ menu() {
 	esac
 }
 
-
 if [ -f /home/user/.phpbrew/bashrc ]; then
 	source /home/user/.phpbrew/bashrc
+	phpbrew use php-7.2.5
 fi
 menu

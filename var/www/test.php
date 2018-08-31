@@ -45,6 +45,28 @@ class Website {
 				<tr><th>Server</th><td><?php echo $_SERVER['SERVER_SOFTWARE']; ?></td></tr>
 				<tr><th>PHP</th><td><?php echo phpversion(); ?></td></tr>
 				<tr><th>Current Work Directory</th><td><?php echo getcwd(); ?></td></tr>
+			</table><br>
+
+			<h2>PHP INI Changes</h2>
+			<table style="width: 100%;">
+				<tr><th>Key</th><th>Current value</th><th>Should be</th></tr>
+				<tr><th>error_reporting</th><td><?php echo ini_get('error_reporting'); ?></td><td><?php echo E_ALL; ?></td></tr>
+				<tr><th>display_errors</th><td><?php echo ini_get('display_errors'); ?></td><td>On</td></tr>
+				<tr><th>max_execution_time</th><td><?php echo ini_get('max_execution_time'); ?></td><td>300</td></tr>
+				<tr><th>max_input_time</th><td><?php echo ini_get('max_input_time'); ?></td><td>600</td></tr>
+				<tr><th>max_input_vars</th><td><?php echo ini_get('max_input_vars'); ?></td><td>2000</td></tr>
+				<tr><th>memory_limit</th><td><?php echo ini_get('memory_limit'); ?></td><td>2048M</td></tr>
+
+				<tr><th>date.timezone</th><td><?php echo ini_get('date.timezone'); ?></td><td>Europe/Berlin</td></tr>
+				<tr><th>mysqli.default_host</th><td><?php echo ini_get('mysqli.default_host'); ?></td><td>127.0.0.1</td></tr>
+				<tr><th>sendmail_path</th><td><?php echo ini_get('sendmail_path'); ?></td><td>/usr/bin/env /usr/local/bin/catchmail -t -f 'www-data@localhost'</td></tr>
+				<tr><th>session.gc_maxlifetime</th><td><?php echo ini_get('session.gc_maxlifetime'); ?></td><td>86400</td></tr>
+			</table><br>
+
+			<h2>PHP 5 INI Changes</h2>
+			<table style="width: 100%;">
+				<tr><th>always_populate_raw_post_data</th><td><?php echo ini_get('always_populate_raw_post_data'); ?></td><td>-1</td></tr>
+				<tr><th>mysql.default_host</th><td><?php echo ini_get('mysql.default_host'); ?></td><td>127.0.0.1</td></tr>
 			</table>
 		</div>
 	<?php

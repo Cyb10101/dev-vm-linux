@@ -360,15 +360,6 @@ Ubuntu 18.04: Find not used php versions and remove them.
 grep -linrE '5.6.36|5.5.38|5.4.45' /etc/apache2 /etc/nginx
 ```
 
-## MailCachter
-@todo https://mailcatcher.me/
-
-## Composer
-@todo https://getcomposer.org/download/
-
-## /var/www
-@todo https://packagist.org/packages/typo3/cms-base-distribution
-
 
 ## Ubuntu Desktop: Firefox Browser
 @todo firefox
