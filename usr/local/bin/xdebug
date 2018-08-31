@@ -18,16 +18,20 @@ if [ -f /home/user/.phpbrew/bashrc ]; then
 	read -p 'Enable xDebug? [y/N] ' -n 1 -r
 	echo
 	if [[ $REPLY =~ ^[Yy]$ ]]; then
-		xdebugSwitcher 'enable' '5.4.45'
-		xdebugSwitcher 'enable' '5.5.38'
-		xdebugSwitcher 'enable' '5.6.36'
+		if [[ $(lsb_release -rs) == '16.04' ]]; then
+			xdebugSwitcher 'enable' '5.4.45'
+			xdebugSwitcher 'enable' '5.5.38'
+			xdebugSwitcher 'enable' '5.6.36'
+		fi;
 		xdebugSwitcher 'enable' '7.0.30'
 		xdebugSwitcher 'enable' '7.1.17'
 		xdebugSwitcher 'enable' '7.2.5'
 	else
-		xdebugSwitcher 'disable' '5.4.45'
-		xdebugSwitcher 'disable' '5.5.38'
-		xdebugSwitcher 'disable' '5.6.36'
+		if [[ $(lsb_release -rs) == '16.04' ]]; then
+			xdebugSwitcher 'disable' '5.4.45'
+			xdebugSwitcher 'disable' '5.5.38'
+			xdebugSwitcher 'disable' '5.6.36'
+		fi;
 		xdebugSwitcher 'disable' '7.0.30'
 		xdebugSwitcher 'disable' '7.1.17'
 		xdebugSwitcher 'disable' '7.2.5'
