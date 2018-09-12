@@ -106,11 +106,11 @@ installDns() {
 
 	if [[ $(lsb_release -rs) == '18.04' ]]; then
 		sudo rsync -a /home/user/dev-vm-linux/etc/netplan/ /etc/netplan/
-		sudo service dnsmasq restart
+		sudo systemctl restart dnsmasq
 		sudo netplan generate && sudo netplan apply
 	fi;
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
-		sudo service dnsmasq restart
+		sudo systemctl restart dnsmasq
 	fi;
 	sudo resolvconf -u
 }
@@ -230,7 +230,7 @@ installPhpBrewRequirements() {
 
 	# Argon2 Password Hash (Ubuntu 18.04, PHP 7.2+)
 	if [[ $(lsb_release -rs) == '18.04' ]]; then
-		sudo apt install argon2 libargon2-0 libargon2-0-dev
+		sudo apt -y install argon2 libargon2-0 libargon2-0-dev
 	fi;
 }
 
@@ -478,7 +478,7 @@ installMySQL() {
 	sudo apt -y install mysql-server php-mysql
 
 	sudo cp /home/user/dev-vm-linux/etc/mysql/mysql.conf.d/zzz-development.cnf /etc/mysql/mysql.conf.d/
-	sudo service mysql restart
+	sudo systemctl restart mysql
 
 	mysql <<EOF
 SELECT host, user FROM mysql.user;
@@ -586,7 +586,7 @@ installSamba() {
 	sudo apt -y install samba
 	sudo rsync -a /home/user/dev-vm-linux/etc/samba/smb.conf /etc/samba/
 	echo -e "user\nuser" | sudo smbpasswd -s -a user
-	sudo service smbd restart
+	sudo systemctl restart smbd
 }
 
 # NPM - Node Package Manager
