@@ -422,7 +422,7 @@ Configure Dnsmasq.
 ```Shell
 sudo sh -c 'echo "address=/.vm/127.0.0.1" >> /etc/dnsmasq.conf'
 
-sudo service dnsmasq restart
+sudo systemctl restart dnsmasq
 sudo resolvconf -u
 ```
 
@@ -464,7 +464,7 @@ network:
 Configure Dnsmasq and restart network.
 
 ```Shell
-sudo service dnsmasq restart
+sudo systemctl restart dnsmasq
 sudo netplan generate && sudo netplan apply
 sudo resolvconf -u
 ```
@@ -1023,7 +1023,7 @@ pager=less -FSRX
 Restart MySQL.
 
 ```Shell
-sudo service mysql restart
+sudo systemctl restart mysql
 ```
 
 ###  MySQL - Allow access from normal users
@@ -1239,7 +1239,7 @@ Configure Samba /etc/samba/smb.conf:
 sudo smbpasswd -a user
 # Password: user
 
-sudo service smbd restart
+sudo systemctl restart smbd
 ```
 
 ## NPM - Node Package Manager

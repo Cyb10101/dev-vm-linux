@@ -311,7 +311,7 @@ sudo ln -s /mnt/data/var/www /var/
 #### HDD2 - Move MySQL
 
 ```Shell
-sudo service mysql stop
+sudo systemctl stop mysql
 sudo mkdir -p /mnt/data/var/lib
 sudo mv /var/lib/mysql /mnt/data/var/lib/
 sudo ln -s /mnt/data/var/lib/mysql /var/lib/mysql
@@ -328,8 +328,8 @@ alias /var/lib/mysql/ -> /mnt/data/var/lib/mysql/,
 Restart AppArmor and MySQL.
 
 ```Shell
-sudo service apparmor restart
-sudo service mysql start
+sudo systemctl restart apparmor
+sudo systemctl start mysql
 ```
 
 ## Configure system
