@@ -1,16 +1,16 @@
 #!/bin/bash
 
+pauseAnyKey() {
+	read -n 1 -s -r -p 'Press any key to continue...'
+	echo
+}
+
 installSystem() {
 	sudo add-apt-repository -y multiverse
 	sudo apt update
 
-	echo '';
-	echo 'If you use german keyboard layout install the language pack.';
-	read -p 'Install german language pack? [Y/n] ' -n 1 -r
-	echo
-	if [[ ! $REPLY =~ ^[Nn]$ ]]; then
-	    sudo apt -y install language-pack-de
-	fi
+	# If you use german keyboard layout, install the language pack
+	sudo apt -y install language-pack-de
 
 	sudo apt -y dist-upgrade
 
@@ -70,7 +70,9 @@ installZsh() {
 	sudo rsync -a /tmp/.oh-my-zsh/ /root/.oh-my-zsh/
 	sudo chown -R root:root /root/.oh-my-zsh
 	sudo chown root:root /root/.zshrc
+}
 
+installMotd() {
 	## Message of the day - Disable to much information
 	sudo chmod -x /etc/update-motd.d/10-help-text
 
@@ -82,15 +84,23 @@ installZsh() {
 	## Message of the day - Keep me from working
 	sudo apt -y install boxes lolcat fortune-mod fortunes fortunes-min fortunes-de fortunes-ubuntu-server fortunes-bofh-excuses
 	sudo chmod -x /etc/update-motd.d/60-ubuntu-server-tip
+}
 
+installDns() {
 	# DNS Server (example.vm)
 	if [[ $(lsb_release -rs) == '18.04' ]]; then
-		sudo sh -c 'echo "127.0.1.1    dev-vm" >> /etc/hosts'
+		sudo sh -c 'echo "127.0.0.1    dev-vm" >> /etc/hosts'
 	fi;
 
 	## Install & configure Dnsmasq
 	sudo apt -y install dnsmasq
-	sudo sh -c 'echo "nameserver 127.0.1.1" >> /etc/resolvconf/resolv.conf.d/head'
+	if [[ $(lsb_release -rs) == '18.04' ]]; then
+		sudo sh -c 'echo "nameserver 127.0.0.1" >> /etc/resolvconf/resolv.conf.d/head'
+	fi;
+	if [[ $(lsb_release -rs) == '16.04' ]]; then
+		sudo sh -c 'echo "nameserver 127.0.1.1" >> /etc/resolvconf/resolv.conf.d/head'
+	fi;
+
 	sudo sh -c 'echo "nameserver 8.8.8.8" >> /etc/resolvconf/resolv.conf.d/head'
 	sudo sh -c 'echo "address=/.vm/127.0.0.1" >> /etc/dnsmasq.conf'
 
@@ -103,23 +113,29 @@ installZsh() {
 		sudo service dnsmasq restart
 	fi;
 	sudo resolvconf -u
+}
 
+testDns() {
 	echo '';
 	read -p 'Test DNS Server? [Y/n] ' -n 1 -r
 	echo
 	if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+		# Check DNS Server Port 53
+		sudo ss -pan 'sport = 53'
+		pauseAnyKey
+
 		# Test resolv.conf
 		cat /etc/resolv.conf
 		ping -c 4 example.vm
-		read -n 1 -s -r -p 'Press any key to continue...'
+		pauseAnyKey
 
 		if [[ $(lsb_release -rs) == '18.04' ]]; then
 			systemd-resolve --status
-			read -n 1 -s -r -p 'Press any key to continue...'
+			pauseAnyKey
 		fi;
-		echo
 	fi
 }
+
 
 installApache2() {
 	# System Webserver (Apache)
@@ -201,6 +217,9 @@ installPhpBrew() {
 
 	echo 'source /home/user/.phpbrew/bashrc' >> /home/user/.bashrc
 	echo 'source /home/user/.phpbrew/bashrc' >> /home/user/.zshrc
+	if [ -f /home/user/.phpbrew/bashrc ]; then
+		source /home/user/.phpbrew/bashrc
+	fi
 }
 
 installPhpBrewRequirements() {
@@ -436,7 +455,7 @@ phpBrewConfigure() {
 		configurePhpXdebug 'php-5.4.45'
 		configurePhpXdebug-php-5.4.45
 	fi;
-	/usr/local/bin/xdebug
+	/usr/local/bin/xdebug disable
 
 	# Configure PHP FPM
 	configurePhpFpm7 'php-7.2.5'
@@ -559,8 +578,7 @@ runDockerTest() {
 		# Delete all images
 		sudo docker rmi $(sudo docker images -q)
 
-		read -n 1 -s -r -p 'Press any key to continue...'
-		echo
+		pauseAnyKey
 	fi
 }
 
@@ -585,7 +603,7 @@ installNpm() {
 	sudo npm install -g npm
 
 	# Install Packages
-	sudo npm install -g bower grunt-cli
+	sudo npm install -g grunt-cli
 }
 
 # Yarn - Package Manager
@@ -606,7 +624,7 @@ runSystemUpdate() {
 	sudo apt update && sudo apt -y dist-upgrade && sudo apt -y autoremove
 
 	sudo npm -g outdated
-	sudo npm install -g npm bower grunt-cli
+	sudo npm install -g npm grunt-cli
 }
 
 runCleanup() {
@@ -635,71 +653,45 @@ rebootRequired() {
 	fi
 }
 
-menu() {
-	echo ''
-	echo '1) Install requirements'
-	echo '2) runPart2'
-	echo '3) runPart3'
-	echo '0) Exit'
-	read -p 'Enter your choice: ' choice
+echo '';
+read -p 'Run installation? [y/N] ' -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+	installSystem
+	copyFiles
+	configureGrub
+	configureBash
+	installZsh
+	installMotd
 
-	case "$choice" in
-		'1')
-			installSystem
-		;;
-		'2')
-			copyFiles
-			configureGrub
-			configureBash
-			installZsh
-			installApache2
-			installNginx
-		;;
-		'3')
-			installPhpBrew
-			installPhpBrewRequirements
-			phpBrewBuild
-			phpBrewConfigure
-		;;
-		'4')
-			installMySQL
-			installFakeMail
-			installMailCatcher
-			installComposer
-			installWebsite
-			installWebsiteTypo3
-		;;
-		'5')
-			installDocker
-			installDockerCompose
-			runDockerTest
-		;;
-		'6')
-			installSamba
-			installNpm
-			installYarn
-		;;
-		'8')
-			runApportCli
-			runSystemUpdate
-			runCleanup
-			rebootRequired
-		;;
-		'9')
-		;;
+	installDns
+	installApache2
+	installNginx
 
-		'0')
-			exit 0
-		;;
-		*)
-			echo 'Wrong choice... Please try again.'
-			menu
-		;;
-	esac
-}
+	installPhpBrew
+	installPhpBrewRequirements
+	phpBrewBuild
+	phpBrewConfigure
 
-if [ -f /home/user/.phpbrew/bashrc ]; then
-	source /home/user/.phpbrew/bashrc
-	phpbrew use php-7.2.5
+	installMySQL
+	installFakeMail
+	installMailCatcher
+	installComposer
+	installWebsite
+	installWebsiteTypo3
+
+	installDocker
+	installDockerCompose
+
+	installSamba
+	installNpm
+	installYarn
+
+	testDns
+	runDockerTest
+
+	runApportCli
+	runSystemUpdate
+	runCleanup
+	rebootRequired
 fi
-menu

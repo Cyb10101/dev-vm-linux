@@ -159,16 +159,11 @@ Clone Reository.
 git clone https://github.com/Cyb10101/dev-vm-linux.git /home/user/dev-vm-linux
 ```
 
-@todo remove
-cd /home/user/dev-vm-linux && touch create.sh && chmod +x create.sh && vim create.sh && ./create.sh
-
-### Install Requirements
+### Install
 
 ```Shell
 /home/user/dev-vm-linux/create.sh
 ```
-
-Run "1".
 
 * Ubuntu 18.04: Configuring console-setup: UTF-8
 
@@ -179,7 +174,6 @@ sudo apt -y install gparted meld nautilus-compare
 mkdir ~/Templates
 touch '~/Templates/Empty Document Patch'
 ```
-
 
 ### Optional: Pretest PhpBrew Versions and update PHP
 @todo was damit machen?
