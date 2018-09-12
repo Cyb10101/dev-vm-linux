@@ -623,6 +623,8 @@ runApportCli() {
 runSystemUpdate() {
 	sudo apt update && sudo apt -y dist-upgrade && sudo apt -y autoremove
 
+	echo '';
+	echo 'NPM Update:';
 	sudo npm -g outdated
 	sudo npm install -g npm grunt-cli
 }
@@ -691,7 +693,13 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
 	runDockerTest
 
 	runApportCli
-	runSystemUpdate
 	runCleanup
 	rebootRequired
+fi
+
+echo '';
+read -p 'Update System? [y/N] ' -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+	runSystemUpdate
 fi
