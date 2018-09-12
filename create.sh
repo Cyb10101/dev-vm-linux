@@ -5,7 +5,25 @@ pauseAnyKey() {
 	echo
 }
 
+checkDpkgLock() {
+	i=0
+	tput sc
+	while fuser /var/lib/dpkg/lock >/dev/null 2>&1 ; do
+	    case $(($i % 4)) in
+	        0 ) j="-" ;;
+	        1 ) j="\\" ;;
+	        2 ) j="|" ;;
+	        3 ) j="/" ;;
+	    esac
+	    tput rc
+	    echo -en "\r[$j] Waiting for other software managers to finish..."
+	    sleep 0.5
+	    ((i=i+1))
+	done
+}
+
 installSystem() {
+	checkDpkgLock
 	sudo add-apt-repository -y multiverse
 	sudo apt update
 
@@ -701,5 +719,6 @@ echo '';
 read -p 'Update System? [y/N] ' -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
+	checkDpkgLock
 	runSystemUpdate
 fi
