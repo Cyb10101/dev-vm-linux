@@ -736,14 +736,11 @@ sudo reboot
 # For a XFCE4 Desktop
 sudo apt install xubuntu-desktop
 
-# Ubuntu 18.04: For a Ubuntu Unity Desktop
-sudo apt install ubuntu-unity-desktop
-
-# Ubuntu 16.04: For a Ubuntu Unity Desktop
+# Ubuntu 18.04 & 16.04
 sudo apt install ubuntu-desktop
 
-# For a Ubuntu Gnome Desktop
-sudo apt install ubuntu-gnome-desktop
+# Ubuntu 18.04: For a Ubuntu Unity Desktop (Old)
+sudo apt install ubuntu-unity-desktop
 
 # For the real Gnome Desktop
 sudo apt install gnome
