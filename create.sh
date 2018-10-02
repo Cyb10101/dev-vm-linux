@@ -490,6 +490,22 @@ phpBrewConfigure() {
 	phpBrewBugfix
 }
 
+configureDatabase() {
+	mysql <<EOF
+DROP USER 'root'@'%';
+DROP USER 'root'@'localhost';
+DROP USER 'root'@'127.0.0.1';
+CREATE USER 'root'@'%' IDENTIFIED BY 'root';
+CREATE USER 'root'@'localhost' IDENTIFIED BY 'root';
+CREATE USER 'root'@'127.0.0.1' IDENTIFIED BY 'root';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+SELECT host, user FROM mysql.user;
+EOF
+}
+
 installMySQL() {
 	echo debconf mysql-server/root_password password 'root' | sudo debconf-set-selections
 	echo debconf mysql-server/root_password_again password 'root' | sudo debconf-set-selections
@@ -497,17 +513,25 @@ installMySQL() {
 
 	sudo cp /home/user/dev-vm-linux/etc/mysql/mysql.conf.d/zzz-development.cnf /etc/mysql/mysql.conf.d/
 	sudo systemctl restart mysql
+	configureDatabase
+}
 
-	mysql <<EOF
-SELECT host, user FROM mysql.user;
-DROP USER 'root'@'%';
-DROP USER 'root'@'localhost';
-CREATE USER 'root'@'%' IDENTIFIED BY 'root';
-CREATE USER 'root'@'localhost' IDENTIFIED BY 'root';
-GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
-GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' WITH GRANT OPTION;
-FLUSH PRIVILEGES;
-EOF
+installMariaDB() {
+	echo debconf mysql-server/root_password password 'root' | sudo debconf-set-selections
+	echo debconf mysql-server/root_password_again password 'root' | sudo debconf-set-selections
+
+	## Install MariaDB 10.3
+	sudo apt -y install software-properties-common
+	sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
+	sudo add-apt-repository 'deb [arch=amd64,arm64,ppc64el] http://ftp.hosteurope.de/mirror/mariadb.org/repo/10.3/ubuntu bionic main'
+	if [[ $(lsb_release -rs) == '16.04' ]]; then
+		sudo apt update
+	fi;
+	sudo apt install mariadb-server php-mysql
+
+	sudo cp /home/user/dev-vm-linux/etc/mysql/mysql.conf.d/zzz-development.cnf /etc/mysql/mariadb.conf.d/
+	sudo systemctl restart mysql
+	configureDatabase
 }
 
 installFakeMail() {
@@ -693,7 +717,9 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
 	phpBrewBuild
 	phpBrewConfigure
 
-	installMySQL
+	#installMySQL
+  installMariaDB
+
 	installFakeMail
 	installMailCatcher
 	installComposer
