@@ -527,7 +527,7 @@ installMariaDB() {
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
 		sudo apt update
 	fi;
-	sudo apt install mariadb-server php-mysql
+	sudo apt -y install mariadb-server php-mysql
 
 	sudo cp /home/user/dev-vm-linux/etc/mysql/mysql.conf.d/zzz-development.cnf /etc/mysql/mariadb.conf.d/
 	sudo systemctl restart mysql
