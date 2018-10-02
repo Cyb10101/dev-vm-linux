@@ -252,8 +252,8 @@ installPhpBrewRequirements() {
 	fi;
 }
 
-phpBrewCompile-php-7.2.5Argon2() {
-	phpbrew install -j $(nproc) php-7.2.5 \
+phpBrewCompile-php-7.2.10Argon2() {
+	phpbrew install -j $(nproc) php-7.2.10 \
 		+apxs2 +bcmath +bz2 +calendar +cli +ctype +curl +dom \
 		+fileinfo +filter +fpm +ftp +gd +gettext +iconv +intl +ipc +json +ldap \
 		+mbregex +mbstring +mhash +mcrypt +mysql +opcache +openssl \
@@ -399,40 +399,40 @@ phpBrewBugfix() {
 }
 
 phpBrewBuild() {
-	# PHP 7.2.5
+	# PHP 7.2.10
 	if [[ $(lsb_release -rs) == '18.04' ]]; then
-		phpBrewCompile-php-7.2.5Argon2
+		phpBrewCompile-php-7.2.10Argon2
 		# @todo On build error 'a2enmod php7' retry once
-		phpBrewCompile-php-7.2.5Argon2
+		phpBrewCompile-php-7.2.10Argon2
 	fi;
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
-		phpBrewCompile-php 'php-7.2.5'
+		phpBrewCompile-php 'php-7.2.10'
 		# @todo On build error 'a2enmod php7' retry once
-		phpBrewCompile-php 'php-7.2.5'
+		phpBrewCompile-php 'php-7.2.10'
 	fi;
 
-	phpbrew use php-7.2.5
+	phpbrew use php-7.2.10
 	phpBrewExtension-php-7
 
-	# PHP 7.1.17
-	phpBrewCompile-php 'php-7.1.17'
-	phpbrew use php-7.1.17
+	# PHP 7.1.22
+	phpBrewCompile-php 'php-7.1.22'
+	phpbrew use php-7.1.22
 	phpBrewExtension-php-7
 
-	# PHP 7.0.30
-	phpBrewCompile-php 'php-7.0.30'
-	phpbrew use php-7.0.30
+	# PHP 7.0.32
+	phpBrewCompile-php 'php-7.0.32'
+	phpbrew use php-7.0.32
 	phpBrewExtension-php-7
 
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
 		sudo apt -y install libvpx-dev
 
-		# PHP 5.6.36
-		phpBrewCompile-php 'php-5.6.36'
+		# PHP 5.6.38
+		phpBrewCompile-php 'php-5.6.38'
 		# @todo On build error 'a2enmod php5' retry once
-		phpBrewCompile-php 'php-5.6.36'
+		phpBrewCompile-php 'php-5.6.38'
 
-		phpbrew use php-5.6.36
+		phpbrew use php-5.6.38
 		phpBrewExtension-php-5
 
 		# PHP 5.5.38
@@ -444,17 +444,17 @@ phpBrewBuild() {
 		phpBrewCompile-php-5.4.45
 	fi;
 
-	phpbrew switch php-7.2.5
+	phpbrew switch php-7.2.10
 }
 
 phpBrewConfigure() {
 	# Configure PHP
-	configurePhpIni 'php-7.2.5'
-	configurePhpIni 'php-7.1.17'
-	configurePhpIni 'php-7.0.30'
+	configurePhpIni 'php-7.2.10'
+	configurePhpIni 'php-7.1.22'
+	configurePhpIni 'php-7.0.32'
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
-		configurePhpIni 'php-5.6.36'
-		configurePhpIniPhp5 'php-5.6.36'
+		configurePhpIni 'php-5.6.38'
+		configurePhpIniPhp5 'php-5.6.38'
 
 		configurePhpIni 'php-5.5.38'
 		configurePhpIniPhp5 'php-5.5.38'
@@ -464,11 +464,11 @@ phpBrewConfigure() {
 	fi;
 
 	# Configure PHP xDebug
-	configurePhpXdebug 'php-7.2.5'
-	configurePhpXdebug 'php-7.1.17'
-	configurePhpXdebug 'php-7.0.30'
+	configurePhpXdebug 'php-7.2.10'
+	configurePhpXdebug 'php-7.1.22'
+	configurePhpXdebug 'php-7.0.32'
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
-		configurePhpXdebug 'php-5.6.36'
+		configurePhpXdebug 'php-5.6.38'
 		configurePhpXdebug 'php-5.5.38'
 		configurePhpXdebug 'php-5.4.45'
 		configurePhpXdebug-php-5.4.45
@@ -476,11 +476,11 @@ phpBrewConfigure() {
 	/usr/local/bin/xdebug disable
 
 	# Configure PHP FPM
-	configurePhpFpm7 'php-7.2.5'
-	configurePhpFpm7 'php-7.1.17'
-	configurePhpFpm7 'php-7.0.30'
+	configurePhpFpm7 'php-7.2.10'
+	configurePhpFpm7 'php-7.1.22'
+	configurePhpFpm7 'php-7.0.32'
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
-		configurePhpFpm5 'php-5.6.36'
+		configurePhpFpm5 'php-5.6.38'
 		configurePhpFpm5 'php-5.5.38'
 		configurePhpFpm5 'php-5.4.45'
 	fi;

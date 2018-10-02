@@ -411,10 +411,10 @@ chsh -s $(which zsh)
 Not recommended, but possible.
 
 ```Shell
-vim /home/user/.phpbrew/php/php-7.2.5/etc/php.ini
-vim /home/user/.phpbrew/php/php-7.1.17/etc/php.ini
-vim /home/user/.phpbrew/php/php-7.0.30/etc/php.ini
-vim /home/user/.phpbrew/php/php-5.6.36/etc/php.ini
+vim /home/user/.phpbrew/php/php-7.2.10/etc/php.ini
+vim /home/user/.phpbrew/php/php-7.1.22/etc/php.ini
+vim /home/user/.phpbrew/php/php-7.0.32/etc/php.ini
+vim /home/user/.phpbrew/php/php-5.6.38/etc/php.ini
 vim /home/user/.phpbrew/php/php-5.5.38/etc/php.ini
 vim /home/user/.phpbrew/php/php-5.4.45/etc/php.ini
 

@@ -189,17 +189,17 @@ sudo apt -y install php
 # Install PhpBrew
 
 # PHP Versionen aktualisieren
-find . -type f -exec sed -i '' \
-    -e 's/7\.2\.3/7\.2\.5/g' \
-    -e 's/7\.1\.15/7\.1\.17/g' \
-    -e 's/7\.0\.29/7\.0\.30/g' \
-    -e 's/5\.6\.34/5\.6\.36/g' \
+find . -type d -name '.git' -prune -o -type f -print -exec sed -i '' \
+    -e 's/7\.2\.5/7\.2\.10/g' \
+    -e 's/7\.1\.17/7\.1\.22/g' \
+    -e 's/7\.0\.30/7\.0\.32/g' \
+    -e 's/5\.6\.36/5\.6\.38/g' \
     {} \;
 
-mv etc/nginx/snippets/php-7.2.3.conf etc/nginx/snippets/php-7.2.5.conf
-mv etc/nginx/snippets/php-7.1.15.conf etc/nginx/snippets/php-7.1.17.conf
-mv etc/nginx/snippets/php-7.0.29.conf etc/nginx/snippets/php-7.0.30.conf
-mv etc/nginx/snippets/php-5.6.34.conf etc/nginx/snippets/php-5.6.36.conf
+mv etc/nginx/snippets/php-7.2.5.conf etc/nginx/snippets/php-7.2.10.conf
+mv etc/nginx/snippets/php-7.1.17.conf etc/nginx/snippets/php-7.1.22.conf
+mv etc/nginx/snippets/php-7.0.30.conf etc/nginx/snippets/php-7.0.32.conf
+mv etc/nginx/snippets/php-5.6.36.conf etc/nginx/snippets/php-5.6.38.conf
 ```
 
 ## Ubuntu Desktop: Configure operating system
@@ -351,7 +351,7 @@ mysql.default_host = 127.0.0.1
 Ubuntu 18.04: Find not used php versions and remove them.
 
 ```Shell
-grep -linrE '5.6.36|5.5.38|5.4.45' /etc/apache2 /etc/nginx
+grep -linrE '5.6.38|5.5.38|5.4.45' /etc/apache2 /etc/nginx
 ```
 
 

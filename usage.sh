@@ -40,6 +40,6 @@ menu() {
 
 if [ -f /home/user/.phpbrew/bashrc ]; then
 	source /home/user/.phpbrew/bashrc
-	phpbrew use php-7.2.5
+	phpbrew use php-7.2.10
 fi
 menu
