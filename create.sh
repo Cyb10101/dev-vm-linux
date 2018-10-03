@@ -523,8 +523,11 @@ installMariaDB() {
 	## Install MariaDB 10.3
 	sudo apt -y install software-properties-common
 	sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
-	sudo add-apt-repository 'deb [arch=amd64,arm64,ppc64el] http://ftp.hosteurope.de/mirror/mariadb.org/repo/10.3/ubuntu bionic main'
+	if [[ $(lsb_release -rs) == '18.04' ]]; then
+		sudo add-apt-repository 'deb [arch=amd64,arm64,ppc64el] http://ftp.hosteurope.de/mirror/mariadb.org/repo/10.3/ubuntu bionic main'
+	fi;
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
+		sudo add-apt-repository 'deb [arch=amd64,arm64,i386,ppc64el] http://ftp.hosteurope.de/mirror/mariadb.org/repo/10.3/ubuntu xenial main'
 		sudo apt update
 	fi;
 	sudo apt -y install mariadb-server php-mysql
