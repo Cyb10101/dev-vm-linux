@@ -508,6 +508,24 @@ phpCleanNotUsed() {
 	fi;
 }
 
+testPhp() {
+	if [[ $(lsb_release -rs) == '16.04' ]]; then
+		phpbrew use php-5.4.45
+		php -V
+		phpbrew use php-5.5.38
+		php -V
+		phpbrew use php-5.6.38
+		php -V
+	fi;
+
+	phpbrew use php-7.0.32
+	php -V
+	phpbrew use php-7.1.22
+	php -V
+	phpbrew use php-7.2.10
+	php -V
+}
+
 configureDatabase() {
 	mysql <<EOF
 DROP USER 'root'@'%';
@@ -767,6 +785,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
 	installYarn
 
 	testDns
+	testPhp
 	runDockerTest
 
 	runApportCli
