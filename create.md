@@ -351,7 +351,7 @@ Each new Terminal you opening on desktop or with ssh, you get a new message.
 Install required packages:
 
 ```Shell
-sudo apt install boxes lolcat fortune-mod fortunes fortunes-min fortunes-de fortunes-ubuntu-server fortunes-bofh-excuses
+sudo apt -y install boxes lolcat fortune-mod fortunes fortunes-min fortunes-de fortunes-ubuntu-server fortunes-bofh-excuses
 
 sudo chmod -x /etc/update-motd.d/60-ubuntu-server-tip
 ```
@@ -399,7 +399,7 @@ Configure Dnsmasq and NetworkManager.
 ```Shell
 sudo sh -c 'echo "address=/.vm/127.0.0.1" >> /etc/NetworkManager/dnsmasq.d/development'
 
-# sudo apt install resolvconf
+# sudo apt -y install resolvconf
 sudo vim /etc/NetworkManager/NetworkManager.conf
 ```
 
@@ -422,7 +422,7 @@ Configure Dnsmasq.
 ```Shell
 sudo sh -c 'echo "address=/.vm/127.0.0.1" >> /etc/dnsmasq.conf'
 
-sudo service dnsmasq restart
+sudo systemctl restart dnsmasq
 sudo resolvconf -u
 ```
 
@@ -464,7 +464,7 @@ network:
 Configure Dnsmasq and restart network.
 
 ```Shell
-sudo service dnsmasq restart
+sudo systemctl restart dnsmasq
 sudo netplan generate && sudo netplan apply
 sudo resolvconf -u
 ```
@@ -621,7 +621,7 @@ Argon2 Password Hash:
 
 ```Shell
 #  Ubuntu 18.04, PHP 7.2+
-sudo apt install argon2 libargon2-0 libargon2-0-dev
+sudo apt -y install argon2 libargon2-0 libargon2-0-dev
 ```
 
 ### PhpBrew - Install PHP 7.2.5
@@ -1023,7 +1023,7 @@ pager=less -FSRX
 Restart MySQL.
 
 ```Shell
-sudo service mysql restart
+sudo systemctl restart mysql
 ```
 
 ###  MySQL - Allow access from normal users
@@ -1239,7 +1239,7 @@ Configure Samba /etc/samba/smb.conf:
 sudo smbpasswd -a user
 # Password: user
 
-sudo service smbd restart
+sudo systemctl restart smbd
 ```
 
 ## NPM - Node Package Manager
@@ -1269,7 +1269,7 @@ sudo npm install -g bower grunt-cli
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
 sudo apt update
-sudo apt install --no-install-recommends yarn
+sudo apt -y install --no-install-recommends yarn
 ```
 
 ## Ubuntu Desktop: HeidiSQL
@@ -1412,7 +1412,7 @@ Boot with a Ubuntu Live ISO and fill empty space on hard disk with zeros.
 
 ```Shell
 sudo su
-apt install zerofree
+apt -y install zerofree
 blkid
 zerofree -v /dev/sda1
 poweroff

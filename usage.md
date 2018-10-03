@@ -311,7 +311,7 @@ sudo ln -s /mnt/data/var/www /var/
 #### HDD2 - Move MySQL
 
 ```Shell
-sudo service mysql stop
+sudo systemctl stop mysql
 sudo mkdir -p /mnt/data/var/lib
 sudo mv /var/lib/mysql /mnt/data/var/lib/
 sudo ln -s /mnt/data/var/lib/mysql /var/lib/mysql
@@ -328,8 +328,8 @@ alias /var/lib/mysql/ -> /mnt/data/var/lib/mysql/,
 Restart AppArmor and MySQL.
 
 ```Shell
-sudo service apparmor restart
-sudo service mysql start
+sudo systemctl restart apparmor
+sudo systemctl start mysql
 ```
 
 ## Configure system
@@ -453,7 +453,7 @@ IP address must be adapted for the virtual machine.
 Run in a terminal window:
 
 ```Shell
-sudo apt install sshfs
+sudo apt -y install sshfs
 sudo mkdir -p /mnt/ssh/vm
 
 vim ~/.bashrc && vim ~/.zshrc
@@ -492,7 +492,7 @@ net use Z: \\192.168.56.101\www /PERSISTENT:YES
 Run in a terminal window:
 
 ```Shell
-sudo apt install cifs-utils
+sudo apt -y install cifs-utils
 sudo mkdir -p /mnt/samba/vm
 sudo chmod 777 /mnt/samba/vm
 
@@ -529,7 +529,7 @@ IP address (192.168.56.101) must be adapted for the virtual machine.
 #### DNS Server - Linux Ubuntu Desktop
 
 ```Shell
-# sudo apt install resolvconf
+# sudo apt -y install resolvconf
 sudo vim /etc/NetworkManager/NetworkManager.conf
 ```
 
@@ -692,7 +692,7 @@ Choose if you wan't a minimal or a full desktop.
 Install the minimal XFCE4 Desktop:
 
 ```Shell
-sudo apt install xfce4
+sudo apt -y install xfce4
 ```
 
 To start the desktop type in terminal:
@@ -724,7 +724,7 @@ fi
 
 ```Shell
 # For the real Gnome Desktop
-sudo apt install gnome-core
+sudo apt -y install gnome-core
 
 # At finish installation
 sudo reboot
@@ -734,19 +734,19 @@ sudo reboot
 
 ```Shell
 # For a XFCE4 Desktop
-sudo apt install xubuntu-desktop
+sudo apt -y install xubuntu-desktop
 
 # Ubuntu 18.04: For a Ubuntu Unity Desktop
-sudo apt install ubuntu-unity-desktop
+sudo apt -y install ubuntu-unity-desktop
 
 # Ubuntu 16.04: For a Ubuntu Unity Desktop
-sudo apt install ubuntu-desktop
+sudo apt -y install ubuntu-desktop
 
 # For a Ubuntu Gnome Desktop
-sudo apt install ubuntu-gnome-desktop
+sudo apt -y install ubuntu-gnome-desktop
 
 # For the real Gnome Desktop
-sudo apt install gnome
+sudo apt -y install gnome
 
 # At finish installation
 sudo reboot
