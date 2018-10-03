@@ -89,6 +89,8 @@ Set password for root account with password: root
 
 ```Shell
 sudo passwd root
+
+sudo apt install git
 ```
 
 ### Visudo: No password for user
