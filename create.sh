@@ -511,19 +511,19 @@ phpCleanNotUsed() {
 testPhp() {
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
 		phpbrew use php-5.4.45
-		php -V
+		php -v | grep PHP | grep -v Copyright
 		phpbrew use php-5.5.38
-		php -V
+		php -v | grep PHP | grep -v Copyright
 		phpbrew use php-5.6.38
-		php -V
+		php -v | grep PHP | grep -v Copyright
 	fi;
 
 	phpbrew use php-7.0.32
-	php -V
+	php -v | grep PHP | grep -v Copyright
 	phpbrew use php-7.1.22
-	php -V
+	php -v | grep PHP | grep -v Copyright
 	phpbrew use php-7.2.10
-	php -V
+	php -v | grep PHP | grep -v Copyright
 }
 
 configureDatabase() {
