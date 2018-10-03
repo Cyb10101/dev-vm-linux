@@ -89,8 +89,6 @@ Set password for root account with password: root
 
 ```Shell
 sudo passwd root
-
-sudo apt install git
 ```
 
 ### Visudo: No password for user
@@ -142,9 +140,10 @@ sudo ifdown -a && sudo ifup -a
 
 ### Repository
 
-Clone Repository.
+Install Git & clone repository.
 
 ```Shell
+sudo apt -y install git
 git clone https://github.com/Cyb10101/dev-vm-linux.git /home/user/dev-vm-linux
 ```
 
