@@ -5,6 +5,17 @@ pauseAnyKey() {
 	echo
 }
 
+disableBlankConsole() {
+	setterm -blank 0 -powersave off
+}
+
+bugfixNetfilter() {
+	if [[ $(lsb_release -rs) == '18.04' ]]; then
+		# Default: 65536
+		sudo sysctl -w net.netfilter.nf_conntrack_max=524288
+	fi;
+}
+
 checkDpkgLock() {
 	i=0
 	tput sc
@@ -21,7 +32,6 @@ checkDpkgLock() {
 	    ((i=i+1))
 	done
 }
-
 installSystem() {
 	checkDpkgLock
 	sudo add-apt-repository -y multiverse
@@ -751,6 +761,9 @@ echo '';
 read -p 'Run installation? [y/N] ' -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
+	disableBlankConsole
+	bugfixNetfilter
+
 	installSystem
 	copyFiles
 	configureGrub
