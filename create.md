@@ -91,19 +91,6 @@ Set password for root account with password: root
 sudo passwd root
 ```
 
-Install minimal requirements.
-
-```Shell
-# Already installed
-# sudo apt -y install openssh-server vim git
-```
-
-Configure prefered editor (vim.basic).
-
-```Shell
-sudo update-alternatives --config editor
-```
-
 ### Visudo: No password for user
 
 ```Shell
@@ -153,13 +140,15 @@ sudo ifdown -a && sudo ifup -a
 
 ### Repository
 
-Clone Reository.
+Clone Repository.
 
 ```Shell
 git clone https://github.com/Cyb10101/dev-vm-linux.git /home/user/dev-vm-linux
 ```
 
 ### Install
+
+Run installation.
 
 ```Shell
 /home/user/dev-vm-linux/create.sh
@@ -187,6 +176,9 @@ In the script update the PHP versions for the installation.
 sudo apt -y install php
 
 # Install PhpBrew
+
+# Check available versions
+phpbrew known
 
 # PHP Versionen aktualisieren
 find . -type d -name '.git' -prune -o -type f -print -exec sed -i '' \
@@ -245,16 +237,6 @@ sudo apt -y install dconf-editor
 gsettings list-recursively | grep search
 ```
 
-## Configure Part 2
-
-Bash, Zsh, Message of the day
-
-```Shell
-/home/user/dev-vm-linux/create.sh
-```
-
-Run "2".
-
 ## Message of the day - Keep me from working
 @todo
 Yes, you wan't it! Your boss would kill you, but your soul thanks you.
@@ -298,63 +280,6 @@ sudo systemctl restart network-manager
 sudo resolvconf -u
 ```
 
-## PhpBrew
-@todo
-* http://phpbrew.github.io/phpbrew/
-* https://github.com/phpbrew/phpbrew/wiki/Requirement
-
-```Shell
-phpbrew known
-```
-
-### PhpBrew - Configure PHP
-
-@todo add to test site:
-```INI
-[PHP]
-error_reporting = E_ALL
-display_errors = On
-
-max_execution_time = 300
-max_input_time = 600
-max_input_vars = 2000
-memory_limit = 2048M
-
-upload_max_filesize = 200M
-post_max_size = 200M
-
-[Date]
-date.timezone = Europe/Berlin
-
-[MySQLi]
-mysqli.default_host = 127.0.0.1
-
-[mail function]
-sendmail_path = /usr/bin/env /usr/local/bin/catchmail -t -f 'www-data@localhost'
-
-[Session]
-session.gc_maxlifetime = 86400
-```
-
-* PHP <= 5.6
-
-```INI
-[PHP]
-always_populate_raw_post_data = -1
-
-[MySQL]
-mysql.default_host = 127.0.0.1
-```
-
-### PhpBrew cleanups
-@todo cleanup nötig?
-Ubuntu 18.04: Find not used php versions and remove them.
-
-```Shell
-grep -linrE '5.6.38|5.5.38|5.4.45' /etc/apache2 /etc/nginx
-```
-
-
 ## Ubuntu Desktop: Firefox Browser
 @todo firefox
 * Activate Bookmarks Toolbar
@@ -373,14 +298,6 @@ grep -linrE '5.6.38|5.5.38|5.4.45' /etc/apache2 /etc/nginx
 
 * TYPO3-Demo (Apache)
     - http://apache-demo.vm
-
-## Docker
-@todo https://docs.docker.com/install/linux/docker-ce/ubuntu/
-
-## Docker Compose
-@todo docker compose
-https://docs.docker.com/compose/install/#install-compose
-https://github.com/docker/compose/releases
 
 ## Samba
 @todo samba
