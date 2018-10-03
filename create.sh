@@ -211,6 +211,12 @@ installApache2() {
 	sudo a2ensite apache-demo.conf
 	sudo a2ensite zzz-wildcard-vm.conf
 	sudo a2ensite zzz-wildcard-company.conf
+
+	if [[ $(lsb_release -rs) == '18.04' ]]; then
+		# Bugfix: AH00144: couldn't grab the accept mutex
+		sudo sh -c 'echo "Mutex posixsem" >> /etc/apache2/apache2.conf'
+	fi;
+
 	sudo apache2ctl configtest && sudo systemctl restart apache2
 }
 
