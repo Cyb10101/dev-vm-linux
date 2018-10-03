@@ -490,6 +490,19 @@ phpBrewConfigure() {
 	phpBrewBugfix
 }
 
+phpCleanNotUsed() {
+	if [[ $(lsb_release -rs) == '18.04' ]]; then
+		rm /etc/nginx/snippets/php-5.6.38.conf
+		rm /etc/nginx/snippets/php-5.5.38.conf
+		rm /etc/nginx/snippets/php-5.4.45.conf
+		sed -i -e '/5\.6\.38\|5\.5\.38\|5\.4\.45/d' /etc/apache2/sites-available/*
+		sed -i -e '/5\.6\.38\|5\.5\.38\|5\.4\.45/d' /etc/nginx/sites-available/*
+
+		# Check if defect
+		# grep -linrE '5.6.38|5.5.38|5.4.45' /etc/apache2 /etc/nginx
+	fi;
+}
+
 configureDatabase() {
 	mysql <<EOF
 DROP USER 'root'@'%';
@@ -725,6 +738,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
 	installPhpBrewRequirements
 	phpBrewBuild
 	phpBrewConfigure
+	phpCleanNotUsed
 
 	#installMySQL
   installMariaDB
