@@ -32,7 +32,12 @@ installSystem() {
 
 	sudo apt -y dist-upgrade
 
+	# Install minimal requirements.
+	sudo apt -y install openssh-server vim git
 	sudo apt -y install curl htop putty-tools whois net-tools resolvconf
+
+	# Configure prefered editor
+	sudo update-alternatives --set editor /usr/bin/vim.basic
 }
 
 copyFiles() {
@@ -615,6 +620,8 @@ installWebsiteTypo3() {
 }
 
 installDocker() {
+	# https://docs.docker.com/install/linux/docker-ce/ubuntu/
+
 	sudo apt -y install apt-transport-https ca-certificates curl software-properties-common
 	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 	sudo add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
@@ -624,6 +631,9 @@ installDocker() {
 }
 
 installDockerCompose() {
+	# https://docs.docker.com/compose/install/#install-compose
+	# https://github.com/docker/compose/releases
+
 	sudo curl -L https://github.com/docker/compose/releases/download/1.20.1/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
 	sudo chmod +x /usr/local/bin/docker-compose
 }
