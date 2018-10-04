@@ -44,7 +44,7 @@ installSystem() {
 
 	# Install minimal requirements.
 	sudo apt -y install openssh-server vim git
-	sudo apt -y install curl htop putty-tools whois net-tools resolvconf
+	sudo apt -y install curl crudini htop putty-tools whois net-tools resolvconf
 
 	# Configure prefered editor
 	sudo update-alternatives --set editor /usr/bin/vim.basic
@@ -695,7 +695,30 @@ installSamba() {
 	sudo rsync -a /home/user/dev-vm-linux/etc/samba/smb.conf /etc/samba/
 	echo -e "user\nuser" | sudo smbpasswd -s -a user
 	sudo systemctl restart smbd
+	# configureSamba
 }
+
+configureSamba() {
+	# Not working, because samba configuration file ist defect
+	sudo crudini --set /etc/samba/smb.conf 'global' 'security' 'user'
+	sudo crudini --set /etc/samba/smb.conf 'global' 'allow insecure wide links' 'yes'
+	sudo crudini --set /etc/samba/smb.conf 'global' 'workgroup' 'Company'
+
+	sudo crudini --set /etc/samba/smb.conf 'www' 'comment' 'web path'
+	sudo crudini --set /etc/samba/smb.conf 'www' 'path' '/var/www'
+	sudo crudini --set /etc/samba/smb.conf 'www' 'public' 'no'
+	sudo crudini --set /etc/samba/smb.conf 'www' 'writeable' 'yes'
+	sudo crudini --set /etc/samba/smb.conf 'www' 'guest ok' 'no'
+	sudo crudini --set /etc/samba/smb.conf 'www' 'browseable' 'yes'
+	sudo crudini --set /etc/samba/smb.conf 'www' 'valid users' 'user'
+	sudo crudini --set /etc/samba/smb.conf 'www' 'create mask' '0664'
+	sudo crudini --set /etc/samba/smb.conf 'www' 'directory mask' '0750'
+	sudo crudini --set /etc/samba/smb.conf 'www' 'follow symlinks' 'yes'
+	sudo crudini --set /etc/samba/smb.conf 'www' 'wide links' 'yes'
+	sudo crudini --set /etc/samba/smb.conf 'www' 'force user' 'user'
+	sudo crudini --set /etc/samba/smb.conf 'www' 'force group' 'user'
+}
+
 
 # NPM - Node Package Manager
 installNpm() {

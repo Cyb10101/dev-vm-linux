@@ -157,14 +157,6 @@ Run installation.
 
 * Ubuntu 18.04: Configuring console-setup: UTF-8
 
-@todo desktop
-```Shell
-sudo apt -y install gparted meld nautilus-compare
-
-mkdir ~/Templates
-touch '~/Templates/Empty Document Patch'
-```
-
 ### Optional: Pretest PhpBrew Versions and update PHP
 @todo was damit machen?
 In the script update the PHP versions for the installation.
@@ -196,34 +188,6 @@ mv etc/nginx/snippets/php-5.6.36.conf etc/nginx/snippets/php-5.6.38.conf
 ```
 
 ## Ubuntu Desktop: Configure operating system
-@todo later or remove
-```Shell
-gsettings set org.gnome.desktop.session idle-delay 0
-gsettings set org.gnome.desktop.screensaver lock-enabled false
-gsettings set org.gnome.desktop.screensaver ubuntu-lock-on-suspend false
-
-gsettings set org.gtk.Settings.FileChooser show-hidden true
-gsettings set org.gnome.nautilus.preferences default-folder-viewer 'list-view'
-gsettings set org.gnome.nautilus.preferences executable-text-activation 'ask'
-gsettings set org.gnome.nautilus.list-view default-visible-columns "['name', 'owner', 'group', 'permissions']"
-```
-
-### Ubuntu 18.04 Desktop
-@todo later or remove
-```Shell
-gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'nothing'
-gsettings set org.gnome.nautilus.preferences executable-text-activation 'ask'
-```
-
-### Ubuntu 16.04 Desktop
-@todo later or remove
-```Shell
-gsettings set org.gnome.desktop.interface menus-have-icons true
-gsettings set org.gnome.desktop.interface buttons-have-icons true
-gsettings set org.gnome.desktop.interface clock-show-date true
-gsettings set com.canonical.indicator.session show-real-name-on-panel true
-gsettings set com.canonical.Unity integrated-menus true
-```
 
 * Ubuntu 16.04 Desktop: System Settings > Security & Privacy > Files & Applications > Record file and application usage = Off
 
@@ -256,147 +220,6 @@ Enable "terminalMotd" in bash & zsh:
 ```Shell
 vim ~/.bashrc && sudo vim /root/.bashrc
 vim ~/.zshrc && sudo vim /root/.zshrc
-```
-
-### Ubuntu Desktop
-@todo remove?
-Configure Dnsmasq and NetworkManager.
-
-```Shell
-sudo sh -c 'echo "address=/.vm/127.0.0.1" >> /etc/NetworkManager/dnsmasq.d/development'
-
-# sudo apt install resolvconf
-sudo vim /etc/NetworkManager/NetworkManager.conf
-```
-
-Append to file: /etc/NetworkManager/NetworkManager.conf
-
-```ini
-[main]
-dns=dnsmasq
-```
-
-```Shell
-sudo systemctl restart network-manager
-sudo resolvconf -u
-```
-
-## Ubuntu Desktop: Firefox Browser
-@todo firefox
-* Activate Bookmarks Toolbar
-
-* MailCachter
-    - http://127.0.0.1:1080/
-
-* Nginx Localhost
-    - http://127.0.0.1/
-
-* Apache Localhost
-    - http://127.0.0.1:8080/
-
-* TYPO3-Demo (Nginx)
-    - http://nginx-demo.vm
-
-* TYPO3-Demo (Apache)
-    - http://apache-demo.vm
-
-## Samba
-@todo samba
-Configure Samba /etc/samba/smb.conf:
-
-```Text
-[global]
-   security = user
-   allow insecure wide links = yes
-   workgroup = Company
-
-[www]
-  comment = web path
-  path = /var/www
-  public = no
-  writeable = yes
-  guest ok = no
-  browseable = yes
-  valid users = user
-  create mask = 0664
-  directory mask = 0750
-  follow symlinks = yes
-  wide links = yes
-  force user = user
-  force group = user
-```
-
-## Ubuntu Desktop: HeidiSQL
-@todo remove or else
-* https://www.heidisql.com/
-* https://www.chiark.greenend.org.uk/~sgtatham/putty/
-
-```Shell
-wget -O ~/Downloads/HeidiSQL.exe https://www.heidisql.com/installers/HeidiSQL_9.5.0.5196_Setup.exe
-wget -O ~/Downloads/putty.msi https://the.earth.li/~sgtatham/putty/latest/w64/putty-64bit-0.70-installer.msi
-
-sudo apt -y install playonlinux
-```
-
-Open PlayOnLinux and create a new virtual drive.
-
-* Tools > Manage Wine versions > Install latest 64 bit Wine version (current: 3.14)
-
-* Configure > New > 64 bit latest Wine Version (Container name: HeidiSQL)
-* Select Container
-	- Wine > Configure Wine > Application > Windows Version: Windows XP
-    - Miscellaneous > Run a .exe file in this virtual drive > Install HeidiSQL & Putty
-	- General > Make a new shortcut from this virtual drive > heidisql.exe > Shortcut name: HeidiSQL
-
-Remove HeidiSQL created Shortcut and convert icon from executable.
-
-```Shell
-rm ~/Downloads/HeidiSQL.exe ~/Desktop/HeidiSQL.desktop ~/Desktop/HeidiSQL.lnk ~/Downloads/putty.msi
-
-# Maybe Bug on Ubuntu 16.04
-wrestool -x -t14 --name=MAINICON ~/.PlayOnLinux/wineprefix/HeidiSQL/drive_c/Program\ Files/HeidiSQL/heidisql.exe > ~/.PlayOnLinux/wineprefix/HeidiSQL/drive_c/Program\ Files/HeidiSQL/heidisql.ico
-```
-
-Open HeidiSQL and create new session.
-
-* Session Name: Localhost
-* Hostname / IP: 127.0.0.1
-* User: root
-* Password: root
-* Port: 3306
-
-Connect Server Localhost in HeidiSQL and configure it.
-
-* Tools > Preferences > SQL > Editor font: Liberation Mono, 10pt
-
-## Ubuntu 16.04 Desktop: Do not display a dialog box on ACPI shutdown
-@todo desktop
-```Shell
-sudo vim /etc/acpi/powerbtn.sh
-```
-
-At the top of the file:
-
-```Shell
-/sbin/shutdown -h now 'Power button pressed' && exit 0
-```
-
-### Optional Ubuntu Desktop: Set Wallpaper
-@todo desktop
-Can of course also be configured via settings.
-
-```Shell
-ls /home/user/Pictures
-
-gsettings set org.gnome.desktop.background picture-uri "file:///home/user/Pictures/wallpaper.jpg"
-gsettings set org.gnome.desktop.background picture-options 'zoom'
-```
-
-Ubuntu 18.04: Additionally for lock screen
-
-```Shell
-gsettings set org.gnome.desktop.screensaver picture-uri "file:///home/user/Pictures/wallpaper.jpg"
-gsettings set org.gnome.desktop.screensaver picture-options 'zoom'
 ```
 
 ## Optional: Change keyboard layout
