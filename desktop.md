@@ -7,7 +7,7 @@ For those who need a desktop on the server, you can install one of the following
 Run desktop installation:
 
 ```Shell
-/home/user/dev-vm-linux/desktop.sh
+/home/user/dev-vm-linux/desktop
 ```
 
 * Ubuntu 16.04 Desktop: System Settings > Security & Privacy > Files & Applications > Record file and application usage = Off

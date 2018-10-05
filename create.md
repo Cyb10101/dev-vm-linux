@@ -152,7 +152,7 @@ git clone https://github.com/Cyb10101/dev-vm-linux.git /home/user/dev-vm-linux
 Run installation.
 
 ```Shell
-/home/user/dev-vm-linux/create.sh
+/home/user/dev-vm-linux/create
 ```
 
 * Ubuntu 18.04: Configuring console-setup: UTF-8

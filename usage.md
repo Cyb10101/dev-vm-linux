@@ -1,7 +1,9 @@
 ## Virtualbox import - General
 
 Here is explained step by step how to import the VirtualBox OVA file and configure the virtual machine.
-For some actions, you can easily use the usage script.
+
+For some actions, you can easily use the usage script:
+/home/user/dev-vm-linux/usage
 
 ### Import OVA file
 
