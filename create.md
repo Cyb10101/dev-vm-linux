@@ -187,17 +187,6 @@ mv etc/nginx/snippets/php-7.0.30.conf etc/nginx/snippets/php-7.0.32.conf
 mv etc/nginx/snippets/php-5.6.36.conf etc/nginx/snippets/php-5.6.38.conf
 ```
 
-## Optional: Change keyboard layout
-@todo was damit machen?
-Example:
-
-* Generic 105-key keyboard
-* English (US)
-
-```Shell
-sudo dpkg-reconfigure keyboard-configuration
-```
-
 ## Recommended: Shrink hard disk for export
 
 Boot with a Ubuntu Live ISO and fill empty space on hard disk with zeros.

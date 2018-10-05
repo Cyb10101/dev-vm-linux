@@ -1,6 +1,7 @@
 ## Virtualbox import - General
 
 Here is explained step by step how to import the VirtualBox OVA file and configure the virtual machine.
+For some actions, you can easily use the usage script.
 
 ### Import OVA file
 
@@ -90,16 +91,9 @@ The MySQL access:
 
 * Username: root | Password: root
 
-### Optional: Change keyboard layout
+## Optional: Change keyboard layout
 
-You may want to change the layout of your keyboard.
-Current keyboard layout is set to german.
-
-```Shell
-sudo dpkg-reconfigure keyboard-configuration
-```
-
-Example:
+Use usage script. Example:
 
 * Generic 105-key keyboard
 * English (US)
@@ -107,22 +101,6 @@ Example:
 ### Configure Network
 
 I recommend configuring the network because it can be different for everyone.
-
-### Set hostname
-
-Search for "dev-vm" and replace it in your name.
-
-Allowed: a-z 0-9 - (Hyphen)
-
-No capitalization! For example: dev-your-name
-
-```Shell
-sudo vim /etc/hostname
-sudo vim /etc/hosts
-sudo vim /etc/apache2/conf-available/server-name.conf
-```
-
-### Configure network
 
 With the command "ip a" you can check your current network configuration.
 
@@ -132,6 +110,16 @@ If that's not the case, you'll need to adjust those values.
 ```Shell
 ip a
 ```
+
+### Configure system
+
+Configure it in the usage script "Configure system".
+
+* Set hostname
+* Generate SSH Key
+* Generate a putty key
+* Configure Git
+* Development Context
 
 #### Optional Ubuntu 18.04 Server: Set static IP in network configuration
 
@@ -230,158 +218,11 @@ This allows you to variably adjust the storage space and even move it to another
 
 Partition and format the second hard disk in terminal or with gparted.
 
-#### HDD2 - Format second hard disk (Terminal - recommended)
-
-Format the second hard disk by using a terminal.
-
-* Start menu > Terminal
-
-```Shell
-sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | sudo fdisk /dev/sdb ${TGTDEV}
-  g # create a new empty GPT partition table
-  n # new partition
-  1 # partition number 1
-    # first sector (default)
-    # last sector (default)
-  p # print the partition table
-  w # write table to disk and exit
-EOF
-
-sudo mkfs.ext4 /dev/sdb1
-```
-
-#### HDD2 - Format second hard disk (GParted - alternative)
-
-Format the second hard disk by using GParted (GUI).
-
-For a server you need a Ubuntu Desktop Live CD.
-
-* Start menu > GParted
-* Select device (/dev/sdb)
-* Device > Create Partition Table > msdos or gpt
-* Partition > New
-    - File system: ext4
-    - Label: Data
-
-Reboot if you use a live disk.
-
-### HDD2 - Mount second hard disk (Fstab)
-
-* Start menu > Terminal
-
-```Shell
-sudo mkdir /mnt/data
-sudo blkid | grep sdb
-
-sudo vim /etc/fstab
-```
-
-* Ubuntu 18.04: Append to fstab
-
-```Text
-UUID=288132af-be1e-4a3a-a2b6-1210c9816f50 /mnt/data ext4 defaults 0 0
-```
-
-* Other Ubuntu: Append to fstab
-
-```Text
-UUID=288132af-be1e-4a3a-a2b6-1210c9816f50 /mnt/data ext4 errors=remount-ro 0 1
-```
-
-* Execute in Terminal
-
-```Shell
-sudo mount /mnt/data
-sudo chmod 777 /mnt/data
-```
-
-#### HDD2 - Move Webserver
-
-```Shell
-sudo mkdir -p /mnt/data/var/www
-sudo chown -R user:user /mnt/data/var
-sudo chmod 775 /mnt/data/var/www
-sudo chmod g+s /mnt/data/var/www
-
-sudo mv /var/www/!(.|..) /mnt/data/var/www/
-sudo rmdir /var/www
-sudo ln -s /mnt/data/var/www /var/
-```
-
-#### HDD2 - Move MySQL
-
-```Shell
-sudo service mysql stop
-sudo mkdir -p /mnt/data/var/lib
-sudo mv /var/lib/mysql /mnt/data/var/lib/
-sudo ln -s /mnt/data/var/lib/mysql /var/lib/mysql
-
-sudo vim /etc/apparmor.d/tunables/alias
-```
-
-Append to file alias.
-
-```Text
-alias /var/lib/mysql/ -> /mnt/data/var/lib/mysql/,
-```
-
-Restart AppArmor and MySQL.
-
-```Shell
-sudo service apparmor restart
-sudo service mysql start
-```
+Format the second hard disk by using the usage script "Create second harddisk".
 
 ## Configure system
 
 At this point you configure your system.
-
-### Generate SSH Key
-
-Use your own e-mail address.
-
-```Shell
-ssh-keygen -t rsa -b 4096 -C 'user@example.org'
-```
-
-### Convert SSH Key to Putty Key
-
-Generate a putty key.
-Is useful if you want to connect later using Putty or HeidiSQL.
-You can later use the windows release or copy it to your computer via SSH.
-
-
-```Shell
-puttygen /home/user/.ssh/id_rsa -o /var/www/id_rsa.ppk
-```
-
-### Configure Git
-
-Enter your own name & e-mail.
-
-```Shell
-git config --global user.name 'Your Name'
-git config --global user.email 'user@example.org'
-```
-
-### Development Context (User & Root)
-
-Search for "Development/YourName" and replace it in your own name.
-
-```Shell
-sudo vim /etc/apache2/conf-available/macro-virtual-host-defaults.conf
-sudo vim /etc/nginx/snippets/fastcgi-php.conf
-```
-
-## Add enviroment variables
-
-Replace "Development/YourName" with your own name.
-
-```Shell
-sudo sh -c 'echo "TYPO3_CONTEXT=Development/YourName" >> /etc/environment'
-sudo sh -c 'echo "FLOW_CONTEXT=Development/YourName" >> /etc/environment'
-sudo sh -c 'echo "WWW_CONTEXT=Development/YourName" >> /etc/environment'
-```
 
 ### Optional: Set domain
 
@@ -436,14 +277,12 @@ sendmail_path = /usr/sbin/sendmailfake
 sudo reboot
 ```
 
-## Usage script
-
 ### Message of the day - Keep me from working
 
 Yes, you wan't it! Your boss would kill you, but your soul thanks you.
 Each new Terminal you opening on desktop or with ssh, you get a new message.
 
-To activate/deactivate it, run usage script "Message of the day".
+To activate/deactivate it use usage script "Message of the day".
 
 Show which fortunes are available and configure it at function "terminalMotd" in .shell-methods file:
 
