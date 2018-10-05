@@ -10,6 +10,8 @@ Run desktop installation:
 /home/user/dev-vm-linux/desktop.sh
 ```
 
+* Ubuntu 16.04 Desktop: System Settings > Security & Privacy > Files & Applications > Record file and application usage = Off
+
 ### Autologin
 
 Forces auto login. Maybe not recommended.
@@ -117,4 +119,15 @@ Ubuntu 18.04: Additionally for lock screen
 ```Shell
 gsettings set org.gnome.desktop.screensaver picture-uri "file:///home/user/Pictures/wallpaper.jpg"
 gsettings set org.gnome.desktop.screensaver picture-options 'zoom'
+```
+
+### Optional: Watcher for changes to the configuration
+@todo later or remove
+
+For further configuration, you can use these tools.
+
+```Shell
+dconf watch /
+sudo apt -y install dconf-editor
+gsettings list-recursively | grep search
 ```

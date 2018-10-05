@@ -187,41 +187,6 @@ mv etc/nginx/snippets/php-7.0.30.conf etc/nginx/snippets/php-7.0.32.conf
 mv etc/nginx/snippets/php-5.6.36.conf etc/nginx/snippets/php-5.6.38.conf
 ```
 
-## Ubuntu Desktop: Configure operating system
-
-* Ubuntu 16.04 Desktop: System Settings > Security & Privacy > Files & Applications > Record file and application usage = Off
-
-### Optional: Watcher for changes to the configuration
-@todo later or remove
-
-For further configuration, you can use these tools.
-
-```Shell
-dconf watch /
-sudo apt -y install dconf-editor
-gsettings list-recursively | grep search
-```
-
-## Message of the day - Keep me from working
-@todo
-Yes, you wan't it! Your boss would kill you, but your soul thanks you.
-Each new Terminal you opening on desktop or with ssh, you get a new message.
-
-
-Show which fortunes are available and configure it at function "terminalMotd" in .shell-methods file:
-
-```Shell
-ls /usr/share/games/fortunes
-vim /home/user/.shell-methods
-```
-
-Enable "terminalMotd" in bash & zsh:
-
-```Shell
-vim ~/.bashrc && sudo vim /root/.bashrc
-vim ~/.zshrc && sudo vim /root/.zshrc
-```
-
 ## Optional: Change keyboard layout
 @todo was damit machen?
 Example:

@@ -436,6 +436,22 @@ sendmail_path = /usr/sbin/sendmailfake
 sudo reboot
 ```
 
+## Usage script
+
+### Message of the day - Keep me from working
+
+Yes, you wan't it! Your boss would kill you, but your soul thanks you.
+Each new Terminal you opening on desktop or with ssh, you get a new message.
+
+To activate/deactivate it, run usage script "Message of the day".
+
+Show which fortunes are available and configure it at function "terminalMotd" in .shell-methods file:
+
+```Shell
+ls /usr/share/games/fortunes
+vim /home/user/.shell-methods
+```
+
 ## Documentation
 
 What can i do?
