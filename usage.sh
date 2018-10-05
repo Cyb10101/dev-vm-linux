@@ -47,9 +47,9 @@ changeDevelopmentContext() {
 		sudo sed -i "s/\(.*SetEnv FLOW_CONTEXT Development\/\).*/\1${REPLY}/g" /etc/apache2/conf-available/macro-virtual-host-defaults.conf
 		sudo sed -i "s/\(.*SetEnv WWW_CONTEXT Development\/\).*/\1${REPLY}/g" /etc/apache2/conf-available/macro-virtual-host-defaults.conf
 
-		sudo sed -i "s/\(.*fastcgi_param TYPO3_CONTEXT Development\/\).*/\1${REPLY}/g" /etc/nginx/snippets/fastcgi-php.conf
-		sudo sed -i "s/\(.*fastcgi_param FLOW_CONTEXT Development\/\).*/\1${REPLY}/g" /etc/nginx/snippets/fastcgi-php.conf
-		sudo sed -i "s/\(.*fastcgi_param WWW_CONTEXT Development\/\).*/\1${REPLY}/g" /etc/nginx/snippets/fastcgi-php.conf
+		sudo sed -i "s/\(.*fastcgi_param TYPO3_CONTEXT Development\/\).*/\1${REPLY};/g" /etc/nginx/snippets/fastcgi-php.conf
+		sudo sed -i "s/\(.*fastcgi_param FLOW_CONTEXT Development\/\).*/\1${REPLY};/g" /etc/nginx/snippets/fastcgi-php.conf
+		sudo sed -i "s/\(.*fastcgi_param WWW_CONTEXT Development\/\).*/\1${REPLY};/g" /etc/nginx/snippets/fastcgi-php.conf
 
 		echoCommand="TYPO3_CONTEXT=Development/${REPLY}"
 		sudo sh -c "echo ${echoCommand} >> /etc/environment"
@@ -84,6 +84,26 @@ configureGit() {
 	if [[ $REPLY != '' ]]; then
 		git config --global user.email "${REPLY}"
 	fi
+}
+
+setDevelopmentDomain() {
+	echo '';
+	read -p 'Your development domain (vm00.company.org): ' -r
+	echo '';
+	if [[ $REPLY != '' ]]; then
+		expression1=`echo "${REPLY}" | sed -r "s/\./\\\./g"`
+		expression2=`echo "${REPLY}" | sed -r "s/\./\\\\\\\\\\\./g"`
+
+		find /etc/apache2/sites-available /etc/nginx/sites-available -type f -exec sed -i '' \
+		    -e "s/vm00\.example\.org/${expression1}/g" \
+		    -e "s/vm00\\\.example\\\.org/${expression2}/g" \
+		    {} \;
+	fi
+}
+
+restartWebserver() {
+	sudo apache2ctl configtest && sudo systemctl restart apache2
+	sudo nginx -t && sudo systemctl restart nginx
 }
 
 createSecondHarddisk() {
@@ -161,6 +181,19 @@ messageOfTheDayRoot() {
 	fi
 }
 
+changeShell() {
+	currentShellPath=`getent passwd $(id -un) | awk -F : '{print $NF}'`
+	bashPath=`which bash`
+	echo "Enter password user '${USER}'."
+	if [ "${currentShellPath}" == "${bashPath}" ]; then
+		chsh -s $(which zsh)
+		echo 'Shell is now zsh.'
+	else
+		chsh -s $(which bash)
+		echo 'Shell is now bash.'
+	fi
+}
+
 menu() {
 	echo ''
 	echo '1) Configure system'
@@ -168,6 +201,7 @@ menu() {
 	echo '3) Message of the day'
 	echo '4) Change keyboard layout'
 	echo '5) Convert SSH key to Putty key'
+	echo '6) Change login shell'
 	echo '0) Exit'
 	read -p 'Enter your choice: ' choice
 
@@ -178,6 +212,8 @@ menu() {
 			convertSshKeyToPutty
 			configureGit
 			changeDevelopmentContext
+			setDevelopmentDomain
+			restartWebserver
 			rebootRequired
 		;;
 		'2')
@@ -194,6 +230,9 @@ menu() {
 		;;
 		'5')
 			convertSshKeyToPutty
+		;;
+		'6')
+			changeShell
 		;;
 
 		'0')

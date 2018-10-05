@@ -119,7 +119,8 @@ Configure it in the usage script "Configure system".
 * Generate SSH Key
 * Generate a putty key
 * Configure Git
-* Development Context
+* Development context
+* Development domain
 
 #### Optional Ubuntu 18.04 Server: Set static IP in network configuration
 
@@ -224,28 +225,10 @@ Format the second hard disk by using the usage script "Create second harddisk".
 
 At this point you configure your system.
 
-### Optional: Set domain
-
-Search for "vm00.example.org" and replace it in your domain.
-
-```Shell
-find /etc/apache2/sites-available /etc/nginx/sites-available -type f -exec sed -i '' \
-    -e 's/vm00\.example\.org/vm00\.company\.de/g' \
-    -e 's/vm00\\\.example\\\.org/vm00\\\.company\\\.de/g' \
-    {} \;
-
-sudo apache2ctl configtest && sudo systemctl restart apache2
-sudo nginx -t && sudo systemctl restart nginx
-```
-
 ### Optional: Change login shell permanently
 
 Change from "bash" to "zsh" for the current user.
-
-```Shell
-chsh -s $(which zsh)
-# chsh -s $(which bash)
-```
+Use usage script "Change login shell".
 
 ### Optional: Switch from MailCachter to Fakemail
 
