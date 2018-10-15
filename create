@@ -265,6 +265,9 @@ installPhpBrewRequirements() {
 	sudo chmod -R oga+rw /usr/lib/apache2/modules
 	sudo chmod -R oga+rw /etc/apache2
 
+	# ImageMagick
+	sudo apt -y install libmagickwand-dev libmagickcore-dev
+
 	sudo apt -y install autoconf apache2-dev libxml2-dev libcurl4-openssl-dev pkg-config libssl-dev libbz2-dev libjpeg-turbo8-dev libpng-dev libxpm-dev libfreetype6-dev libmcrypt4 libmcrypt-dev libpq-dev libreadline-dev libtidy-dev libxslt1-dev
 
 	# Argon2 Password Hash (Ubuntu 18.04, PHP 7.2+)
@@ -322,6 +325,7 @@ phpBrewExtensionGd() {
 
 phpBrewExtension-php-7() {
 	phpBrewExtensionGd
+	phpbrew extension install imagick
 	phpbrew extension install opcache
 	phpbrew extension install apcu
 	phpbrew extension install xdebug 2.6.0
@@ -329,8 +333,13 @@ phpBrewExtension-php-7() {
 
 phpBrewExtension-php-5() {
 	phpBrewExtensionGd
+	phpbrew extension install imagick
 	phpbrew extension install opcache
 	phpbrew extension install xdebug 2.5.5
+}
+
+phpBrewExtension-php-5-4() {
+	phpbrew extension install imagick
 }
 
 phpBrewCompile-php-5.4.45() {
@@ -463,6 +472,7 @@ phpBrewBuild() {
 
 		# PHP 5.4.45
 		phpBrewCompile-php-5.4.45
+		phpBrewExtension-php-5-4
 	fi;
 
 	phpbrew switch php-7.2.10
@@ -613,18 +623,9 @@ installMailCatcher() {
 
 installComposer() {
 	# https://getcomposer.org/download/
-	hashComposer=93b54496392c062774670ac18b134c3b3a95e5a5e5c8f1a9f115f203b75bf9a129d5daa8ba6a13e2cc8a1da0806388a8
 
-	wget -O composer-setup.php https://getcomposer.org/installer
-	if [[ $(sha384sum composer-setup.php | awk '{print $1}') == ${hashComposer} ]]; then
-		php composer-setup.php
-		rm composer-setup.php
-		sudo mv composer.phar /usr/local/bin/composer
-	else
-		rm composer-setup.php
-		echo 'Composer installer corrupt! Installation aborted!';
-		pauseAnyKey
-	fi;
+	curl -sS https://getcomposer.org/installer | php
+	sudo mv composer.phar /usr/local/bin/composer
 }
 
 installWebsite() {
