@@ -13,15 +13,15 @@ Notes:
 * URL and VM can change through development
 * Keyboard layout is set to german
 
-Downloads:
+Downloads: https://netslum.de/downloads
 
 * Ubuntu 18.04, PHP <= 7.0, Docker edge:
-  - https://netslum.de/download/dev-vm-linux/UbuntuDev2018Server.ova
-  - https://netslum.de/download/dev-vm-linux/UbuntuDev2018Desktop.ova
+  - UbuntuDev2018Server
+  - UbuntuDev2018Desktop
 
 * Ubuntu 16.04, PHP <= 5.4, Docker stable:
-  - https://netslum.de/download/dev-vm-linux/UbuntuDev2016Server.ova
-  - https://netslum.de/download/dev-vm-linux/UbuntuDev2016Desktop.ova
+  - UbuntuDev2016Server
+  - UbuntuDev2016Desktop
 
 ## Create a virtual machine
 
