@@ -535,6 +535,9 @@ phpCleanNotUsed() {
 }
 
 testPhp() {
+	phpbrew list
+	pauseAnyKey
+
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
 		phpbrew use php-5.4.45
 		php -v | grep PHP | grep -v Copyright
