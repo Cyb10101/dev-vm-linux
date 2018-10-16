@@ -23,6 +23,10 @@ VirtualBox > Settings
   - Adapter 1, NAT
   - Adapter 2, Bridged Adapter, eth1 (Your network device)
 
+#### Bugfix: enp0s3: Detected Tx Unit Hang
+
+For Linux hosts systems, maybe you should use non Intel network card.
+You can use "PCnet-FAST III (Am79c973)" insteat.
 
 ### Download Ubuntu
 
