@@ -639,11 +639,8 @@ installWebsite() {
 installWebsiteTypo3() {
 	# https://packagist.org/packages/typo3/cms-base-distribution
 
-	# @todo PHP <= 7.2 - No LTS version - Long term support
-	# composer create-project typo3/cms-base-distribution /var/www/typo3demo ^9
-
-	# PHP <= 7.0
-	composer create-project typo3/cms-base-distribution /var/www/typo3demo ^8
+	# PHP <= 7.2
+	composer create-project typo3/cms-base-distribution /var/www/typo3demo ^9
 
 	php /var/www/typo3demo/vendor/bin/typo3cms install:setup \
 	    --no-interaction \
