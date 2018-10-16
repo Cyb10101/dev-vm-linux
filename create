@@ -183,8 +183,8 @@ installApache2() {
 
 	sudo a2enmod actions alias deflate expires headers macro rewrite proxy proxy_fcgi ssl vhost_alias
 
+	# ImageMagick & GraphicMagick
 	sudo apt -y install imagemagick graphicsmagick
-	# sudo apt -y install graphicsmagick graphicsmagick-imagemagick-compat
 
 	sudo rsync -a /home/user/dev-vm-linux/etc/apache2/conf-available/ /etc/apache2/conf-available/
 	sudo rsync -a /home/user/dev-vm-linux/etc/apache2/sites-available/ /etc/apache2/sites-available/
