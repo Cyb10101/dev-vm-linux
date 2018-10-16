@@ -38,8 +38,8 @@ server {
 	#include snippets/php-5.5.38.conf;
 	#include snippets/php-5.6.38.conf;
 	#include snippets/php-7.0.32.conf;
-	#include snippets/php-7.1.22.conf;
-	include snippets/php-7.2.10.conf;
+	#include snippets/php-7.1.23.conf;
+	include snippets/php-7.2.11.conf;
 }
 
 # example.org.dev.vm
@@ -82,8 +82,8 @@ server {
 	#include snippets/php-5.5.38.conf;
 	#include snippets/php-5.6.38.conf;
 	#include snippets/php-7.0.32.conf;
-	#include snippets/php-7.1.22.conf;
-	include snippets/php-7.2.10.conf;
+	#include snippets/php-7.1.23.conf;
+	include snippets/php-7.2.11.conf;
 }
 
 # www.example.vm
@@ -126,8 +126,8 @@ server {
 	#include snippets/php-5.5.38.conf;
 	#include snippets/php-5.6.38.conf;
 	#include snippets/php-7.0.32.conf;
-	#include snippets/php-7.1.22.conf;
-	include snippets/php-7.2.10.conf;
+	#include snippets/php-7.1.23.conf;
+	include snippets/php-7.2.11.conf;
 }
 
 # example.vm
@@ -170,6 +170,6 @@ server {
 	#include snippets/php-5.5.38.conf;
 	#include snippets/php-5.6.38.conf;
 	#include snippets/php-7.0.32.conf;
-	#include snippets/php-7.1.22.conf;
-	include snippets/php-7.2.10.conf;
+	#include snippets/php-7.1.23.conf;
+	include snippets/php-7.2.11.conf;
 }

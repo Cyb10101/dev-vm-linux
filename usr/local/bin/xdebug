@@ -20,8 +20,8 @@ function xdebugSwitcher {
 		runXdebugSwitcher ${1} '5.6.38'
 	fi;
 	runXdebugSwitcher ${1} '7.0.32'
-	runXdebugSwitcher ${1} '7.1.22'
-	runXdebugSwitcher ${1} '7.2.10'
+	runXdebugSwitcher ${1} '7.1.23'
+	runXdebugSwitcher ${1} '7.2.11'
 }
 
 if [ -f /home/user/.phpbrew/bashrc ]; then

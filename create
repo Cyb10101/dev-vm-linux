@@ -276,8 +276,8 @@ installPhpBrewRequirements() {
 	fi;
 }
 
-phpBrewCompile-php-7.2.10Argon2() {
-	phpbrew install -j $(nproc) php-7.2.10 \
+phpBrewCompile-php-7.2.11Argon2() {
+	phpbrew install -j $(nproc) php-7.2.11 \
 		+apxs2 +bcmath +bz2 +calendar +cli +ctype +curl +dom \
 		+fileinfo +filter +fpm +ftp +gd +gettext +iconv +intl +ipc +json +ldap \
 		+mbregex +mbstring +mhash +mcrypt +mysql +opcache +openssl \
@@ -429,24 +429,24 @@ phpBrewBugfix() {
 }
 
 phpBrewBuild() {
-	# PHP 7.2.10
+	# PHP 7.2.11
 	if [[ $(lsb_release -rs) == '18.04' ]]; then
-		phpBrewCompile-php-7.2.10Argon2
+		phpBrewCompile-php-7.2.11Argon2
 		# @todo On build error 'a2enmod php7' retry once
-		phpBrewCompile-php-7.2.10Argon2
+		phpBrewCompile-php-7.2.11Argon2
 	fi;
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
-		phpBrewCompile-php 'php-7.2.10'
+		phpBrewCompile-php 'php-7.2.11'
 		# @todo On build error 'a2enmod php7' retry once
-		phpBrewCompile-php 'php-7.2.10'
+		phpBrewCompile-php 'php-7.2.11'
 	fi;
 
-	phpbrew use php-7.2.10
+	phpbrew use php-7.2.11
 	phpBrewExtension-php-7
 
-	# PHP 7.1.22
-	phpBrewCompile-php 'php-7.1.22'
-	phpbrew use php-7.1.22
+	# PHP 7.1.23
+	phpBrewCompile-php 'php-7.1.23'
+	phpbrew use php-7.1.23
 	phpBrewExtension-php-7
 
 	# PHP 7.0.32
@@ -475,13 +475,13 @@ phpBrewBuild() {
 		phpBrewExtension-php-5-4
 	fi;
 
-	phpbrew switch php-7.2.10
+	phpbrew switch php-7.2.11
 }
 
 phpBrewConfigure() {
 	# Configure PHP
-	configurePhpIni 'php-7.2.10'
-	configurePhpIni 'php-7.1.22'
+	configurePhpIni 'php-7.2.11'
+	configurePhpIni 'php-7.1.23'
 	configurePhpIni 'php-7.0.32'
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
 		configurePhpIni 'php-5.6.38'
@@ -495,8 +495,8 @@ phpBrewConfigure() {
 	fi;
 
 	# Configure PHP xDebug
-	configurePhpXdebug 'php-7.2.10'
-	configurePhpXdebug 'php-7.1.22'
+	configurePhpXdebug 'php-7.2.11'
+	configurePhpXdebug 'php-7.1.23'
 	configurePhpXdebug 'php-7.0.32'
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
 		configurePhpXdebug 'php-5.6.38'
@@ -507,8 +507,8 @@ phpBrewConfigure() {
 	/usr/local/bin/xdebug disable
 
 	# Configure PHP FPM
-	configurePhpFpm7 'php-7.2.10'
-	configurePhpFpm7 'php-7.1.22'
+	configurePhpFpm7 'php-7.2.11'
+	configurePhpFpm7 'php-7.1.23'
 	configurePhpFpm7 'php-7.0.32'
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
 		configurePhpFpm5 'php-5.6.38'
@@ -549,9 +549,9 @@ testPhp() {
 
 	phpbrew use php-7.0.32
 	php -v | grep PHP | grep -v Copyright
-	phpbrew use php-7.1.22
+	phpbrew use php-7.1.23
 	php -v | grep PHP | grep -v Copyright
-	phpbrew use php-7.2.10
+	phpbrew use php-7.2.11
 	php -v | grep PHP | grep -v Copyright
 }
 

@@ -244,8 +244,8 @@ Use usage script "Change login shell".
 Not recommended, but possible.
 
 ```Shell
-vim /home/user/.phpbrew/php/php-7.2.10/etc/php.ini
-vim /home/user/.phpbrew/php/php-7.1.22/etc/php.ini
+vim /home/user/.phpbrew/php/php-7.2.11/etc/php.ini
+vim /home/user/.phpbrew/php/php-7.1.23/etc/php.ini
 vim /home/user/.phpbrew/php/php-7.0.32/etc/php.ini
 vim /home/user/.phpbrew/php/php-5.6.38/etc/php.ini
 vim /home/user/.phpbrew/php/php-5.5.38/etc/php.ini
