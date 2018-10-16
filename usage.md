@@ -83,6 +83,9 @@ In general, you should never need the user "root".
 
 ### Passwords
 
+The default username is "root" or "admin".
+The default password is "Admin123" or "Admin123!".
+
 The passwords of Linux users are the same as the user names.
 Note: You can't connect your ssh with the user "root".
 
@@ -92,6 +95,10 @@ Note: You can't connect your ssh with the user "root".
 The MySQL access:
 
 * Username: root | Password: root
+
+TYPO3 Backend:
+
+* Username: admin | Password: Admin123 | Install-Tool: Admin123
 
 ## Optional: Change keyboard layout
 
