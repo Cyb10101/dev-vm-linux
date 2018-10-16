@@ -418,7 +418,9 @@ phpBrewAutostart() {
 }
 
 phpBrewBugfix() {
-	sudo a2dismod php5
+	if [[ $(lsb_release -rs) == '16.04' ]]; then
+		sudo a2dismod php5
+	fi;
 	sudo a2dismod php7
 	if [[ $(lsb_release -rs) == '18.04' ]]; then
 		sudo a2dismod php7.2
@@ -792,7 +794,6 @@ read -p 'Run installation? [y/N] ' -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
 	disableBlankConsole
-	bugfixNetfilter
 
 	installSystem
 	copyFiles
@@ -802,6 +803,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
 	installMotd
 
 	installDns
+
 	installApache2
 	installNginx
 
@@ -821,6 +823,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
 	installWebsiteTypo3
 
 	installDocker
+	bugfixNetfilter
 	installDockerCompose
 
 	installSamba
