@@ -767,7 +767,7 @@ runCleanup() {
 	sudo chown -R user:user /etc/nginx/sites-available
 	sudo chown -R user:user /etc/nginx/sites-enabled
 
-	rm -rf /home/user/dev-vm-linux
+	# rm -rf /home/user/dev-vm-linux
 
 	sudo rm -rd /var/www/html
 	sudo rm /home/user/.mysql_history

@@ -1,3 +1,7 @@
+## I am crazy! Lazy or whatever...
+
+If you are in any way crazier, that may interest you.
+
 ### I need a desktop!
 
 No you don't... Maybe not recommended.
@@ -30,7 +34,7 @@ ExecStart=-/sbin/agetty --autologin user --noclear %I 38400 linux
 ```
 
 ## Ubuntu Desktop: Firefox Browser
-@todo firefox
+
 * Activate Bookmarks Toolbar
 
 * MailCachter
@@ -49,7 +53,7 @@ ExecStart=-/sbin/agetty --autologin user --noclear %I 38400 linux
     - http://apache-demo.vm
 
 ## Ubuntu Desktop: HeidiSQL
-@todo remove or else
+
 * https://www.heidisql.com/
 * https://www.chiark.greenend.org.uk/~sgtatham/putty/
 
@@ -92,7 +96,7 @@ Connect Server Localhost in HeidiSQL and configure it.
 * Tools > Preferences > SQL > Editor font: Liberation Mono, 10pt
 
 ## Ubuntu 16.04 Desktop: Do not display a dialog box on ACPI shutdown
-@todo desktop
+
 ```Shell
 sudo vim /etc/acpi/powerbtn.sh sudo vim /etc/acpi/powerbtn.sh
 ```
@@ -104,7 +108,7 @@ At the top of the file:
 ```
 
 ### Optional Ubuntu Desktop: Set Wallpaper
-@todo desktop
+
 Can of course also be configured via settings.
 
 ```Shell
@@ -122,7 +126,6 @@ gsettings set org.gnome.desktop.screensaver picture-options 'zoom'
 ```
 
 ### Optional: Watcher for changes to the configuration
-@todo later or remove
 
 For further configuration, you can use these tools.
 

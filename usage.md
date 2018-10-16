@@ -60,8 +60,6 @@ VirtualBox > Machine > Settings
     - Adapter Type: Intel PRO/1000 MT Desktop (82540EM)
     - Generate new MAC Address
 
-Optional for Desktop Version: Install Virtualbox Extension Pack
-
 #### Explanation of the network configuration
 
 This is a simple configuration of the network and theoretically should work well on all machines.
@@ -83,8 +81,7 @@ In general, you should never need the user "root".
 
 ### Passwords
 
-The default username is "root" or "admin".
-The default password is "Admin123" or "Admin123!".
+If login data is missing, the default username is "root" or "admin" and the default password is "Admin123" or "Admin123!".
 
 The passwords of Linux users are the same as the user names.
 Note: You can't connect your ssh with the user "root".
@@ -521,7 +518,3 @@ PhpStorm > Run > Edit Configurations > Defaults > PHP Remote Debug
 ### MySQL not working
 
 Set host "localhost" to "127.0.0.1".
-
-## I am crazy! Lazy or whatever...
-
-If you are in any way crazier, that may interest you.

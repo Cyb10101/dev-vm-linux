@@ -25,9 +25,10 @@ VirtualBox > Settings
 
 
 ### Download Ubuntu
+
 https://ubuntu.com/
 
-### Install Ubuntu Server 16.04
+### Installation for Ubuntu Server 16.04
 
 Note: Ubuntu 18.04, has no PHP 5.* and docker ready.
 
@@ -57,7 +58,7 @@ Note: Ubuntu 18.04, has no PHP 5.* and docker ready.
 * Install GRUB boot loader = Yes
 * Reboot
 
-### Install Ubuntu Server 18.04
+### Installation for Ubuntu Server 18.04
 
 Note: Ubuntu 18.04, has no PHP 5.* and docker ready.
 
@@ -157,39 +158,14 @@ Run installation.
 
 * Ubuntu 18.04: Configuring console-setup: UTF-8
 
-### Optional: Pretest PhpBrew Versions and update PHP
-@todo was damit machen?
-In the script update the PHP versions for the installation.
+Now you have created a new virtual machine.
 
-* Create Snapshot, install PHP, install PhpBrew
-* Query and update available PHP versions
-* Reset snapshot
-
-```Shell
-sudo apt -y install php
-
-# Install PhpBrew
-
-# Check available versions
-phpbrew known
-
-# PHP Versionen aktualisieren
-find . -type d -name '.git' -prune -o -type f -print -exec sed -i '' \
-    -e 's/7\.2\.10/7\.2\.11/g' \
-    -e 's/7\.1\.22/7\.1\.23/g' \
-    -e 's/7\.0\.30/7\.0\.32/g' \
-    -e 's/5\.6\.36/5\.6\.38/g' \
-    {} \;
-
-mv etc/nginx/snippets/php-7.2.10.conf etc/nginx/snippets/php-7.2.11.conf
-mv etc/nginx/snippets/php-7.1.22.conf etc/nginx/snippets/php-7.1.23.conf
-mv etc/nginx/snippets/php-7.0.30.conf etc/nginx/snippets/php-7.0.32.conf
-mv etc/nginx/snippets/php-5.6.36.conf etc/nginx/snippets/php-5.6.38.conf
-```
+I recommend to export the virtual machine to a ova file. See following...
 
 ## Recommended: Shrink hard disk for export
 
 Boot with a Ubuntu Live ISO and fill empty space on hard disk with zeros.
+This make your exportet image smaller.
 
 ```Shell
 sudo su
@@ -208,3 +184,33 @@ poweroff
 ## Virtualbox import
 
 To import a OVA file and configure the virtual machine see file [usage.md](usage.md).
+
+## Optional: Pretest PhpBrew versions and update PHP
+
+Update the PHP versions in the repository.
+
+* Create Snapshot, install PHP, install PhpBrew
+* Query and update available PHP versions
+* Reset snapshot
+
+```Shell
+sudo apt -y install php
+
+# Install PhpBrew
+
+# Check available versions
+phpbrew known
+
+# Update PHP versions in repository
+find . -type d -name '.git' -prune -o -type f -print -exec sed -i '' \
+    -e 's/7\.2\.10/7\.2\.11/g' \
+    -e 's/7\.1\.22/7\.1\.23/g' \
+    -e 's/7\.0\.30/7\.0\.32/g' \
+    -e 's/5\.6\.36/5\.6\.38/g' \
+    {} \;
+
+mv etc/nginx/snippets/php-7.2.10.conf etc/nginx/snippets/php-7.2.11.conf
+mv etc/nginx/snippets/php-7.1.22.conf etc/nginx/snippets/php-7.1.23.conf
+mv etc/nginx/snippets/php-7.0.30.conf etc/nginx/snippets/php-7.0.32.conf
+mv etc/nginx/snippets/php-5.6.36.conf etc/nginx/snippets/php-5.6.38.conf
+```
