@@ -184,7 +184,7 @@ installApache2() {
 	sudo a2enmod actions alias deflate expires headers macro rewrite proxy proxy_fcgi ssl vhost_alias
 
 	# ImageMagick & GraphicMagick
-	sudo apt -y install imagemagick graphicsmagick
+	sudo apt -y install imagemagick graphicsmagick libgraphicsmagick1-dev
 
 	sudo rsync -a /home/user/dev-vm-linux/etc/apache2/conf-available/ /etc/apache2/conf-available/
 	sudo rsync -a /home/user/dev-vm-linux/etc/apache2/sites-available/ /etc/apache2/sites-available/
@@ -326,16 +326,24 @@ phpBrewExtensionGd() {
 phpBrewExtension-php-7() {
 	phpBrewExtensionGd
 	phpbrew extension install imagick
+	phpbrew extension install gmagick 2.0.5RC1
 	phpbrew extension install opcache
 	phpbrew extension install apcu
 	phpbrew extension install xdebug 2.6.0
+
+	phpbrew extension disable imagick
+	phpbrew extension enable gmagick
 }
 
 phpBrewExtension-php-5() {
 	phpBrewExtensionGd
 	phpbrew extension install imagick
+	phpbrew extension install gmagick 1.1.7RC3
 	phpbrew extension install opcache
 	phpbrew extension install xdebug 2.5.5
+
+	phpbrew extension disable imagick
+	phpbrew extension enable gmagick
 }
 
 phpBrewExtension-php-5-4() {
