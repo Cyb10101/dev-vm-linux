@@ -297,7 +297,7 @@ IP address must be adapted for the virtual machine.
 Run in a terminal window:
 
 ```Shell
-sudo apt install sshfs
+sudo apt -y install sshfs
 sudo mkdir -p /mnt/ssh/vm
 
 vim ~/.bashrc && vim ~/.zshrc
@@ -336,7 +336,7 @@ net use Z: \\192.168.56.101\www /PERSISTENT:YES
 Run in a terminal window:
 
 ```Shell
-sudo apt install cifs-utils
+sudo apt -y install cifs-utils
 sudo mkdir -p /mnt/samba/vm
 sudo chmod 777 /mnt/samba/vm
 
@@ -373,7 +373,7 @@ IP address (192.168.56.101) must be adapted for the virtual machine.
 #### DNS Server - Linux Ubuntu Desktop
 
 ```Shell
-# sudo apt install resolvconf
+# sudo apt -y install resolvconf
 sudo vim /etc/NetworkManager/NetworkManager.conf
 ```
 
