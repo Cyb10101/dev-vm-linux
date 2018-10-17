@@ -1,0 +1,252 @@
+#!/bin/bash
+
+pauseAnyKey() {
+	read -n 1 -s -r -p 'Press any key to continue...'
+	echo
+}
+
+rebootRequired() {
+	echo '';
+	read -p 'Reboot? [Y/n] ' -n 1 -r
+	echo '';
+	if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+		sudo reboot
+	fi
+}
+
+changeHostname() {
+	echo '';
+	echo 'Allowed: a-z 0-9 - (Hyphen)';
+	echo 'No capitalization! For example: dev-your-name';
+	read -p 'Change Hostname: ' -r
+	echo '';
+	if [[ $REPLY != '' ]]; then
+		sudo hostnamectl set-hostname ${REPLY}
+		echoCommand="127.0.0.1    ${REPLY}"
+		sudo sh -c "echo ${echoCommand} >> /etc/hosts"
+		sed -i "s/^\(ServerName\).*/\1 ${REPLY}/" /etc/apache2/conf-available/server-name.conf
+	fi
+}
+
+generateSshKey() {
+	echo '';
+	echo 'Generate SSH key';
+	read -p 'Your e-mail address: ' -r
+	echo '';
+	if [[ $REPLY != '' ]]; then
+		ssh-keygen -t rsa -b 4096 -C "${REPLY}" -f /home/user/.ssh/id_rsa
+	fi
+}
+
+changeDevelopmentContext() {
+	echo '';
+	read -p 'Your Development Context (Username): ' -r
+	echo '';
+	if [[ $REPLY != '' ]]; then
+		sudo sed -i "s/\(.*SetEnv TYPO3_CONTEXT Development\/\).*/\1${REPLY}/g" /etc/apache2/conf-available/macro-virtual-host-defaults.conf
+		sudo sed -i "s/\(.*SetEnv FLOW_CONTEXT Development\/\).*/\1${REPLY}/g" /etc/apache2/conf-available/macro-virtual-host-defaults.conf
+		sudo sed -i "s/\(.*SetEnv WWW_CONTEXT Development\/\).*/\1${REPLY}/g" /etc/apache2/conf-available/macro-virtual-host-defaults.conf
+
+		sudo sed -i "s/\(.*fastcgi_param TYPO3_CONTEXT Development\/\).*/\1${REPLY};/g" /etc/nginx/snippets/fastcgi-php.conf
+		sudo sed -i "s/\(.*fastcgi_param FLOW_CONTEXT Development\/\).*/\1${REPLY};/g" /etc/nginx/snippets/fastcgi-php.conf
+		sudo sed -i "s/\(.*fastcgi_param WWW_CONTEXT Development\/\).*/\1${REPLY};/g" /etc/nginx/snippets/fastcgi-php.conf
+
+		echoCommand="TYPO3_CONTEXT=Development/${REPLY}"
+		sudo sh -c "echo ${echoCommand} >> /etc/environment"
+		echoCommand="FLOW_CONTEXT=Development/${REPLY}"
+		sudo sh -c "echo ${echoCommand} >> /etc/environment"
+		echoCommand="WWW_CONTEXT=Development/${REPLY}"
+		sudo sh -c "echo ${echoCommand} >> /etc/environment"
+
+		echo "Your full development context is: Development/${REPLY}"
+		pauseAnyKey
+	fi
+}
+
+convertSshKeyToPutty() {
+	puttygen /home/user/.ssh/id_rsa -o /var/www/id_rsa.ppk
+	echo 'Putty SSH key stored here: /var/www/id_rsa.ppk';
+	pauseAnyKey
+}
+
+configureGit() {
+	echo '';
+	echo 'Configure Git';
+
+	read -p 'Your full name (firstname lastname): ' -r
+	echo '';
+	if [[ $REPLY != '' ]]; then
+		git config --global user.name "${REPLY}"
+	fi
+
+	read -p 'Your e-mail address: ' -r
+	echo '';
+	if [[ $REPLY != '' ]]; then
+		git config --global user.email "${REPLY}"
+	fi
+}
+
+setDevelopmentDomain() {
+	echo '';
+	read -p 'Your development domain (vm00.company.org): ' -r
+	echo '';
+	if [[ $REPLY != '' ]]; then
+		expression1=`echo "${REPLY}" | sed -r "s/\./\\\./g"`
+		expression2=`echo "${REPLY}" | sed -r "s/\./\\\\\\\\\\\./g"`
+
+		find /etc/apache2/sites-available /etc/nginx/sites-available -type f -exec sed -i '' \
+		    -e "s/vm00\.example\.org/${expression1}/g" \
+		    -e "s/vm00\\\.example\\\.org/${expression2}/g" \
+		    {} \;
+	fi
+}
+
+restartWebserver() {
+	sudo apache2ctl configtest && sudo systemctl restart apache2
+	sudo nginx -t && sudo systemctl restart nginx
+}
+
+createSecondHarddisk() {
+	sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | sudo fdisk /dev/sdb ${TGTDEV}
+  g # create a new empty GPT partition table
+  n # new partition
+  1 # partition number 1
+    # first sector (default)
+    # last sector (default)
+  p # print the partition table
+  w # write table to disk and exit
+EOF
+
+	sudo mkfs.ext4 /dev/sdb1
+	sudo mkdir /mnt/data
+
+	UUID=`sudo blkid -s UUID -o value /dev/sdb1`
+	if [[ $(lsb_release -rs) == '18.04' ]]; then
+		echoCommand="UUID=${UUID} /mnt/data ext4 defaults 0 0"
+	fi;
+	if [[ $(lsb_release -rs) == '16.04' ]]; then
+		echoCommand="UUID=${UUID} /mnt/data ext4 errors=remount-ro 0 1"
+	fi;
+	sudo sh -c "echo ${echoCommand} >> /etc/fstab"
+
+	sudo mount /mnt/data
+	sudo chmod 777 /mnt/data
+}
+
+moveHarddisk2Webserver() {
+	sudo mkdir -p /mnt/data/var/www
+	sudo chown -R user:user /mnt/data/var
+	sudo chmod 775 /mnt/data/var/www
+	sudo chmod g+s /mnt/data/var/www
+
+	sudo mv /var/www/{.,}* /mnt/data/var/www/
+	sudo rmdir /var/www
+	sudo ln -s /mnt/data/var/www /var/
+}
+
+moveHarddisk2Mysql() {
+	sudo systemctl stop mysql
+	sudo mkdir -p /mnt/data/var/lib
+	sudo mv /var/lib/mysql /mnt/data/var/lib/
+	sudo ln -s /mnt/data/var/lib/mysql /var/lib/mysql
+	sudo sh -c 'echo "alias /var/lib/mysql/ -> /mnt/data/var/lib/mysql/," >> /etc/apparmor.d/tunables/alias'
+
+	sudo systemctl apparmor mysql
+	sudo systemctl start mysql
+}
+
+messageOfTheDayUser() {
+	echo '';
+	read -p 'Message of the day for user? [Y/n] ' -n 1 -r
+	echo '';
+	if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+		sed -i 's/^#terminalMotd/terminalMotd/' /home/user/.bashrc
+		sed -i 's/^#terminalMotd/terminalMotd/' /home/user/.zshrc
+	else
+		sed -i 's/^terminalMotd/#terminalMotd/' /home/user/.bashrc
+		sed -i 's/^terminalMotd/#terminalMotd/' /home/user/.zshrc
+	fi
+}
+
+messageOfTheDayRoot() {
+	echo '';
+	read -p 'Message of the day for root? [y/N] ' -n 1 -r
+	echo '';
+	if [[ $REPLY =~ ^[Yy]$ ]]; then
+		sudo sed -i 's/^#terminalMotd/terminalMotd/' /root/.bashrc
+		sudo sed -i 's/^#terminalMotd/terminalMotd/' /root/.zshrc
+	else
+		sudo sed -i 's/^terminalMotd/#terminalMotd/' /root/.bashrc
+		sudo sed -i 's/^terminalMotd/#terminalMotd/' /root/.zshrc
+	fi
+}
+
+changeShell() {
+	currentShellPath=`getent passwd $(id -un) | awk -F : '{print $NF}'`
+	bashPath=`which bash`
+	echo "Enter password user '${USER}'."
+	if [ "${currentShellPath}" == "${bashPath}" ]; then
+		chsh -s $(which zsh)
+		echo 'Shell is now zsh.'
+	else
+		chsh -s $(which bash)
+		echo 'Shell is now bash.'
+	fi
+}
+
+menu() {
+	echo ''
+	echo '1) Configure system'
+	echo '2) Create second harddisk'
+	echo '3) Message of the day'
+	echo '4) Change keyboard layout'
+	echo '5) Convert SSH key to Putty key'
+	echo '6) Change login shell'
+	echo '0) Exit'
+	read -p 'Enter your choice: ' choice
+
+	case "$choice" in
+		'1')
+			changeHostname
+			generateSshKey
+			convertSshKeyToPutty
+			configureGit
+			changeDevelopmentContext
+			setDevelopmentDomain
+			restartWebserver
+			rebootRequired
+		;;
+		'2')
+			createSecondHarddisk
+			moveHarddisk2Webserver
+			moveHarddisk2Mysql
+		;;
+		'3')
+			messageOfTheDayUser
+			messageOfTheDayRoot
+		;;
+		'4')
+			sudo dpkg-reconfigure keyboard-configuration
+		;;
+		'5')
+			convertSshKeyToPutty
+		;;
+		'6')
+			changeShell
+		;;
+
+		'0')
+			exit 0
+		;;
+		*)
+			echo 'Wrong choice... Please try again.'
+			menu
+		;;
+	esac
+}
+
+if [ -f /home/user/.phpbrew/bashrc ]; then
+	source /home/user/.phpbrew/bashrc
+	phpbrew use php-7.2.11
+fi
+menu

@@ -1,0 +1,856 @@
+#!/bin/bash
+
+pauseAnyKey() {
+	read -n 1 -s -r -p 'Press any key to continue...'
+	echo
+}
+
+disableBlankConsole() {
+	setterm -blank 0 -powersave off
+}
+
+bugfixNetfilter() {
+	if [[ $(lsb_release -rs) == '18.04' ]]; then
+		# Default: 65536
+		sudo sysctl -w net.netfilter.nf_conntrack_max=524288
+	fi;
+}
+
+checkDpkgLock() {
+	i=0
+	tput sc
+	while fuser /var/lib/dpkg/lock >/dev/null 2>&1 ; do
+	    case $(($i % 4)) in
+	        0 ) j="-" ;;
+	        1 ) j="\\" ;;
+	        2 ) j="|" ;;
+	        3 ) j="/" ;;
+	    esac
+	    tput rc
+	    echo -en "\r[$j] Waiting for other software managers to finish..."
+	    sleep 0.5
+	    ((i=i+1))
+	done
+}
+installSystem() {
+	checkDpkgLock
+	sudo add-apt-repository -y multiverse
+	sudo apt update
+
+	# If you use german keyboard layout, install the language pack
+	sudo apt -y install language-pack-de
+
+	sudo apt -y dist-upgrade
+
+	# Install minimal requirements.
+	sudo apt -y install openssh-server vim git
+	sudo apt -y install curl crudini htop putty-tools whois net-tools resolvconf
+
+	# Configure prefered editor
+	sudo update-alternatives --set editor /usr/bin/vim.basic
+}
+
+copyFiles() {
+	# Copy files
+	rsync -a /home/user/dev-vm-linux/home/user/ /home/user/
+	sudo rsync -a /home/user/dev-vm-linux/usr/local/bin/ /usr/local/bin/
+}
+
+configureGrub() {
+	# Configure Grub
+	if [[ $(lsb_release -rs) == '18.04' ]]; then
+		sudo sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT=".*"/GRUB_CMDLINE_LINUX_DEFAULT="maybe-ubiquity consoleblank=0"/' /etc/default/grub
+	fi;
+	if [[ $(lsb_release -rs) == '16.04' ]]; then
+		sudo sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT=".*"/GRUB_CMDLINE_LINUX_DEFAULT="consoleblank=0"/' /etc/default/grub
+	fi;
+	sudo update-grub
+}
+
+appendBashRcFile() {
+	array=(
+		'source ~/.shell-methods'
+		'#sshAgentRestart'
+		'#sshAgentAddKey 24h ~/.ssh/id_rsa'
+		'addAlias'
+		'stylePS1'
+		'#terminalMotd'
+	)
+	for id in ${!array[*]}; do
+		if [[ ${1} == 'root' ]]; then
+			sudo sh -c "echo \"${array[$id]}\" >> ${2}"
+		else
+			echo "${array[$id]}" >> ${2}
+		fi
+	done
+}
+
+configureBash() {
+	# Bash (User & Root)
+	sudo cp /home/user/dev-vm-linux/home/user/.shell-methods /root/
+	appendBashRcFile 'user' ~/.bashrc
+	appendBashRcFile 'root' /root/.bashrc
+}
+
+installZsh() {
+	# Zsh (User & Root)
+	sudo apt -y install zsh
+	sudo rsync -a /home/user/dev-vm-linux/home/user/.zshrc /root/
+	sudo rsync -a /home/user/dev-vm-linux/home/user/.oh-my-zsh/ /root/.oh-my-zsh/
+	git clone https://github.com/robbyrussell/oh-my-zsh.git /tmp/.oh-my-zsh
+
+	rsync -a /tmp/.oh-my-zsh/ ~/.oh-my-zsh/
+	sudo rsync -a /tmp/.oh-my-zsh/ /root/.oh-my-zsh/
+	sudo chown -R root:root /root/.oh-my-zsh
+	sudo chown root:root /root/.zshrc
+}
+
+installMotd() {
+	## Message of the day - Disable to much information
+	sudo chmod -x /etc/update-motd.d/10-help-text
+
+	# Ubuntu 16.04:
+	if [[ $(lsb_release -rs) == '16.04' ]]; then
+		sudo chmod -x /etc/update-motd.d/91-release-upgrade
+	fi;
+
+	## Message of the day - Keep me from working
+	sudo apt -y install boxes lolcat fortune-mod fortunes fortunes-min fortunes-de fortunes-ubuntu-server fortunes-bofh-excuses
+	sudo chmod -x /etc/update-motd.d/60-ubuntu-server-tip
+}
+
+installDns() {
+	# DNS Server (example.vm)
+	if [[ $(lsb_release -rs) == '18.04' ]]; then
+		sudo sh -c 'echo "127.0.0.1    dev-vm" >> /etc/hosts'
+	fi;
+
+	## Install & configure Dnsmasq
+	sudo apt -y install dnsmasq
+	if [[ $(lsb_release -rs) == '18.04' ]]; then
+		sudo sh -c 'echo "nameserver 127.0.0.1" >> /etc/resolvconf/resolv.conf.d/head'
+	fi;
+	if [[ $(lsb_release -rs) == '16.04' ]]; then
+		sudo sh -c 'echo "nameserver 127.0.1.1" >> /etc/resolvconf/resolv.conf.d/head'
+	fi;
+
+	sudo sh -c 'echo "nameserver 8.8.8.8" >> /etc/resolvconf/resolv.conf.d/head'
+	sudo sh -c 'echo "address=/.vm/127.0.0.1" >> /etc/dnsmasq.conf'
+
+	if [[ $(lsb_release -rs) == '18.04' ]]; then
+		sudo rsync -a /home/user/dev-vm-linux/etc/netplan/ /etc/netplan/
+		sudo systemctl restart dnsmasq
+		sudo netplan generate && sudo netplan apply
+	fi;
+	if [[ $(lsb_release -rs) == '16.04' ]]; then
+		sudo systemctl restart dnsmasq
+	fi;
+	sudo resolvconf -u
+}
+
+testDns() {
+	echo '';
+	read -p 'Test DNS Server? [Y/n] ' -n 1 -r
+	echo
+	if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+		# Check DNS Server Port 53
+		sudo ss -pan 'sport = 53'
+		pauseAnyKey
+
+		# Test resolv.conf
+		cat /etc/resolv.conf
+		ping -c 4 example.vm
+		pauseAnyKey
+
+		if [[ $(lsb_release -rs) == '18.04' ]]; then
+			systemd-resolve --status
+			pauseAnyKey
+		fi;
+	fi
+}
+
+
+installApache2() {
+	# System Webserver (Apache)
+	sudo apt -y install apache2 php libapache2-mod-php php-fpm php-curl php-xml
+
+	if [[ $(lsb_release -rs) == '18.04' ]]; then
+		sudo a2enconf php7.2-fpm
+	fi;
+	if [[ $(lsb_release -rs) == '16.04' ]]; then
+		sudo a2enconf php7.0-fpm
+	fi;
+
+	sudo a2enmod actions alias deflate expires headers macro rewrite proxy proxy_fcgi ssl vhost_alias
+
+	# ImageMagick & GraphicMagick
+	sudo apt -y install imagemagick graphicsmagick libgraphicsmagick1-dev
+
+	sudo rsync -a /home/user/dev-vm-linux/etc/apache2/conf-available/ /etc/apache2/conf-available/
+	sudo rsync -a /home/user/dev-vm-linux/etc/apache2/sites-available/ /etc/apache2/sites-available/
+	sudo cp /home/user/dev-vm-linux/etc/apache2/ports.conf /etc/apache2/
+	sudo chown -R user:user /etc/apache2/sites-available
+	sudo chown -R user:user /etc/apache2/sites-enabled
+	sudo usermod -aG adm ${USER}
+
+	sudo chmod 0775 /var/www
+	sudo chown -R user:user /var/www
+	sudo find /var/www -type d -exec chmod 775 {} \;
+	sudo find /var/www -type f -exec chmod 664 {} \;
+	sudo find /var/www -type d -exec chmod g+s {} \;
+
+	sudo sed -i 's/^export APACHE_RUN_USER=.*/export APACHE_RUN_USER=user/' /etc/apache2/envvars
+	sudo sed -i 's/^export APACHE_RUN_GROUP=.*/export APACHE_RUN_GROUP=user/' /etc/apache2/envvars
+
+	# Enable configuration and websites
+	sudo a2enconf macro-fancy-indexing.conf
+	sudo a2enconf macro-virtual-host-defaults.conf
+	sudo a2enconf macro-virtual-host-ssl.conf
+	sudo a2enconf phpbrew.conf
+	sudo a2enconf server-name.conf
+	sudo a2ensite apache-demo.conf
+	sudo a2ensite zzz-wildcard-vm.conf
+	sudo a2ensite zzz-wildcard-company.conf
+
+	if [[ $(lsb_release -rs) == '18.04' ]]; then
+		# Bugfix: AH00144: couldn't grab the accept mutex
+		sudo sh -c 'echo "Mutex posixsem" >> /etc/apache2/apache2.conf'
+	fi;
+
+	sudo apache2ctl configtest && sudo systemctl restart apache2
+}
+
+installNginx() {
+	# Install Nginx
+	sudo apt -y install nginx nginx-extras
+	sudo rsync -a /home/user/dev-vm-linux/etc/nginx/conf.d/ /etc/nginx/conf.d/
+	sudo rsync -a /home/user/dev-vm-linux/etc/nginx/sites-available/ /etc/nginx/sites-available/
+	sudo rsync -a /home/user/dev-vm-linux/etc/nginx/snippets/ /etc/nginx/snippets/
+	sudo chown -R user:user /etc/nginx/sites-available
+	sudo chown -R user:user /etc/nginx/sites-enabled
+	sudo chown -R user:user /etc/nginx/snippets
+
+	# Configure Nginx
+	sudo sed -i 's/^user www-data;$/user user;/' /etc/nginx/nginx.conf
+	sudo sh -c 'echo "fastcgi_param TYPO3_CONTEXT Development/YourName;" >> /etc/nginx/snippets/fastcgi-php.conf'
+	sudo sh -c 'echo "fastcgi_param FLOW_CONTEXT Development/YourName;" >> /etc/nginx/snippets/fastcgi-php.conf'
+	sudo sh -c 'echo "fastcgi_param WWW_CONTEXT Development/YourName;" >> /etc/nginx/snippets/fastcgi-php.conf'
+	sudo sh -c 'echo "fastcgi_param SERVER_NAME \$host;" >> /etc/nginx/snippets/fastcgi-php.conf'
+
+	# Enable configuration and websites
+	sudo ln -s /etc/nginx/sites-available/apache-proxy /etc/nginx/sites-enabled/
+	sudo ln -s /etc/nginx/sites-available/nginx-demo /etc/nginx/sites-enabled/
+	sudo ln -s /etc/nginx/sites-available/zzz-wildcard /etc/nginx/sites-enabled/
+	sudo nginx -t && sudo systemctl restart nginx
+}
+
+installPhpBrew() {
+	# http://phpbrew.github.io/phpbrew/
+	# https://github.com/phpbrew/phpbrew/wiki/Requirement
+
+	curl -L -O https://github.com/phpbrew/phpbrew/raw/master/phpbrew
+	chmod +x phpbrew
+	sudo mv phpbrew /usr/local/bin/phpbrew
+	phpbrew init
+	phpbrew update
+
+	echo 'source /home/user/.phpbrew/bashrc' >> /home/user/.bashrc
+	echo 'source /home/user/.phpbrew/bashrc' >> /home/user/.zshrc
+	if [ -f /home/user/.phpbrew/bashrc ]; then
+		source /home/user/.phpbrew/bashrc
+	fi
+}
+
+installPhpBrewRequirements() {
+	sudo chmod -R oga+rw /usr/lib/apache2/modules
+	sudo chmod -R oga+rw /etc/apache2
+
+	# ImageMagick
+	sudo apt -y install libmagickwand-dev libmagickcore-dev
+
+	sudo apt -y install autoconf apache2-dev libxml2-dev libcurl4-openssl-dev pkg-config libssl-dev libbz2-dev libjpeg-turbo8-dev libpng-dev libxpm-dev libfreetype6-dev libmcrypt4 libmcrypt-dev libpq-dev libreadline-dev libtidy-dev libxslt1-dev
+
+	# Argon2 Password Hash (Ubuntu 18.04, PHP 7.2+)
+	if [[ $(lsb_release -rs) == '18.04' ]]; then
+		sudo apt -y install argon2 libargon2-0 libargon2-0-dev
+	fi;
+}
+
+phpBrewCompile-php-7.2.11Argon2() {
+	phpbrew install -j $(nproc) php-7.2.11 \
+		+apxs2 +bcmath +bz2 +calendar +cli +ctype +curl +dom \
+		+fileinfo +filter +fpm +ftp +gd +gettext +iconv +intl +ipc +json +ldap \
+		+mbregex +mbstring +mhash +mcrypt +mysql +opcache +openssl \
+		+pcntl +pcre +pdo +pear +pgsql +phar +posix +readline +session +soap +sockets +sqlite +tidy +tokenizer +xml +zip \
+		-- \
+		--enable-gd-native-ttf \
+		--with-gd=shared \
+		--with-freetype-dir=/usr/include/freetype2/freetype \
+		--with-jpeg-dir=/usr \
+		--with-libdir=lib/x86_64-linux-gnu \
+		--with-png-dir=/usr \
+		--with-vpx-dir=/usr \
+		--with-xpm-dir=/usr \
+		--with-password-argon2
+}
+
+phpBrewCompile-php() {
+	phpbrew install -j $(nproc) ${1} \
+    +apxs2 +bcmath +bz2 +calendar +cli +ctype +curl +dom \
+    +fileinfo +filter +fpm +ftp +gd +gettext +iconv +intl +ipc +json +ldap \
+    +mbregex +mbstring +mhash +mcrypt +mysql +opcache +openssl \
+    +pcntl +pcre +pdo +pear +pgsql +phar +posix +readline +session +soap +sockets +sqlite +tidy +tokenizer +xml +zip \
+    -- \
+    --enable-gd-native-ttf \
+    --with-gd=shared \
+    --with-freetype-dir=/usr/include/freetype2/freetype \
+    --with-jpeg-dir=/usr \
+    --with-libdir=lib/x86_64-linux-gnu \
+    --with-png-dir=/usr \
+    --with-vpx-dir=/usr \
+    --with-xpm-dir=/usr
+}
+
+phpBrewExtensionGd() {
+	phpbrew extension install gd -- \
+			--enable-gd-native-ttf \
+			--with-gd=shared \
+			--with-freetype-dir=/usr/include/freetype2/freetype \
+			--with-jpeg-dir=/usr \
+			--with-libdir=lib/x86_64-linux-gnu \
+			--with-png-dir=/usr \
+			--with-vpx-dir=/usr \
+			--with-xpm-dir=/usr
+}
+
+phpBrewExtension-php-7() {
+	phpBrewExtensionGd
+	phpbrew extension install imagick
+	phpbrew extension install gmagick 2.0.5RC1
+	phpbrew extension install opcache
+	phpbrew extension install apcu
+	phpbrew extension install xdebug 2.6.0
+
+	phpbrew extension disable imagick
+	phpbrew extension enable gmagick
+}
+
+phpBrewExtension-php-5() {
+	phpBrewExtensionGd
+	phpbrew extension install imagick
+	phpbrew extension install gmagick 1.1.7RC3
+	phpbrew extension install opcache
+	phpbrew extension install xdebug 2.5.5
+
+	phpbrew extension disable imagick
+	phpbrew extension enable gmagick
+}
+
+phpBrewExtension-php-5-4() {
+	phpbrew extension install imagick
+}
+
+phpBrewCompile-php-5.4.45() {
+	phpbrew install -j $(nproc) php-5.4.45 \
+	    +apxs2 +bcmath +bz2 +calendar +cli +ctype +curl +dom \
+	    +fileinfo +filter +fpm +ftp +gettext +iconv +intl +ipc +json +ldap \
+	    +mbregex +mbstring +mhash +mcrypt +mysql +opcache +openssl \
+	    +pcntl +pcre +pdo +pear +pgsql +phar +posix +readline +session +soap +sockets +sqlite +tidy +tokenizer +xml +zip \
+	    -- \
+	    --with-freetype-dir=/usr/include/freetype2/freetype \
+	    --with-jpeg-dir=/usr \
+	    --with-libdir=lib/x86_64-linux-gnu \
+	    --with-png-dir=/usr \
+	    --with-vpx-dir=/usr \
+	    --with-xpm-dir=/usr
+
+	phpbrew use php-5.4.45
+
+	phpbrew extension install gd -- \
+		--enable-gd-native-ttf \
+		--with-gd=shared \
+		--with-freetype-dir=/usr/include/freetype2/freetype \
+		--with-jpeg-dir=/usr \
+		--with-libdir=lib/x86_64-linux-gnu \
+		--with-png-dir=/usr \
+		--with-xpm-dir=/usr
+
+	phpbrew extension install xdebug 2.4.1
+}
+
+configurePhpIni() {
+	sed -i 's/^error_reporting =.*/error_reporting = E_ALL/' /home/user/.phpbrew/php/${1}/etc/php.ini
+	sed -i 's/^display_errors =.*/display_errors = On/' /home/user/.phpbrew/php/${1}/etc/php.ini
+
+	sed -i 's/^max_execution_time =.*/max_execution_time = 300/' /home/user/.phpbrew/php/${1}/etc/php.ini
+	sed -i 's/^max_input_time =.*/max_input_time = 600/' /home/user/.phpbrew/php/${1}/etc/php.ini
+	sed -i 's/^; max_input_vars =.*/max_input_vars = 2000/' /home/user/.phpbrew/php/${1}/etc/php.ini
+	sed -i 's/^memory_limit =.*/memory_limit = 2048M/' /home/user/.phpbrew/php/${1}/etc/php.ini
+
+	sed -i 's/^upload_max_filesize = .*/upload_max_filesize = 200M/' /home/user/.phpbrew/php/${1}/etc/php.ini
+	sed -i 's/^post_max_size =.*/post_max_size = 200M/' /home/user/.phpbrew/php/${1}/etc/php.ini
+
+	sed -i 's/^;date.timezone =.*/date.timezone = Europe\/Berlin/' /home/user/.phpbrew/php/${1}/etc/php.ini
+
+	sed -i 's/^mysqli.default_host =.*/mysqli.default_host = 127.0.0.1/' /home/user/.phpbrew/php/${1}/etc/php.ini
+
+	sed -i "s/^;sendmail_path =.*/sendmail_path = \/usr\/bin\/env \/usr\/local\/bin\/catchmail -t -f 'www-data@localhost'/" /home/user/.phpbrew/php/${1}/etc/php.ini
+
+	sed -i 's/^session.gc_maxlifetime =.*/session.gc_maxlifetime = 86400/' /home/user/.phpbrew/php/${1}/etc/php.ini
+}
+configurePhpIniPhp5() {
+	sed -i "s/^;always_populate_raw_post_data =.*/always_populate_raw_post_data = -1/" /home/user/.phpbrew/php/${1}/etc/php.ini
+
+	sed -i 's/^mysql.default_host =.*/mysql.default_host = 127.0.0.1/' /home/user/.phpbrew/php/${1}/etc/php.ini
+}
+
+configurePhpXdebug() {
+	cp /home/user/dev-vm-linux/snippets/xdebug.ini /home/user/.phpbrew/php/${1}/var/db/
+}
+configurePhpXdebug-php-5.4.45() {
+	sed -i 's/^zend_extension=.*/zend_extension=\/home\/user\/.phpbrew\/php\/php-5.4.45\/lib\/php\/extensions\/no-debug-non-zts-20100525\/xdebug.so/' /home/user/.phpbrew/php/php-5.4.45/var/db/xdebug.ini
+}
+
+# PhpBrew FPM configuration
+configurePhpFpm7() {
+	sed -i 's/^user = nobody$/;user = nobody/' /home/user/.phpbrew/php/${1}/etc/php-fpm.d/www.conf
+	sed -i 's/^group = nobody$/;group = nobody/' /home/user/.phpbrew/php/${1}/etc/php-fpm.d/www.conf
+}
+configurePhpFpm5() {
+	sed -i 's/^user = nobody$/;user = nobody/' /home/user/.phpbrew/php/${1}/etc/php-fpm.conf
+	sed -i 's/^group = nobody$/;group = nobody/' /home/user/.phpbrew/php/${1}/etc/php-fpm.conf
+}
+
+phpBrewAutostart() {
+	sudo sh -c 'echo "@reboot user /home/user/.start-php-fpm.sh" >> /etc/crontab'
+}
+
+phpBrewBugfix() {
+	if [[ $(lsb_release -rs) == '16.04' ]]; then
+		sudo a2dismod php5
+	fi;
+	sudo a2dismod php7
+	if [[ $(lsb_release -rs) == '18.04' ]]; then
+		sudo a2dismod php7.2
+	fi;
+	if [[ $(lsb_release -rs) == '16.04' ]]; then
+		sudo a2dismod php7.0
+	fi;
+}
+
+phpBrewBuild() {
+	# PHP 7.2.11
+	if [[ $(lsb_release -rs) == '18.04' ]]; then
+		phpBrewCompile-php-7.2.11Argon2
+		# @todo On build error 'a2enmod php7' retry once
+		phpBrewCompile-php-7.2.11Argon2
+	fi;
+	if [[ $(lsb_release -rs) == '16.04' ]]; then
+		phpBrewCompile-php 'php-7.2.11'
+		# @todo On build error 'a2enmod php7' retry once
+		phpBrewCompile-php 'php-7.2.11'
+	fi;
+
+	phpbrew use php-7.2.11
+	phpBrewExtension-php-7
+
+	# PHP 7.1.23
+	phpBrewCompile-php 'php-7.1.23'
+	phpbrew use php-7.1.23
+	phpBrewExtension-php-7
+
+	# PHP 7.0.32
+	phpBrewCompile-php 'php-7.0.32'
+	phpbrew use php-7.0.32
+	phpBrewExtension-php-7
+
+	if [[ $(lsb_release -rs) == '16.04' ]]; then
+		sudo apt -y install libvpx-dev
+
+		# PHP 5.6.38
+		phpBrewCompile-php 'php-5.6.38'
+		# @todo On build error 'a2enmod php5' retry once
+		phpBrewCompile-php 'php-5.6.38'
+
+		phpbrew use php-5.6.38
+		phpBrewExtension-php-5
+
+		# PHP 5.5.38
+		phpBrewCompile-php 'php-5.5.38'
+		phpbrew use php-5.5.38
+		phpBrewExtension-php-5
+
+		# PHP 5.4.45
+		phpBrewCompile-php-5.4.45
+		phpBrewExtension-php-5-4
+	fi;
+
+	phpbrew switch php-7.2.11
+}
+
+phpBrewConfigure() {
+	# Configure PHP
+	configurePhpIni 'php-7.2.11'
+	configurePhpIni 'php-7.1.23'
+	configurePhpIni 'php-7.0.32'
+	if [[ $(lsb_release -rs) == '16.04' ]]; then
+		configurePhpIni 'php-5.6.38'
+		configurePhpIniPhp5 'php-5.6.38'
+
+		configurePhpIni 'php-5.5.38'
+		configurePhpIniPhp5 'php-5.5.38'
+
+		configurePhpIni 'php-5.4.45'
+		configurePhpIniPhp5 'php-5.4.45'
+	fi;
+
+	# Configure PHP xDebug
+	configurePhpXdebug 'php-7.2.11'
+	configurePhpXdebug 'php-7.1.23'
+	configurePhpXdebug 'php-7.0.32'
+	if [[ $(lsb_release -rs) == '16.04' ]]; then
+		configurePhpXdebug 'php-5.6.38'
+		configurePhpXdebug 'php-5.5.38'
+		configurePhpXdebug 'php-5.4.45'
+		configurePhpXdebug-php-5.4.45
+	fi;
+	/usr/local/bin/xdebug disable
+
+	# Configure PHP FPM
+	configurePhpFpm7 'php-7.2.11'
+	configurePhpFpm7 'php-7.1.23'
+	configurePhpFpm7 'php-7.0.32'
+	if [[ $(lsb_release -rs) == '16.04' ]]; then
+		configurePhpFpm5 'php-5.6.38'
+		configurePhpFpm5 'php-5.5.38'
+		configurePhpFpm5 'php-5.4.45'
+	fi;
+
+	# PhpBrew other
+	phpBrewAutostart
+	phpBrewBugfix
+}
+
+phpCleanNotUsed() {
+	if [[ $(lsb_release -rs) == '18.04' ]]; then
+		rm /etc/nginx/snippets/php-5.6.38.conf
+		rm /etc/nginx/snippets/php-5.5.38.conf
+		rm /etc/nginx/snippets/php-5.4.45.conf
+		sed -i -e '/5\.6\.38\|5\.5\.38\|5\.4\.45/d' /etc/apache2/sites-available/*
+		sed -i -e '/5\.6\.38\|5\.5\.38\|5\.4\.45/d' /etc/nginx/sites-available/*
+
+		# Check if defect
+		# grep -linrE '5.6.38|5.5.38|5.4.45' /etc/apache2 /etc/nginx
+	fi;
+}
+
+testPhp() {
+	phpbrew list
+	pauseAnyKey
+
+	if [[ $(lsb_release -rs) == '16.04' ]]; then
+		phpbrew use php-5.4.45
+		php -v | grep PHP | grep -v Copyright
+		phpbrew use php-5.5.38
+		php -v | grep PHP | grep -v Copyright
+		phpbrew use php-5.6.38
+		php -v | grep PHP | grep -v Copyright
+	fi;
+
+	phpbrew use php-7.0.32
+	php -v | grep PHP | grep -v Copyright
+	phpbrew use php-7.1.23
+	php -v | grep PHP | grep -v Copyright
+	phpbrew use php-7.2.11
+	php -v | grep PHP | grep -v Copyright
+}
+
+configureDatabase() {
+	mysql <<EOF
+DROP USER 'root'@'%';
+DROP USER 'root'@'localhost';
+DROP USER 'root'@'127.0.0.1';
+CREATE USER 'root'@'%' IDENTIFIED BY 'root';
+CREATE USER 'root'@'localhost' IDENTIFIED BY 'root';
+CREATE USER 'root'@'127.0.0.1' IDENTIFIED BY 'root';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+SELECT host, user FROM mysql.user;
+EOF
+}
+
+installMySQL() {
+	echo debconf mysql-server/root_password password 'root' | sudo debconf-set-selections
+	echo debconf mysql-server/root_password_again password 'root' | sudo debconf-set-selections
+	sudo apt -y install mysql-server php-mysql
+
+	sudo cp /home/user/dev-vm-linux/etc/mysql/mysql.conf.d/zzz-development.cnf /etc/mysql/mysql.conf.d/
+	sudo systemctl restart mysql
+	configureDatabase
+}
+
+installMariaDB() {
+	echo debconf mysql-server/root_password password 'root' | sudo debconf-set-selections
+	echo debconf mysql-server/root_password_again password 'root' | sudo debconf-set-selections
+
+	## Install MariaDB 10.3
+	sudo apt -y install software-properties-common
+	sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
+	if [[ $(lsb_release -rs) == '18.04' ]]; then
+		sudo add-apt-repository 'deb [arch=amd64,arm64,ppc64el] http://ftp.hosteurope.de/mirror/mariadb.org/repo/10.3/ubuntu bionic main'
+	fi;
+	if [[ $(lsb_release -rs) == '16.04' ]]; then
+		sudo add-apt-repository 'deb [arch=amd64,arm64,i386,ppc64el] http://ftp.hosteurope.de/mirror/mariadb.org/repo/10.3/ubuntu xenial main'
+		sudo apt update
+	fi;
+	sudo apt -y install mariadb-server php-mysql
+
+	sudo cp /home/user/dev-vm-linux/etc/mysql/mysql.conf.d/zzz-development.cnf /etc/mysql/mariadb.conf.d/
+	sudo systemctl restart mysql
+	configureDatabase
+}
+
+installFakeMail() {
+	sudo apt -y install tofrodos ack-grep
+	sudo cp /home/user/dev-vm-linux/usr/sbin/sendmailfake /usr/sbin/
+}
+
+installMailCatcher() {
+	# https://mailcatcher.me/
+
+	sudo apt -y install build-essential libsqlite3-dev ruby-dev
+	sudo gem install mailcatcher
+	sudo sh -c 'echo "@reboot root \$(which mailcatcher) --ip=0.0.0.0" >> /etc/crontab'
+
+	if [[ $(lsb_release -rs) == '18.04' ]]; then
+		sudo rsync -a /home/user/dev-vm-linux/etc/php/7.0/mods-available/mailcatcher.ini /etc/php/7.2/mods-available/
+	fi;
+	if [[ $(lsb_release -rs) == '16.04' ]]; then
+		sudo rsync -a /home/user/dev-vm-linux/etc/php/7.0/mods-available/mailcatcher.ini /etc/php/7.0/mods-available/
+	fi;
+
+	sudo phpenmod mailcatcher
+}
+
+installComposer() {
+	# https://getcomposer.org/download/
+
+	curl -sS https://getcomposer.org/installer | php
+	sudo mv composer.phar /usr/local/bin/composer
+}
+
+installWebsite() {
+	sudo rm -rf /var/www/html
+	sudo rsync -a /home/user/dev-vm-linux/var/www/ /var/www/
+}
+
+installWebsiteTypo3() {
+	# https://packagist.org/packages/typo3/cms-base-distribution
+
+	# PHP <= 7.2
+	composer create-project typo3/cms-base-distribution /var/www/typo3demo ^9
+
+	php /var/www/typo3demo/vendor/bin/typo3cms install:setup \
+	    --no-interaction \
+	    --database-host-name=127.0.0.1 \
+	    --database-port=3306 \
+	    --database-user-name=root \
+	    --database-user-password=root \
+	    --database-name=typo3demo \
+	    --admin-user-name=admin \
+	    --admin-password=Admin123 \
+	    --site-setup-type=site
+}
+
+installDocker() {
+	# https://docs.docker.com/install/linux/docker-ce/ubuntu/
+
+	sudo apt -y install apt-transport-https ca-certificates curl software-properties-common
+	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+	sudo add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+	sudo apt update
+	sudo apt -y install docker-ce
+	sudo usermod -aG docker ${USER}
+}
+
+installDockerCompose() {
+	# https://docs.docker.com/compose/install/#install-compose
+	# https://github.com/docker/compose/releases
+
+	sudo curl -L https://github.com/docker/compose/releases/download/1.20.1/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+	sudo chmod +x /usr/local/bin/docker-compose
+}
+
+runDockerTest() {
+	echo '';
+	read -p 'Test Docker? [Y/n] ' -n 1 -r
+	echo
+	if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+		# Run hello world test
+		sudo docker run hello-world
+
+		# Delete all container
+		sudo docker rm $(sudo docker ps -a -q)
+
+		# Delete all images
+		sudo docker rmi $(sudo docker images -q)
+
+		pauseAnyKey
+	fi
+}
+
+installSamba() {
+	sudo apt -y install samba
+	sudo rsync -a /home/user/dev-vm-linux/etc/samba/smb.conf /etc/samba/
+	echo -e "user\nuser" | sudo smbpasswd -s -a user
+	sudo systemctl restart smbd
+	# configureSamba
+}
+
+configureSamba() {
+	# Not working, because samba configuration file ist defect
+	sudo crudini --set /etc/samba/smb.conf 'global' 'security' 'user'
+	sudo crudini --set /etc/samba/smb.conf 'global' 'allow insecure wide links' 'yes'
+	sudo crudini --set /etc/samba/smb.conf 'global' 'workgroup' 'Company'
+
+	sudo crudini --set /etc/samba/smb.conf 'www' 'comment' 'web path'
+	sudo crudini --set /etc/samba/smb.conf 'www' 'path' '/var/www'
+	sudo crudini --set /etc/samba/smb.conf 'www' 'public' 'no'
+	sudo crudini --set /etc/samba/smb.conf 'www' 'writeable' 'yes'
+	sudo crudini --set /etc/samba/smb.conf 'www' 'guest ok' 'no'
+	sudo crudini --set /etc/samba/smb.conf 'www' 'browseable' 'yes'
+	sudo crudini --set /etc/samba/smb.conf 'www' 'valid users' 'user'
+	sudo crudini --set /etc/samba/smb.conf 'www' 'create mask' '0664'
+	sudo crudini --set /etc/samba/smb.conf 'www' 'directory mask' '0750'
+	sudo crudini --set /etc/samba/smb.conf 'www' 'follow symlinks' 'yes'
+	sudo crudini --set /etc/samba/smb.conf 'www' 'wide links' 'yes'
+	sudo crudini --set /etc/samba/smb.conf 'www' 'force user' 'user'
+	sudo crudini --set /etc/samba/smb.conf 'www' 'force group' 'user'
+}
+
+
+# NPM - Node Package Manager
+installNpm() {
+	cd /tmp && wget https://nodejs.org/dist/v8.11.0/node-v8.11.0-linux-x64.tar.xz
+	sudo tar xf node-v8.11.0-linux-x64.tar.xz
+	cd node-v8.11.0-linux-x64
+	sudo cp -r bin /
+	sudo cp -r include /
+	sudo cp -r lib /
+	sudo cp -r share /
+
+	# Update
+	sudo npm install -g npm
+
+	# Install Packages
+	sudo npm install -g grunt-cli
+}
+
+# Yarn - Package Manager
+installYarn() {
+	curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+	echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+	sudo apt update
+	sudo apt install -y --no-install-recommends yarn
+}
+
+runApportCli() {
+	echo '';
+	echo 'Send it or cancel with button "c":';
+	sudo apport-cli
+}
+
+runSystemUpdate() {
+	sudo apt update && sudo apt -y dist-upgrade && sudo apt -y autoremove
+
+	echo '';
+	echo 'NPM Update:';
+	sudo npm -g outdated
+	sudo npm install -g npm grunt-cli
+}
+
+runCleanup() {
+	sudo chown -R user:user /etc/apache2/sites-available
+	sudo chown -R user:user /etc/apache2/sites-enabled
+	sudo chown -R user:user /etc/nginx/sites-available
+	sudo chown -R user:user /etc/nginx/sites-enabled
+
+	# rm -rf /home/user/dev-vm-linux
+
+	sudo rm -rd /var/www/html
+	sudo rm /home/user/.mysql_history
+	sudo rm /home/user/.bash_history
+	sudo rm /home/user/.zsh_history
+	sudo rm /root/.mysql_history
+	sudo rm /root/.bash_history
+	sudo rm /root/.zsh_history
+}
+
+rebootRequired() {
+	echo '';
+	read -p 'Reboot? [Y/n] ' -n 1 -r
+	echo
+	if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+		sudo reboot
+	fi
+}
+
+echo '';
+read -p 'Run installation? [y/N] ' -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+	disableBlankConsole
+
+	installSystem
+	copyFiles
+	configureGrub
+	configureBash
+	installZsh
+	installMotd
+
+	installDns
+
+	installApache2
+	installNginx
+
+	installPhpBrew
+	installPhpBrewRequirements
+	phpBrewBuild
+	phpBrewConfigure
+	phpCleanNotUsed
+
+	#installMySQL
+  installMariaDB
+
+	installFakeMail
+	installMailCatcher
+	installComposer
+	installWebsite
+	installWebsiteTypo3
+
+	installDocker
+	bugfixNetfilter
+	installDockerCompose
+
+	installSamba
+	installNpm
+	installYarn
+
+	testDns
+	testPhp
+	runDockerTest
+
+	runApportCli
+	runCleanup
+	rebootRequired
+fi
+
+echo '';
+read -p 'Update System? [y/N] ' -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+	checkDpkgLock
+	runSystemUpdate
+fi

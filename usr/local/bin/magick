@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+function runMagickSwitcher {
+	title="$(tr '[:lower:]' '[:upper:]' <<< ${1:0:1})${1:1}"
+	if [ -f /home/user/.phpbrew/php/php-${3}/bin/php ]; then
+		echo ${title} xDebug on PHP ${3}
+		phpbrew use ${3}
+		phpbrew extension ${1} gmagick
+		phpbrew extension ${2} imagick
+		phpbrew fpm restart
+	else
+		echo [Warning] PHP ${3} not found
+	fi
+	echo
+}
+
+function magickSwitcher {
+	if [[ $(lsb_release -rs) == '16.04' ]]; then
+		runMagickSwitcher ${1} ${2} '5.4.45'
+		runMagickSwitcher ${1} ${2} '5.5.38'
+		runMagickSwitcher ${1} ${2} '5.6.38'
+	fi;
+	runMagickSwitcher ${1} ${2} '7.0.32'
+	runMagickSwitcher ${1} ${2} '7.1.23'
+	runMagickSwitcher ${1} ${2} '7.2.11'
+}
+
+if [ -f /home/user/.phpbrew/bashrc ]; then
+	source /home/user/.phpbrew/bashrc
+	if [[ "${1}" == 'enable' ]]; then
+		magickSwitcher 'enable' 'disable'
+	elif [[ "${1}" == 'disable' ]]; then
+		magickSwitcher 'disable' 'enable'
+	else
+		read -p 'Enable GraphicsMagick instead of ImageMagick? [Y/n] ' -n 1 -r
+		echo
+		if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+			magickSwitcher 'enable' 'disable'
+		else
+			magickSwitcher 'disable' 'enable'
+		fi
+	fi
+else
+	echo [Error] PhpBrew not found
+fi

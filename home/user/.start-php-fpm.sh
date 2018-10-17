@@ -15,10 +15,12 @@ function startPhpFpm {
 
 if [ -f /home/user/.phpbrew/bashrc ]; then
 	source /home/user/.phpbrew/bashrc
-	startPhpFpm 5.4.45
-	startPhpFpm 5.5.38
-	startPhpFpm 5.6.36
-	startPhpFpm 7.0.30
-	startPhpFpm 7.1.17
-	startPhpFpm 7.2.5
+	if [[ $(lsb_release -rs) == '16.04' ]]; then
+		startPhpFpm 5.4.45
+		startPhpFpm 5.5.38
+		startPhpFpm 5.6.38
+	fi;
+	startPhpFpm 7.0.32
+	startPhpFpm 7.1.23
+	startPhpFpm 7.2.11
 fi

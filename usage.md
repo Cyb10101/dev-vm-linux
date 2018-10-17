@@ -2,6 +2,9 @@
 
 Here is explained step by step how to import the VirtualBox OVA file and configure the virtual machine.
 
+For some actions, you can easily use the usage script:
+/home/user/dev-vm-linux/usage
+
 ### Import OVA file
 
 First import the VirtualBox OVA file.
@@ -57,8 +60,6 @@ VirtualBox > Machine > Settings
     - Adapter Type: Intel PRO/1000 MT Desktop (82540EM)
     - Generate new MAC Address
 
-Optional for Desktop Version: Install Virtualbox Extension Pack
-
 #### Explanation of the network configuration
 
 This is a simple configuration of the network and theoretically should work well on all machines.
@@ -80,6 +81,8 @@ In general, you should never need the user "root".
 
 ### Passwords
 
+If login data is missing, the default username is "root" or "admin" and the default password is "Admin123" or "Admin123!".
+
 The passwords of Linux users are the same as the user names.
 Note: You can't connect your ssh with the user "root".
 
@@ -90,16 +93,13 @@ The MySQL access:
 
 * Username: root | Password: root
 
-### Optional: Change keyboard layout
+TYPO3 Backend:
 
-You may want to change the layout of your keyboard.
-Current keyboard layout is set to german.
+* Username: admin | Password: Admin123 | Install-Tool: Admin123
 
-```Shell
-sudo dpkg-reconfigure keyboard-configuration
-```
+## Optional: Change keyboard layout
 
-Example:
+Use usage script. Example:
 
 * Generic 105-key keyboard
 * English (US)
@@ -107,22 +107,6 @@ Example:
 ### Configure Network
 
 I recommend configuring the network because it can be different for everyone.
-
-### Set hostname
-
-Search for "dev-vm" and replace it in your name.
-
-Allowed: a-z 0-9 - (Hyphen)
-
-No capitalization! For example: dev-your-name
-
-```Shell
-sudo vim /etc/hostname
-sudo vim /etc/hosts
-sudo vim /etc/apache2/conf-available/server-name.conf
-```
-
-### Configure network
 
 With the command "ip a" you can check your current network configuration.
 
@@ -132,6 +116,17 @@ If that's not the case, you'll need to adjust those values.
 ```Shell
 ip a
 ```
+
+### Configure system
+
+Configure it in the usage script "Configure system".
+
+* Set hostname
+* Generate SSH Key
+* Generate a putty key
+* Configure Git
+* Development context
+* Development domain
 
 #### Optional Ubuntu 18.04 Server: Set static IP in network configuration
 
@@ -230,191 +225,26 @@ This allows you to variably adjust the storage space and even move it to another
 
 Partition and format the second hard disk in terminal or with gparted.
 
-#### HDD2 - Format second hard disk (Terminal - recommended)
-
-Format the second hard disk by using a terminal.
-
-* Start menu > Terminal
-
-```Shell
-sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | sudo fdisk /dev/sdb ${TGTDEV}
-  g # create a new empty GPT partition table
-  n # new partition
-  1 # partition number 1
-    # first sector (default)
-    # last sector (default)
-  p # print the partition table
-  w # write table to disk and exit
-EOF
-
-sudo mkfs.ext4 /dev/sdb1
-```
-
-#### HDD2 - Format second hard disk (GParted - alternative)
-
-Format the second hard disk by using GParted (GUI).
-
-For a server you need a Ubuntu Desktop Live CD.
-
-* Start menu > GParted
-* Select device (/dev/sdb)
-* Device > Create Partition Table > msdos or gpt
-* Partition > New
-    - File system: ext4
-    - Label: Data
-
-Reboot if you use a live disk.
-
-### HDD2 - Mount second hard disk (Fstab)
-
-* Start menu > Terminal
-
-```Shell
-sudo mkdir /mnt/data
-sudo blkid | grep sdb
-
-sudo vim /etc/fstab
-```
-
-* Ubuntu 18.04: Append to fstab
-
-```Text
-UUID=288132af-be1e-4a3a-a2b6-1210c9816f50 /mnt/data ext4 defaults 0 0
-```
-
-* Other Ubuntu: Append to fstab
-
-```Text
-UUID=288132af-be1e-4a3a-a2b6-1210c9816f50 /mnt/data ext4 errors=remount-ro 0 1
-```
-
-* Execute in Terminal
-
-```Shell
-sudo mount /mnt/data
-sudo chmod 777 /mnt/data
-```
-
-#### HDD2 - Move Webserver
-
-```Shell
-sudo mkdir -p /mnt/data/var/www
-sudo chown -R user:user /mnt/data/var
-sudo chmod 775 /mnt/data/var/www
-sudo chmod g+s /mnt/data/var/www
-
-sudo mv /var/www/!(.|..) /mnt/data/var/www/
-sudo rmdir /var/www
-sudo ln -s /mnt/data/var/www /var/
-```
-
-#### HDD2 - Move MySQL
-
-```Shell
-sudo systemctl stop mysql
-sudo mkdir -p /mnt/data/var/lib
-sudo mv /var/lib/mysql /mnt/data/var/lib/
-sudo ln -s /mnt/data/var/lib/mysql /var/lib/mysql
-
-sudo vim /etc/apparmor.d/tunables/alias
-```
-
-Append to file alias.
-
-```Text
-alias /var/lib/mysql/ -> /mnt/data/var/lib/mysql/,
-```
-
-Restart AppArmor and MySQL.
-
-```Shell
-sudo systemctl restart apparmor
-sudo systemctl start mysql
-```
+Format the second hard disk by using the usage script "Create second harddisk".
 
 ## Configure system
 
 At this point you configure your system.
 
-### Generate SSH Key
-
-Use your own e-mail address.
-
-```Shell
-ssh-keygen -t rsa -b 4096 -C 'user@example.org'
-```
-
-### Convert SSH Key to Putty Key
-
-Generate a putty key.
-Is useful if you want to connect later using Putty or HeidiSQL.
-You can later use the windows release or copy it to your computer via SSH.
-
-
-```Shell
-puttygen /home/user/.ssh/id_rsa -o /var/www/id_rsa.ppk
-```
-
-### Configure Git
-
-Enter your own name & e-mail.
-
-```Shell
-git config --global user.name 'Your Name'
-git config --global user.email 'user@example.org'
-```
-
-### Development Context (User & Root)
-
-Search for "Development/YourName" and replace it in your own name.
-
-```Shell
-sudo vim /etc/apache2/conf-available/macro-virtual-host-defaults.conf
-sudo vim /etc/nginx/snippets/fastcgi-php.conf
-```
-
-## Add enviroment variables
-
-Replace "Development/YourName" with your own name.
-
-```Shell
-sudo sh -c 'echo "TYPO3_CONTEXT=Development/YourName" >> /etc/environment'
-sudo sh -c 'echo "FLOW_CONTEXT=Development/YourName" >> /etc/environment'
-sudo sh -c 'echo "WWW_CONTEXT=Development/YourName" >> /etc/environment'
-```
-
-### Optional: Set domain
-
-Search for "vm00.example.org" and replace it in your domain.
-
-```Shell
-find /etc/apache2/sites-available /etc/nginx/sites-available -type f -exec sed -i '' \
-    -e 's/vm00\.example\.org/vm00\.company\.de/g' \
-    -e 's/vm00\\\.example\\\.org/vm00\\\.company\\\.de/g' \
-    {} \;
-
-sudo apache2ctl configtest && sudo systemctl restart apache2
-sudo nginx -t && sudo systemctl restart nginx
-```
-
 ### Optional: Change login shell permanently
 
 Change from "bash" to "zsh" for the current user.
-
-```Shell
-chsh -s $(which zsh)
-# chsh -s $(which bash)
-```
+Use usage script "Change login shell".
 
 ### Optional: Switch from MailCachter to Fakemail
 
 Not recommended, but possible.
 
 ```Shell
-vim /home/user/.phpbrew/php/php-7.2.5/etc/php.ini
-vim /home/user/.phpbrew/php/php-7.1.17/etc/php.ini
-vim /home/user/.phpbrew/php/php-7.0.30/etc/php.ini
-vim /home/user/.phpbrew/php/php-5.6.36/etc/php.ini
+vim /home/user/.phpbrew/php/php-7.2.11/etc/php.ini
+vim /home/user/.phpbrew/php/php-7.1.23/etc/php.ini
+vim /home/user/.phpbrew/php/php-7.0.32/etc/php.ini
+vim /home/user/.phpbrew/php/php-5.6.38/etc/php.ini
 vim /home/user/.phpbrew/php/php-5.5.38/etc/php.ini
 vim /home/user/.phpbrew/php/php-5.4.45/etc/php.ini
 
@@ -434,6 +264,20 @@ sendmail_path = /usr/sbin/sendmailfake
 
 ```Shell
 sudo reboot
+```
+
+### Message of the day - Keep me from working
+
+Yes, you wan't it! Your boss would kill you, but your soul thanks you.
+Each new Terminal you opening on desktop or with ssh, you get a new message.
+
+To activate/deactivate it use usage script "Message of the day".
+
+Show which fortunes are available and configure it at function "terminalMotd" in .shell-methods file:
+
+```Shell
+ls /usr/share/games/fortunes
+vim /home/user/.shell-methods
 ```
 
 ## Documentation
@@ -624,6 +468,14 @@ Wildcard for local domains:
 *.vm00.example.org -> example.vm00.example.org -> /var/www/example/public
 ```
 
+### Switch GraphicMagick to ImageMagick
+
+To activate or disable current Magick run in console:
+
+```Shell
+magick
+```
+
 ### PHP extension xDebug & IDE (PhpStorm)
 
 To activate or disable xDebug run in console:
@@ -674,97 +526,3 @@ PhpStorm > Run > Edit Configurations > Defaults > PHP Remote Debug
 ### MySQL not working
 
 Set host "localhost" to "127.0.0.1".
-
-## I am crazy! Lazy or whatever...
-
-If you are in any way crazier, that may interest you.
-
-### I need a desktop!
-
-Maybe not recommended.
-
-For those who need a desktop on the server, you can install one of the following packages.
-
-Choose if you wan't a minimal or a full desktop.
-
-#### Install the minimal desktop (XFCE4)
-
-Install the minimal XFCE4 Desktop:
-
-```Shell
-sudo apt -y install xfce4
-```
-
-To start the desktop type in terminal:
-
-```Shell
-startx
-```
-
-##### Add autostart after login for the minimal XFCE4 desktop
-
-If you don't want to type on every login startx, you can add a autostart.
-
-Edit file .bashrc & .zshrc:
-
-```Shell
-vim /home/user/.bashrc
-vim /home/user/.zshrc
-```
-
-Add at end of .bashrc & .zshrc file:
-
-```Shell
-if [[ ! ${DISPLAY} && ${XDG_VTNR} -eq 1 ]]; then
-  exec startx
-fi
-```
-
-#### Install the minimal desktop (Gnome)
-
-```Shell
-# For the real Gnome Desktop
-sudo apt -y install gnome-core
-
-# At finish installation
-sudo reboot
-```
-
-#### Install the full desktop (Xubuntu, Unity, Gnome)
-
-```Shell
-# For a XFCE4 Desktop
-sudo apt -y install xubuntu-desktop
-
-# Ubuntu 18.04: For a Ubuntu Unity Desktop
-sudo apt -y install ubuntu-unity-desktop
-
-# Ubuntu 16.04: For a Ubuntu Unity Desktop
-sudo apt -y install ubuntu-desktop
-
-# For a Ubuntu Gnome Desktop
-sudo apt -y install ubuntu-gnome-desktop
-
-# For the real Gnome Desktop
-sudo apt -y install gnome
-
-# At finish installation
-sudo reboot
-```
-
-### Autologin
-
-Forces auto login. Maybe not recommended.
-
-```Shell
-sudo systemctl edit getty@tty1
-```
-
-Add in "getty@tty1" file:
-
-```ini
-[Service]
-Type=idle
-ExecStart=
-ExecStart=-/sbin/agetty --autologin user --noclear %I 38400 linux
-```
