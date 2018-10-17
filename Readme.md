@@ -26,6 +26,6 @@ To develop a own virtual machine from scratch see file [create.md](create.md).
 
 To import a OVA file and configure the virtual machine see file [usage.md](usage.md).
 
-### I need a desktop!
+## I need a desktop!
 
 No you don't... Maybe not recommended. See file [desktop.md](desktop.md)
