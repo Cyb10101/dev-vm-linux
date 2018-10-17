@@ -16,25 +16,18 @@ VirtualBox > Settings
   - Motherboard > Boot Order: Optical, Hard Disk
   - Processor > CPU: 4 (Maximum of green)
 * Storage (Expert mode)
-  - SATA Port 0, Hard disk, File location: System, 80 GB, VDMK, Dynamically allocated
+  - SATA Port 0, Hard disk, File location: System, 100 GB, VDMK, Dynamically allocated
   - SATA Port 2, Compact Disc, Insert operating system
 * Audio > Enable Audio: false
 * Network
   - Adapter 1, NAT
   - Adapter 2, Bridged Adapter, eth1 (Your network device)
 
-#### Bugfix: enp0s3: Detected Tx Unit Hang
-
-For Linux hosts systems, maybe you should use non Intel network card.
-You can use "PCnet-FAST III (Am79c973)" insteat.
-
 ### Download Ubuntu
 
 https://ubuntu.com/
 
 ### Installation for Ubuntu Server 16.04
-
-Note: Ubuntu 18.04, has no PHP 5.* and docker ready.
 
 * Language: English
 * Install Ubuntu Server
@@ -64,29 +57,31 @@ Note: Ubuntu 18.04, has no PHP 5.* and docker ready.
 
 ### Installation for Ubuntu Server 18.04
 
-Note: Ubuntu 18.04, has no PHP 5.* and docker ready.
-
-* Page 1:
+* Page 1 - Language:
   - Language: English
-* Page 2: (Your preference -> Identify keyboard)
+* Page 2 - Keyboard configuration:
+  - Your preference -> Identify keyboard
   - Layout: English (US)
   - Variant: English (US)
-* Page 3: (Install Ubuntu)
-* Page 4:
+* Page 3 - Ubuntu 18.04:
+  - Install Ubuntu
+* Page 4 - Network connections:
   - Network configuration
+* Page 5 - Configure proxy:
   - Proxy address: (empty)
-* Page 5: (bypassed)
-* Page 6:
+* Page 6 - Configure Ubuntu archive mirror:
+  - (bypass)
+* Page 7 - Filesystem setup:
   - Use an Entire Disk
   - VBOX_HARDDISK_...
-
-  * Your name: user
-  * Your Server's name: dev-vm
-  * Username: user
-  * Passwort: user
-* Page 7: (bypassed)
-* Page 8: (Installation running)
-* Page 9: (Reboot)
+* Page 8 - Profile:
+  - Your name: user
+  - Your Server's name: dev-vm
+  - Username: user
+  - Passwort: user
+* Page 9 - Feature Server: (bypassed)
+* Page 10: (Installation running)
+* Page 11: (Reboot)
 
 ## Procceed the installation
 
