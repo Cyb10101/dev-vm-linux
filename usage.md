@@ -468,6 +468,14 @@ Wildcard for local domains:
 *.vm00.example.org -> example.vm00.example.org -> /var/www/example/public
 ```
 
+### Switch GraphicMagick to ImageMagick
+
+To activate or disable current Magick run in console:
+
+```Shell
+magick
+```
+
 ### PHP extension xDebug & IDE (PhpStorm)
 
 To activate or disable xDebug run in console:
