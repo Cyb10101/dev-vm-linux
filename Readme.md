@@ -15,13 +15,8 @@ Notes:
 
 Downloads: https://netslum.de/downloads
 
-* Ubuntu 18.04, PHP <= 7.0, Docker edge:
-  - UbuntuDev2018Server
-  - UbuntuDev2018Desktop
-
-* Ubuntu 16.04, PHP <= 5.4, Docker stable:
-  - UbuntuDev2016Server
-  - UbuntuDev2016Desktop
+* UbuntuDev2018: Ubuntu 18.04, PHP <= 7.0
+* UbuntuDev2016: Ubuntu 16.04, PHP <= 5.4
 
 ## Create a virtual machine
 
