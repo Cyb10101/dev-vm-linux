@@ -151,7 +151,7 @@ moveHarddisk2Mysql() {
 	sudo ln -s /mnt/data/var/lib/mysql /var/lib/mysql
 	sudo sh -c 'echo "alias /var/lib/mysql/ -> /mnt/data/var/lib/mysql/," >> /etc/apparmor.d/tunables/alias'
 
-	sudo systemctl apparmor mysql
+	sudo systemctl restart apparmor
 	sudo systemctl start mysql
 }
 
