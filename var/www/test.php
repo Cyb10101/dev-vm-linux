@@ -142,6 +142,9 @@ class Website {
 		?>
 		<div class="container">
 			<h2>E-Mail test</h2>
+			<p>
+				<a href="http://<?php echo $_SERVER['SERVER_ADDR']; ?>:1080/" target="_blank" class="btn btn-green">Mail Catcher</a>
+			</p>
 			<?php
 			echo 'SendMail Path: ' . ini_get('sendmail_path') . '<br/>';
 			$result = mail('test@example.org', 'Test E-Mail PHP ' . phpversion(), 'This is a <b>development</b> on <b>PHP ' . phpversion() . '</b> test.');
