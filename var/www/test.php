@@ -147,7 +147,16 @@ class Website {
 			</p>
 			<?php
 			echo 'SendMail Path: ' . ini_get('sendmail_path') . '<br/>';
-			$result = mail('test@example.org', 'Test E-Mail PHP ' . phpversion(), 'This is a <b>development</b> on <b>PHP ' . phpversion() . '</b> test.');
+
+			$header = [
+				'From: webmaster@example.org',
+				'Content-Type: text/html',
+				'MIME-Version: 1.0',
+				'X-Mailer: PHP/' . phpversion(),
+			];
+			$subject = 'Test E-Mail PHP ' . phpversion();
+			$message = 'This is a <b>development</b> on <b>PHP ' . phpversion() . '</b> test.';
+			$result = mail('test@example.org', $subject, $message, implode("\r\n", $header));
 			echo 'E-Mail ' . ($result ? '' : 'not ') . 'send.';
 			?>
 		</div>
