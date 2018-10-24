@@ -143,7 +143,7 @@ class Website {
 		<div class="container">
 			<h2>E-Mail test</h2>
 			<p>
-				<a href="http://<?php echo $_SERVER['SERVER_ADDR']; ?>:1080/" target="_blank" class="btn btn-green">Mail Catcher</a>
+				<a href="http://<?php echo $_SERVER['SERVER_ADDR']; ?>:8025/" target="_blank" class="btn btn-green">MailHog</a>
 			</p>
 			<?php
 			echo 'SendMail Path: ' . ini_get('sendmail_path') . '<br/>';
