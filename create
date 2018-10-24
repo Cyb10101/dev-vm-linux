@@ -169,7 +169,6 @@ testDns() {
 	fi
 }
 
-
 installApache2() {
 	# System Webserver (Apache)
 	sudo apt -y install apache2 php libapache2-mod-php php-fpm php-curl php-xml
