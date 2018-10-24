@@ -1,3 +1,5 @@
+# sub.www.example.org.dev.vm
+# sub.www.example.org.dev.vm00.example.org
 # www.example.org.dev.vm
 # www.example.org.dev.vm00.example.org
 server {
@@ -8,6 +10,7 @@ server {
 	listen [::]:443 ssl http2;
 	include snippets/snakeoil.conf;
 
+	server_name ~^(?<xsubname2>.+)\.(?<xsubname>.+)\.(?<xservername>.+)\.(?<xtoplevel>.+)\.dev\.(vm|vm00\.example\.org)$;
 	server_name ~^(?<xsubname>.+)\.(?<xservername>.+)\.(?<xtoplevel>.+)\.dev\.(vm|vm00\.example\.org)$;
 
 	set $lastFolder /public;
@@ -34,11 +37,6 @@ server {
 		}
 	}
 
-	#include snippets/php-5.4.45.conf;
-	#include snippets/php-5.5.38.conf;
-	#include snippets/php-5.6.38.conf;
-	#include snippets/php-7.0.32.conf;
-	#include snippets/php-7.1.23.conf;
 	include snippets/php-7.2.11.conf;
 }
 
@@ -78,14 +76,11 @@ server {
 		}
 	}
 
-	#include snippets/php-5.4.45.conf;
-	#include snippets/php-5.5.38.conf;
-	#include snippets/php-5.6.38.conf;
-	#include snippets/php-7.0.32.conf;
-	#include snippets/php-7.1.23.conf;
 	include snippets/php-7.2.11.conf;
 }
 
+# sub.www.example.vm
+# sub.www.example.vm00.example.org
 # www.example.vm
 # www.example.vm00.example.org
 server {
@@ -96,6 +91,7 @@ server {
 	listen [::]:443 ssl http2;
 	include snippets/snakeoil.conf;
 
+	server_name ~^(?<xsubname2>.+)\.(?<xsubname>.+)\.(?<xservername>.+)\.(vm|vm00\.example\.org)$;
 	server_name ~^(?<xsubname>.+)\.(?<xservername>.+)\.(vm|vm00\.example\.org)$;
 
 	set $lastFolder /public;
@@ -122,11 +118,6 @@ server {
 		}
 	}
 
-	#include snippets/php-5.4.45.conf;
-	#include snippets/php-5.5.38.conf;
-	#include snippets/php-5.6.38.conf;
-	#include snippets/php-7.0.32.conf;
-	#include snippets/php-7.1.23.conf;
 	include snippets/php-7.2.11.conf;
 }
 
@@ -166,10 +157,5 @@ server {
 		}
 	}
 
-	#include snippets/php-5.4.45.conf;
-	#include snippets/php-5.5.38.conf;
-	#include snippets/php-5.6.38.conf;
-	#include snippets/php-7.0.32.conf;
-	#include snippets/php-7.1.23.conf;
 	include snippets/php-7.2.11.conf;
 }

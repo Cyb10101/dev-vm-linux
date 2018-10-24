@@ -169,7 +169,6 @@ testDns() {
 	fi
 }
 
-
 installApache2() {
 	# System Webserver (Apache)
 	sudo apt -y install apache2 php libapache2-mod-php php-fpm php-curl php-xml
@@ -394,7 +393,7 @@ configurePhpIni() {
 
 	sed -i 's/^mysqli.default_host =.*/mysqli.default_host = 127.0.0.1/' /home/user/.phpbrew/php/${1}/etc/php.ini
 
-	sed -i "s/^;sendmail_path =.*/sendmail_path = \/usr\/bin\/env \/usr\/local\/bin\/catchmail -t -f 'www-data@localhost'/" /home/user/.phpbrew/php/${1}/etc/php.ini
+	sed -i "s/^;sendmail_path =.*/sendmail_path = \/home\/user\/go\/bin\/mhsendmail/" /home/user/.phpbrew/php/${1}/etc/php.ini
 
 	sed -i 's/^session.gc_maxlifetime =.*/session.gc_maxlifetime = 86400/' /home/user/.phpbrew/php/${1}/etc/php.ini
 }
@@ -612,26 +611,26 @@ installMariaDB() {
 	configureDatabase
 }
 
-installFakeMail() {
-	sudo apt -y install tofrodos ack-grep
-	sudo cp /home/user/dev-vm-linux/usr/sbin/sendmailfake /usr/sbin/
+installGoLanguage() {
+	wget -O /tmp/go-linux-amd64.tar.gz https://dl.google.com/go/go1.11.1.linux-amd64.tar.gz
+	sudo tar -C /usr/local -xzf /tmp/go-linux-amd64.tar.gz
+
+	export PATH=${PATH}:/usr/local/go/bin
+	echoCommand="export PATH=${PATH}:/usr/local/go/bin"
+	sudo sh -c "echo ${echoCommand} >> /etc/profile"
 }
 
-installMailCatcher() {
-	# https://mailcatcher.me/
+installMailHog() {
+	# For local installation
+	go get github.com/mailhog/MailHog
+	sudo sh -c 'echo "@reboot root /home/user/go/bin/MailHog" >> /etc/crontab'
 
-	sudo apt -y install build-essential libsqlite3-dev ruby-dev
-	sudo gem install mailcatcher
-	sudo sh -c 'echo "@reboot root \$(which mailcatcher) --ip=0.0.0.0" >> /etc/crontab'
+	# For docker installation
+	# sudo docker run -d --publish 1025:1025 --publish 8025:8025 mailhog/mailhog
+}
 
-	if [[ $(lsb_release -rs) == '18.04' ]]; then
-		sudo rsync -a /home/user/dev-vm-linux/etc/php/7.0/mods-available/mailcatcher.ini /etc/php/7.2/mods-available/
-	fi;
-	if [[ $(lsb_release -rs) == '16.04' ]]; then
-		sudo rsync -a /home/user/dev-vm-linux/etc/php/7.0/mods-available/mailcatcher.ini /etc/php/7.0/mods-available/
-	fi;
-
-	sudo phpenmod mailcatcher
+installMhSendmail() {
+	go get github.com/mailhog/mhsendmail
 }
 
 installComposer() {
@@ -824,8 +823,10 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
 	#installMySQL
   installMariaDB
 
-	installFakeMail
-	installMailCatcher
+	installGoLanguage
+	installMailHog
+	installMhSendmail
+
 	installComposer
 	installWebsite
 	installWebsiteTypo3

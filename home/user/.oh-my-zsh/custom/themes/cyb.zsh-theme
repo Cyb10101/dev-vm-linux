@@ -151,3 +151,4 @@ precmd() {
 setopt prompt_subst
 PROMPT='$(cyb_prompt_status)'
 RPROMPT='$(git_prompt_info)$(git_prompt_status)$(git_prompt_ahead)%{$reset_color%}'
+

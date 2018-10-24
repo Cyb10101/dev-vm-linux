@@ -236,30 +236,6 @@ At this point you configure your system.
 Change from "bash" to "zsh" for the current user.
 Use usage script "Change login shell".
 
-### Optional: Switch from MailCachter to Fakemail
-
-Not recommended, but possible.
-
-```Shell
-vim /home/user/.phpbrew/php/php-7.2.11/etc/php.ini
-vim /home/user/.phpbrew/php/php-7.1.23/etc/php.ini
-vim /home/user/.phpbrew/php/php-7.0.32/etc/php.ini
-vim /home/user/.phpbrew/php/php-5.6.38/etc/php.ini
-vim /home/user/.phpbrew/php/php-5.5.38/etc/php.ini
-vim /home/user/.phpbrew/php/php-5.4.45/etc/php.ini
-
-# Ubuntu 18.04
-sudo vim /etc/php/7.2/mods-available/mailcatcher.ini
-
-# Ubuntu 16.04
-sudo vim /etc/php/7.0/mods-available/mailcatcher.ini
-```
-
-```INI
-;sendmail_path = /usr/bin/env /usr/local/bin/catchmail -t -f 'www-data@localhost'
-sendmail_path = /usr/sbin/sendmailfake
-```
-
 ### Finish
 
 ```Shell
@@ -416,7 +392,7 @@ Maybe you must restart the Service:
 
 * Actions > Restart Acrylic Service
 
-### E-Mail - MailCachter
+### E-Mail - MailHog
 
 If the MailCachter is used, e-mails can be sent to this SMTP address:
 
@@ -428,7 +404,7 @@ To see if an e-mail has been sent, you can go to this website.
 IP address must be adjusted outside the virtual machine.
 
 ```Text
-http://127.0.0.1:1080/
+http://127.0.0.1:8025/
 ```
 
 ### Apache & Nginx

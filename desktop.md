@@ -37,8 +37,8 @@ ExecStart=-/sbin/agetty --autologin user --noclear %I 38400 linux
 
 * Activate Bookmarks Toolbar
 
-* MailCachter
-    - http://127.0.0.1:1080/
+* MailHog
+    - http://127.0.0.1:8025/
 
 * Nginx Localhost
     - http://127.0.0.1/
