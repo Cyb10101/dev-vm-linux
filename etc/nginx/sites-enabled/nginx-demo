@@ -27,12 +27,12 @@ server {
 		}
 	}
 
-	#include snippets/php-5.4.45.conf;
-	#include snippets/php-5.5.38.conf;
-	#include snippets/php-5.6.38.conf;
-	#include snippets/php-7.0.32.conf;
-	#include snippets/php-7.1.23.conf;
-	include snippets/php-7.2.11.conf;
+	#include snippets/php54.conf;
+	#include snippets/php55.conf;
+	#include snippets/php56.conf;
+	#include snippets/php70.conf;
+	#include snippets/php71.conf;
+	include snippets/php72.conf;
 
 	#include snippets/typo3-staticfilecache.conf;
 }

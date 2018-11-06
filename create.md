@@ -207,9 +207,4 @@ find . -type d -name '.git' -prune -o -type f -print -exec sed -i '' \
     -e 's/7\.0\.30/7\.0\.32/g' \
     -e 's/5\.6\.36/5\.6\.38/g' \
     {} \;
-
-mv etc/nginx/snippets/php-7.2.10.conf etc/nginx/snippets/php-7.2.11.conf
-mv etc/nginx/snippets/php-7.1.22.conf etc/nginx/snippets/php-7.1.23.conf
-mv etc/nginx/snippets/php-7.0.30.conf etc/nginx/snippets/php-7.0.32.conf
-mv etc/nginx/snippets/php-5.6.36.conf etc/nginx/snippets/php-5.6.38.conf
 ```

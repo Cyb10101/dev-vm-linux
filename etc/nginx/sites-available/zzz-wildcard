@@ -37,7 +37,7 @@ server {
 		}
 	}
 
-	include snippets/php-7.2.11.conf;
+	include snippets/php72.conf;
 }
 
 # example.org.dev.vm
@@ -76,7 +76,7 @@ server {
 		}
 	}
 
-	include snippets/php-7.2.11.conf;
+	include snippets/php72.conf;
 }
 
 # sub.www.example.vm
@@ -118,7 +118,7 @@ server {
 		}
 	}
 
-	include snippets/php-7.2.11.conf;
+	include snippets/php72.conf;
 }
 
 # example.vm
@@ -157,5 +157,5 @@ server {
 		}
 	}
 
-	include snippets/php-7.2.11.conf;
+	include snippets/php72.conf;
 }

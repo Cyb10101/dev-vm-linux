@@ -188,6 +188,7 @@ installApache2() {
 
 	sudo rsync -a /home/user/dev-vm-linux/etc/apache2/conf-available/ /etc/apache2/conf-available/
 	sudo rsync -a /home/user/dev-vm-linux/etc/apache2/sites-available/ /etc/apache2/sites-available/
+	sudo rsync -a /home/user/dev-vm-linux/etc/apache2/sites-enabled/ /etc/apache2/sites-enabled/
 	sudo cp /home/user/dev-vm-linux/etc/apache2/ports.conf /etc/apache2/
 	sudo chown -R user:user /etc/apache2/sites-available
 	sudo chown -R user:user /etc/apache2/sites-enabled
@@ -208,7 +209,6 @@ installApache2() {
 	sudo a2enconf macro-virtual-host-ssl.conf
 	sudo a2enconf phpbrew.conf
 	sudo a2enconf server-name.conf
-	sudo a2ensite apache-demo.conf
 	sudo a2ensite zzz-wildcard-vm.conf
 	sudo a2ensite zzz-wildcard-company.conf
 
@@ -225,6 +225,7 @@ installNginx() {
 	sudo apt -y install nginx nginx-extras
 	sudo rsync -a /home/user/dev-vm-linux/etc/nginx/conf.d/ /etc/nginx/conf.d/
 	sudo rsync -a /home/user/dev-vm-linux/etc/nginx/sites-available/ /etc/nginx/sites-available/
+	sudo rsync -a /home/user/dev-vm-linux/etc/nginx/sites-enabled/ /etc/nginx/sites-enabled/
 	sudo rsync -a /home/user/dev-vm-linux/etc/nginx/snippets/ /etc/nginx/snippets/
 	sudo chown -R user:user /etc/nginx/sites-available
 	sudo chown -R user:user /etc/nginx/sites-enabled
@@ -238,8 +239,6 @@ installNginx() {
 	sudo sh -c 'echo "fastcgi_param SERVER_NAME \$host;" >> /etc/nginx/snippets/fastcgi-php.conf'
 
 	# Enable configuration and websites
-	sudo ln -s /etc/nginx/sites-available/apache-proxy /etc/nginx/sites-enabled/
-	sudo ln -s /etc/nginx/sites-available/nginx-demo /etc/nginx/sites-enabled/
 	sudo ln -s /etc/nginx/sites-available/zzz-wildcard /etc/nginx/sites-enabled/
 	sudo nginx -t && sudo systemctl restart nginx
 }
@@ -276,7 +275,7 @@ installPhpBrewRequirements() {
 	fi;
 }
 
-phpBrewCompile-php-7.2.11Argon2() {
+phpBrewCompile-php72Argon2() {
 	phpbrew install -j $(nproc) php-7.2.11 \
 		+apxs2 +bcmath +bz2 +calendar +cli +ctype +curl +dom \
 		+fileinfo +filter +fpm +ftp +gd +gettext +iconv +intl +ipc +json +ldap \
@@ -323,7 +322,7 @@ phpBrewExtensionGd() {
 			--with-xpm-dir=/usr
 }
 
-phpBrewExtension-php-7() {
+phpBrewExtension-php7() {
 	phpBrewExtensionGd
 	phpbrew extension install imagick
 	phpbrew extension install gmagick 2.0.5RC1
@@ -335,7 +334,7 @@ phpBrewExtension-php-7() {
 	phpbrew extension enable gmagick
 }
 
-phpBrewExtension-php-5() {
+phpBrewExtension-php5() {
 	phpBrewExtensionGd
 	phpbrew extension install imagick
 	phpbrew extension install gmagick 1.1.7RC3
@@ -346,11 +345,11 @@ phpBrewExtension-php-5() {
 	phpbrew extension enable gmagick
 }
 
-phpBrewExtension-php-5-4() {
+phpBrewExtension-php54() {
 	phpbrew extension install imagick
 }
 
-phpBrewCompile-php-5.4.45() {
+phpBrewCompile-php54() {
 	phpbrew install -j $(nproc) php-5.4.45 \
 	    +apxs2 +bcmath +bz2 +calendar +cli +ctype +curl +dom \
 	    +fileinfo +filter +fpm +ftp +gettext +iconv +intl +ipc +json +ldap \
@@ -441,9 +440,9 @@ phpBrewBugfix() {
 phpBrewBuild() {
 	# PHP 7.2.11
 	if [[ $(lsb_release -rs) == '18.04' ]]; then
-		phpBrewCompile-php-7.2.11Argon2
+		phpBrewCompile-php72Argon2
 		# @todo On build error 'a2enmod php7' retry once
-		phpBrewCompile-php-7.2.11Argon2
+		phpBrewCompile-php72Argon2
 	fi;
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
 		phpBrewCompile-php 'php-7.2.11'
@@ -452,17 +451,17 @@ phpBrewBuild() {
 	fi;
 
 	phpbrew use php-7.2.11
-	phpBrewExtension-php-7
+	phpBrewExtension-php7
 
 	# PHP 7.1.23
 	phpBrewCompile-php 'php-7.1.23'
 	phpbrew use php-7.1.23
-	phpBrewExtension-php-7
+	phpBrewExtension-php7
 
 	# PHP 7.0.32
 	phpBrewCompile-php 'php-7.0.32'
 	phpbrew use php-7.0.32
-	phpBrewExtension-php-7
+	phpBrewExtension-php7
 
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
 		sudo apt -y install libvpx-dev
@@ -473,16 +472,16 @@ phpBrewBuild() {
 		phpBrewCompile-php 'php-5.6.38'
 
 		phpbrew use php-5.6.38
-		phpBrewExtension-php-5
+		phpBrewExtension-php5
 
 		# PHP 5.5.38
 		phpBrewCompile-php 'php-5.5.38'
 		phpbrew use php-5.5.38
-		phpBrewExtension-php-5
+		phpBrewExtension-php5
 
 		# PHP 5.4.45
-		phpBrewCompile-php-5.4.45
-		phpBrewExtension-php-5-4
+		phpBrewCompile-php54
+		phpBrewExtension-php54
 	fi;
 
 	phpbrew switch php-7.2.11
