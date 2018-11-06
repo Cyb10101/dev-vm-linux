@@ -532,9 +532,12 @@ phpBrewConfigure() {
 
 phpCleanNotUsed() {
 	if [[ $(lsb_release -rs) == '18.04' ]]; then
-		rm /etc/nginx/snippets/php-5.6.38.conf
-		rm /etc/nginx/snippets/php-5.5.38.conf
-		rm /etc/nginx/snippets/php-5.4.45.conf
+		rm /etc/apache2/conf-available/macro-php56.conf
+		rm /etc/apache2/conf-available/macro-php55.conf
+		rm /etc/apache2/conf-available/macro-php54.conf
+		rm /etc/nginx/snippets/php56.conf
+		rm /etc/nginx/snippets/php55.conf
+		rm /etc/nginx/snippets/php54.conf
 		sed -i -e '/5\.6\.38\|5\.5\.38\|5\.4\.45/d' /etc/apache2/sites-available/*
 		sed -i -e '/5\.6\.38\|5\.5\.38\|5\.4\.45/d' /etc/nginx/sites-available/*
 
