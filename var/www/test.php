@@ -59,7 +59,7 @@ class Website {
 
 				<tr><th>date.timezone</th><td><?php echo ini_get('date.timezone'); ?></td><td>Europe/Berlin</td></tr>
 				<tr><th>mysqli.default_host</th><td><?php echo ini_get('mysqli.default_host'); ?></td><td>127.0.0.1</td></tr>
-				<tr><th>sendmail_path</th><td><?php echo ini_get('sendmail_path'); ?></td><td>/usr/bin/env /usr/local/bin/catchmail -t -f 'www-data@localhost'</td></tr>
+				<tr><th>sendmail_path</th><td><?php echo ini_get('sendmail_path'); ?></td><td>/home/user/go/bin/mhsendmail</td></tr>
 				<tr><th>session.gc_maxlifetime</th><td><?php echo ini_get('session.gc_maxlifetime'); ?></td><td>86400</td></tr>
 			</table><br>
 
