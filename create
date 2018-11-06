@@ -32,6 +32,7 @@ checkDpkgLock() {
 	    ((i=i+1))
 	done
 }
+
 installSystem() {
 	checkDpkgLock
 	sudo add-apt-repository -y multiverse
@@ -621,6 +622,8 @@ installGoLanguage() {
 }
 
 installMailHog() {
+	# https://github.com/mailhog/MailHog
+
 	# For local installation
 	go get github.com/mailhog/MailHog
 	sudo sh -c 'echo "@reboot root /home/user/go/bin/MailHog" >> /etc/crontab'
@@ -630,6 +633,7 @@ installMailHog() {
 }
 
 installMhSendmail() {
+	# https://github.com/mailhog/mhsendmail
 	go get github.com/mailhog/mhsendmail
 }
 
