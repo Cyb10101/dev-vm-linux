@@ -205,6 +205,12 @@ installApache2() {
 
 	# Enable configuration and websites
 	sudo a2enconf macro-fancy-indexing.conf
+	sudo a2enconf macro-php54.conf
+	sudo a2enconf macro-php55.conf
+	sudo a2enconf macro-php56.conf
+	sudo a2enconf macro-php70.conf
+	sudo a2enconf macro-php71.conf
+	sudo a2enconf macro-php72.conf
 	sudo a2enconf macro-virtual-host-defaults.conf
 	sudo a2enconf macro-virtual-host-ssl.conf
 	sudo a2enconf phpbrew.conf
