@@ -7,6 +7,7 @@ bindkey -e
 
 autoload -Uz compinit
 compinit
+setopt no_auto_remove_slash
 
 # Path to your oh-my-zsh installation.
 export ZSH=$HOME/.oh-my-zsh
