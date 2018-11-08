@@ -94,7 +94,9 @@ setDevelopmentDomain() {
 		expression1=`echo "${REPLY}" | sed -r "s/\./\\\./g"`
 		expression2=`echo "${REPLY}" | sed -r "s/\./\\\\\\\\\\\./g"`
 
-		find /etc/apache2/sites-available /etc/nginx/sites-available -type f -exec sed -i '' \
+		find /etc/apache2/sites-available /etc/apache2/sites-enabled \
+		     /etc/nginx/sites-available /etc/nginx/sites-enabled \
+				-type f -exec sed -i '' \
 		    -e "s/vm00\.example\.org/${expression1}/g" \
 		    -e "s/vm00\\\.example\\\.org/${expression2}/g" \
 		    {} \;
