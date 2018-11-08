@@ -84,9 +84,6 @@ function addAlias {
   # less defaults
   alias less='less -FSRX'
 
-  # find biggest files
-  alias diskspace='du --max-depth=1 | sort -nr | less'
-
   # auto sudo
   #alias htop='sudo htop'
   alias iotop='sudo iotop'
