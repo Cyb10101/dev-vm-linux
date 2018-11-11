@@ -37,7 +37,11 @@ server {
 		}
 	}
 
-	include snippets/php72.conf;
+	location ~ (\.php$|^[^.]*$) {
+	#location ~ \.php(/|$) {
+		include snippets/fastcgi-php.conf;
+		include snippets/php72.conf;
+	}
 }
 
 # example.org.dev.vm
@@ -76,7 +80,11 @@ server {
 		}
 	}
 
-	include snippets/php72.conf;
+	location ~ (\.php$|^[^.]*$) {
+	#location ~ \.php(/|$) {
+		include snippets/fastcgi-php.conf;
+		include snippets/php72.conf;
+	}
 }
 
 # sub.www.example.vm
@@ -118,7 +126,11 @@ server {
 		}
 	}
 
-	include snippets/php72.conf;
+	location ~ (\.php$|^[^.]*$) {
+	#location ~ \.php(/|$) {
+		include snippets/fastcgi-php.conf;
+		include snippets/php72.conf;
+	}
 }
 
 # example.vm
@@ -157,5 +169,9 @@ server {
 		}
 	}
 
-	include snippets/php72.conf;
+	location ~ (\.php$|^[^.]*$) {
+	#location ~ \.php(/|$) {
+		include snippets/fastcgi-php.conf;
+		include snippets/php72.conf;
+	}
 }

@@ -27,12 +27,17 @@ server {
 		}
 	}
 
-	#include snippets/php54.conf;
-	#include snippets/php55.conf;
-	#include snippets/php56.conf;
-	#include snippets/php70.conf;
-	#include snippets/php71.conf;
-	include snippets/php72.conf;
+	location ~ (\.php$|^[^.]*$) {
+	#location ~ \.php(/|$) {
+		include snippets/fastcgi-php.conf;
+
+		#include snippets/php54.conf;
+		#include snippets/php55.conf;
+		#include snippets/php56.conf;
+		#include snippets/php70.conf;
+		#include snippets/php71.conf;
+		include snippets/php72.conf;
+	}
 
 	#include snippets/typo3-staticfilecache.conf;
 }

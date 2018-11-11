@@ -239,6 +239,7 @@ installNginx() {
 
 	# Configure Nginx
 	sudo sed -i 's/^user www-data;$/user user;/' /etc/nginx/nginx.conf
+	sudo sed -i 's/^try_files \$fastcgi_script_name =404;/try_files \$fastcgi_script_name \/index.php =404;/' /etc/nginx/snippets/fastcgi-php.conf
 	sudo sh -c 'echo "fastcgi_param TYPO3_CONTEXT Development/YourName;" >> /etc/nginx/snippets/fastcgi-php.conf'
 	sudo sh -c 'echo "fastcgi_param FLOW_CONTEXT Development/YourName;" >> /etc/nginx/snippets/fastcgi-php.conf'
 	sudo sh -c 'echo "fastcgi_param WWW_CONTEXT Development/YourName;" >> /etc/nginx/snippets/fastcgi-php.conf'
