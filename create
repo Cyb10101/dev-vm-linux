@@ -834,7 +834,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
 	phpCleanNotUsed
 
 	#installMySQL
-  installMariaDB
+	installMariaDB
 
 	installGoLanguage
 	installMailHog
