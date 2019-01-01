@@ -15,8 +15,8 @@ Notes:
 
 Downloads: https://netslum.de/downloads
 
-* UbuntuDev2018: Ubuntu 18.04, PHP <= 7.0
-* UbuntuDev2016: Ubuntu 16.04, PHP <= 5.4
+* UbuntuDev2018: Ubuntu 18.04, PHP >= 7.0
+* UbuntuDev2016: Ubuntu 16.04, PHP >= 5.4
 
 ## Create a virtual machine
 
