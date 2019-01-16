@@ -211,6 +211,7 @@ installApache2() {
 	sudo a2enconf macro-php70.conf
 	sudo a2enconf macro-php71.conf
 	sudo a2enconf macro-php72.conf
+	sudo a2enconf macro-php73.conf
 	sudo a2enconf macro-virtual-host-defaults.conf
 	sudo a2enconf macro-virtual-host-ssl.conf
 	sudo a2enconf phpbrew.conf
@@ -282,8 +283,8 @@ installPhpBrewRequirements() {
 	fi;
 }
 
-phpBrewCompile-php72Argon2() {
-	phpbrew install -j $(nproc) php-7.2.11 \
+phpBrewCompile-php72UpArgon2() {
+	phpbrew install -j $(nproc) php-7.3.1 \
 		+apxs2 +bcmath +bz2 +calendar +cli +ctype +curl +dom \
 		+fileinfo +filter +fpm +ftp +gd +gettext +iconv +intl +ipc +json +ldap \
 		+mbregex +mbstring +mhash +mcrypt +mysql +opcache +openssl \
@@ -327,6 +328,18 @@ phpBrewExtensionGd() {
 			--with-png-dir=/usr \
 			--with-vpx-dir=/usr \
 			--with-xpm-dir=/usr
+}
+
+phpBrewExtension-php73() {
+	phpBrewExtensionGd
+	phpbrew extension install imagick
+	phpbrew extension install gmagick 2.0.5RC1
+	phpbrew extension install opcache
+	phpbrew extension install apcu
+	phpbrew extension install xdebug 2.7.0beta1
+
+	phpbrew extension disable imagick
+	phpbrew extension enable gmagick
 }
 
 phpBrewExtension-php7() {
@@ -445,27 +458,38 @@ phpBrewBugfix() {
 }
 
 phpBrewBuild() {
-	# PHP 7.2.11
+	# PHP 7.3
 	if [[ $(lsb_release -rs) == '18.04' ]]; then
-		phpBrewCompile-php72Argon2
+		phpBrewCompile-php72UpArgon2 'php-7.3.1'
 		# @todo On build error 'a2enmod php7' retry once
-		phpBrewCompile-php72Argon2
+		phpBrewCompile-php72UpArgon2 'php-7.3.1'
 	fi;
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
-		phpBrewCompile-php 'php-7.2.11'
+		phpBrewCompile-php 'php-7.3.1'
 		# @todo On build error 'a2enmod php7' retry once
+		phpBrewCompile-php 'php-7.3.1'
+	fi;
+
+	phpbrew use php-7.3.1
+	phpBrewExtension-php73
+
+	# PHP 7.2
+	if [[ $(lsb_release -rs) == '18.04' ]]; then
+		phpBrewCompile-php72UpArgon2 'php-7.2.11'
+	fi;
+	if [[ $(lsb_release -rs) == '16.04' ]]; then
 		phpBrewCompile-php 'php-7.2.11'
 	fi;
 
 	phpbrew use php-7.2.11
 	phpBrewExtension-php7
 
-	# PHP 7.1.23
+	# PHP 7.1
 	phpBrewCompile-php 'php-7.1.23'
 	phpbrew use php-7.1.23
 	phpBrewExtension-php7
 
-	# PHP 7.0.32
+	# PHP 7.0
 	phpBrewCompile-php 'php-7.0.32'
 	phpbrew use php-7.0.32
 	phpBrewExtension-php7
@@ -473,7 +497,7 @@ phpBrewBuild() {
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
 		sudo apt -y install libvpx-dev
 
-		# PHP 5.6.38
+		# PHP 5.6
 		phpBrewCompile-php 'php-5.6.38'
 		# @todo On build error 'a2enmod php5' retry once
 		phpBrewCompile-php 'php-5.6.38'
@@ -481,12 +505,12 @@ phpBrewBuild() {
 		phpbrew use php-5.6.38
 		phpBrewExtension-php5
 
-		# PHP 5.5.38
+		# PHP 5.5
 		phpBrewCompile-php 'php-5.5.38'
 		phpbrew use php-5.5.38
 		phpBrewExtension-php5
 
-		# PHP 5.4.45
+		# PHP 5.4
 		phpBrewCompile-php54
 		phpBrewExtension-php54
 	fi;
@@ -496,6 +520,7 @@ phpBrewBuild() {
 
 phpBrewConfigure() {
 	# Configure PHP
+	configurePhpIni 'php-7.3.1'
 	configurePhpIni 'php-7.2.11'
 	configurePhpIni 'php-7.1.23'
 	configurePhpIni 'php-7.0.32'
@@ -511,6 +536,7 @@ phpBrewConfigure() {
 	fi;
 
 	# Configure PHP xDebug
+	configurePhpXdebug 'php-7.3.1'
 	configurePhpXdebug 'php-7.2.11'
 	configurePhpXdebug 'php-7.1.23'
 	configurePhpXdebug 'php-7.0.32'
@@ -523,6 +549,7 @@ phpBrewConfigure() {
 	/usr/local/bin/xdebug disable
 
 	# Configure PHP FPM
+	configurePhpFpm7 'php-7.3.1'
 	configurePhpFpm7 'php-7.2.11'
 	configurePhpFpm7 'php-7.1.23'
 	configurePhpFpm7 'php-7.0.32'
@@ -542,6 +569,9 @@ phpCleanNotUsed() {
 		rm /etc/apache2/conf-available/macro-php56.conf
 		rm /etc/apache2/conf-available/macro-php55.conf
 		rm /etc/apache2/conf-available/macro-php54.conf
+		rm /etc/apache2/conf-enabled/macro-php56.conf
+		rm /etc/apache2/conf-enabled/macro-php55.conf
+		rm /etc/apache2/conf-enabled/macro-php54.conf
 		rm /etc/nginx/snippets/php56.conf
 		rm /etc/nginx/snippets/php55.conf
 		rm /etc/nginx/snippets/php54.conf

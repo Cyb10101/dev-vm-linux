@@ -23,4 +23,5 @@ if [ -f /home/user/.phpbrew/bashrc ]; then
 	startPhpFpm 7.0.32
 	startPhpFpm 7.1.23
 	startPhpFpm 7.2.11
+	startPhpFpm 7.3.1
 fi

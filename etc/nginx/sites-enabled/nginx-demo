@@ -36,7 +36,8 @@ server {
 		#include snippets/php56.conf;
 		#include snippets/php70.conf;
 		#include snippets/php71.conf;
-		include snippets/php72.conf;
+		#include snippets/php72.conf;
+		include snippets/php73.conf;
 	}
 
 	#include snippets/typo3-staticfilecache.conf;
