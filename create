@@ -275,7 +275,9 @@ installPhpBrewRequirements() {
 	# ImageMagick
 	sudo apt -y install libmagickwand-dev libmagickcore-dev
 
-	sudo apt -y install autoconf apache2-dev libxml2-dev libcurl4-openssl-dev pkg-config libssl-dev libbz2-dev libjpeg-turbo8-dev libpng-dev libxpm-dev libfreetype6-dev libmcrypt4 libmcrypt-dev libpq-dev libreadline-dev libtidy-dev libxslt1-dev
+	sudo apt -y install autoconf apache2-dev libxml2-dev libcurl4-openssl-dev pkg-config \
+		libssl-dev libbz2-dev libjpeg-turbo8-dev libpng-dev libxpm-dev libfreetype6-dev \
+		libmcrypt4 libmcrypt-dev libpq-dev libreadline-dev libtidy-dev libxslt1-dev libzip-dev
 
 	# Argon2 Password Hash (Ubuntu 18.04, PHP 7.2+)
 	if [[ $(lsb_release -rs) == '18.04' ]]; then
