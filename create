@@ -524,7 +524,7 @@ phpBrewBuild() {
 		phpBrewExtension-php54
 	fi;
 
-	phpbrew switch php-7.2.14
+	phpbrew switch php-7.3.1
 }
 
 phpBrewConfigure() {
