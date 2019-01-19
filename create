@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 pauseAnyKey() {
 	read -n 1 -s -r -p 'Press any key to continue...'
@@ -462,12 +463,16 @@ phpBrewBugfix() {
 phpBrewBuild() {
 	# PHP 7.3
 	if [[ $(lsb_release -rs) == '18.04' ]]; then
+		set +e
 		phpBrewCompile-php72UpArgon2 'php-7.3.1'
+		set -e
 		# @todo On build error 'a2enmod php7' retry once
 		phpBrewCompile-php72UpArgon2 'php-7.3.1'
 	fi;
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
+		set +e
 		phpBrewCompile-php 'php-7.3.1'
+		set -e
 		# @todo On build error 'a2enmod php7' retry once
 		phpBrewCompile-php 'php-7.3.1'
 	fi;
