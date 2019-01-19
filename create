@@ -265,9 +265,7 @@ installPhpBrew() {
 
 	echo 'source /home/user/.phpbrew/bashrc' >> /home/user/.bashrc
 	echo 'source /home/user/.phpbrew/bashrc' >> /home/user/.zshrc
-	if [ -f /home/user/.phpbrew/bashrc ]; then
-		source /home/user/.phpbrew/bashrc
-	fi
+	[[ -e ~/.phpbrew/bashrc ]] && source ~/.phpbrew/bashrc
 }
 
 installPhpBrewRequirements() {
