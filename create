@@ -6,7 +6,9 @@ pauseAnyKey() {
 }
 
 disableBlankConsole() {
-	setterm -blank 0 -powersave off
+	if [[ "${TERM}" != 'xterm-256color' ]]; then
+		setterm -blank 0 -powersave off
+	fi;
 }
 
 bugfixNetfilter() {
