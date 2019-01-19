@@ -505,7 +505,9 @@ phpBrewBuild() {
 		sudo apt -y install libvpx-dev
 
 		# PHP 5.6
+		set +e
 		phpBrewCompile-php 'php-5.6.38'
+		set -e
 		# @todo On build error 'a2enmod php5' retry once
 		phpBrewCompile-php 'php-5.6.38'
 
