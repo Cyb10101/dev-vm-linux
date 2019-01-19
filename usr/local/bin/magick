@@ -23,6 +23,7 @@ function magickSwitcher {
 	runMagickSwitcher ${1} ${2} '7.0.32'
 	runMagickSwitcher ${1} ${2} '7.1.23'
 	runMagickSwitcher ${1} ${2} '7.2.11'
+	runMagickSwitcher ${1} ${2} '7.3.1'
 }
 
 if [ -f /home/user/.phpbrew/bashrc ]; then
