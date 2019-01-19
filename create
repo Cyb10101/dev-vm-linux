@@ -833,7 +833,7 @@ runCleanup() {
 	sudo chown -R user:user /etc/nginx/sites-enabled
 
 	# rm -rf /home/user/dev-vm-linux
-
+	set +e
 	sudo rm -rd /var/www/html
 	sudo rm /home/user/.mysql_history
 	sudo rm /home/user/.bash_history
@@ -841,6 +841,7 @@ runCleanup() {
 	sudo rm /root/.mysql_history
 	sudo rm /root/.bash_history
 	sudo rm /root/.zsh_history
+	set -e
 }
 
 rebootRequired() {
