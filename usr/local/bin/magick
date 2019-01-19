@@ -18,11 +18,12 @@ function magickSwitcher {
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
 		runMagickSwitcher ${1} ${2} '5.4.45'
 		runMagickSwitcher ${1} ${2} '5.5.38'
-		runMagickSwitcher ${1} ${2} '5.6.38'
+		runMagickSwitcher ${1} ${2} '5.6.40'
 	fi;
-	runMagickSwitcher ${1} ${2} '7.0.32'
-	runMagickSwitcher ${1} ${2} '7.1.23'
-	runMagickSwitcher ${1} ${2} '7.2.11'
+	runMagickSwitcher ${1} ${2} '7.0.33'
+	runMagickSwitcher ${1} ${2} '7.1.26'
+	runMagickSwitcher ${1} ${2} '7.2.14'
+	runMagickSwitcher ${1} ${2} '7.3.1'
 }
 
 if [ -f /home/user/.phpbrew/bashrc ]; then

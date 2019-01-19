@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 pauseAnyKey() {
 	read -n 1 -s -r -p 'Press any key to continue...'
@@ -6,7 +7,9 @@ pauseAnyKey() {
 }
 
 disableBlankConsole() {
-	setterm -blank 0 -powersave off
+	if [[ "${TERM}" != 'xterm-256color' ]]; then
+		setterm -blank 0 -powersave off
+	fi;
 }
 
 bugfixNetfilter() {
@@ -211,6 +214,7 @@ installApache2() {
 	sudo a2enconf macro-php70.conf
 	sudo a2enconf macro-php71.conf
 	sudo a2enconf macro-php72.conf
+	sudo a2enconf macro-php73.conf
 	sudo a2enconf macro-virtual-host-defaults.conf
 	sudo a2enconf macro-virtual-host-ssl.conf
 	sudo a2enconf phpbrew.conf
@@ -262,9 +266,7 @@ installPhpBrew() {
 
 	echo 'source /home/user/.phpbrew/bashrc' >> /home/user/.bashrc
 	echo 'source /home/user/.phpbrew/bashrc' >> /home/user/.zshrc
-	if [ -f /home/user/.phpbrew/bashrc ]; then
-		source /home/user/.phpbrew/bashrc
-	fi
+	[[ -e ~/.phpbrew/bashrc ]] && source ~/.phpbrew/bashrc
 }
 
 installPhpBrewRequirements() {
@@ -274,7 +276,9 @@ installPhpBrewRequirements() {
 	# ImageMagick
 	sudo apt -y install libmagickwand-dev libmagickcore-dev
 
-	sudo apt -y install autoconf apache2-dev libxml2-dev libcurl4-openssl-dev pkg-config libssl-dev libbz2-dev libjpeg-turbo8-dev libpng-dev libxpm-dev libfreetype6-dev libmcrypt4 libmcrypt-dev libpq-dev libreadline-dev libtidy-dev libxslt1-dev
+	sudo apt -y install autoconf apache2-dev libxml2-dev libcurl4-openssl-dev pkg-config \
+		libssl-dev libbz2-dev libjpeg-turbo8-dev libpng-dev libxpm-dev libfreetype6-dev \
+		libmcrypt4 libmcrypt-dev libpq-dev libreadline-dev libtidy-dev libxslt1-dev libzip-dev
 
 	# Argon2 Password Hash (Ubuntu 18.04, PHP 7.2+)
 	if [[ $(lsb_release -rs) == '18.04' ]]; then
@@ -282,8 +286,8 @@ installPhpBrewRequirements() {
 	fi;
 }
 
-phpBrewCompile-php72Argon2() {
-	phpbrew install -j $(nproc) php-7.2.11 \
+phpBrewCompile-php72UpArgon2() {
+	phpbrew install -j $(nproc) ${1} \
 		+apxs2 +bcmath +bz2 +calendar +cli +ctype +curl +dom \
 		+fileinfo +filter +fpm +ftp +gd +gettext +iconv +intl +ipc +json +ldap \
 		+mbregex +mbstring +mhash +mcrypt +mysql +opcache +openssl \
@@ -327,6 +331,18 @@ phpBrewExtensionGd() {
 			--with-png-dir=/usr \
 			--with-vpx-dir=/usr \
 			--with-xpm-dir=/usr
+}
+
+phpBrewExtension-php73() {
+	phpBrewExtensionGd
+	phpbrew extension install imagick
+	phpbrew extension install gmagick 2.0.5RC1
+	phpbrew extension install opcache
+	phpbrew extension install apcu
+	phpbrew extension install xdebug 2.7.0beta1
+
+	phpbrew extension disable imagick
+	phpbrew extension enable gmagick
 }
 
 phpBrewExtension-php7() {
@@ -445,63 +461,81 @@ phpBrewBugfix() {
 }
 
 phpBrewBuild() {
-	# PHP 7.2.11
+	# PHP 7.3
 	if [[ $(lsb_release -rs) == '18.04' ]]; then
-		phpBrewCompile-php72Argon2
+		set +e
+		phpBrewCompile-php72UpArgon2 'php-7.3.1'
+		set -e
 		# @todo On build error 'a2enmod php7' retry once
-		phpBrewCompile-php72Argon2
+		phpBrewCompile-php72UpArgon2 'php-7.3.1'
 	fi;
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
-		phpBrewCompile-php 'php-7.2.11'
+		set +e
+		phpBrewCompile-php 'php-7.3.1'
+		set -e
 		# @todo On build error 'a2enmod php7' retry once
-		phpBrewCompile-php 'php-7.2.11'
+		phpBrewCompile-php 'php-7.3.1'
 	fi;
 
-	phpbrew use php-7.2.11
+	phpbrew use php-7.3.1
+	phpBrewExtension-php73
+
+	# PHP 7.2
+	if [[ $(lsb_release -rs) == '18.04' ]]; then
+		phpBrewCompile-php72UpArgon2 'php-7.2.14'
+	fi;
+	if [[ $(lsb_release -rs) == '16.04' ]]; then
+		phpBrewCompile-php 'php-7.2.14'
+	fi;
+
+	phpbrew use php-7.2.14
 	phpBrewExtension-php7
 
-	# PHP 7.1.23
-	phpBrewCompile-php 'php-7.1.23'
-	phpbrew use php-7.1.23
+	# PHP 7.1
+	phpBrewCompile-php 'php-7.1.26'
+	phpbrew use php-7.1.26
 	phpBrewExtension-php7
 
-	# PHP 7.0.32
-	phpBrewCompile-php 'php-7.0.32'
-	phpbrew use php-7.0.32
+	# PHP 7.0
+	phpBrewCompile-php 'php-7.0.33'
+	phpbrew use php-7.0.33
 	phpBrewExtension-php7
 
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
 		sudo apt -y install libvpx-dev
 
-		# PHP 5.6.38
-		phpBrewCompile-php 'php-5.6.38'
+		# PHP 5.6
+		set +e
+		phpBrewCompile-php 'php-5.6.40'
+		set -e
 		# @todo On build error 'a2enmod php5' retry once
-		phpBrewCompile-php 'php-5.6.38'
+		phpBrewCompile-php 'php-5.6.40'
 
-		phpbrew use php-5.6.38
+		phpbrew use php-5.6.40
 		phpBrewExtension-php5
 
-		# PHP 5.5.38
+		# PHP 5.5
 		phpBrewCompile-php 'php-5.5.38'
 		phpbrew use php-5.5.38
 		phpBrewExtension-php5
 
-		# PHP 5.4.45
+		# PHP 5.4
 		phpBrewCompile-php54
 		phpBrewExtension-php54
 	fi;
 
-	phpbrew switch php-7.2.11
+	phpbrew switch php-7.3.1
 }
 
 phpBrewConfigure() {
 	# Configure PHP
-	configurePhpIni 'php-7.2.11'
-	configurePhpIni 'php-7.1.23'
-	configurePhpIni 'php-7.0.32'
+	configurePhpIni 'php-7.3.1'
+	configurePhpIni 'php-7.2.14'
+	configurePhpIni 'php-7.1.26'
+	configurePhpIni 'php-7.0.33'
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
-		configurePhpIni 'php-5.6.38'
-		configurePhpIniPhp5 'php-5.6.38'
+		configurePhpIni 'php-5.6.40'
+		configurePhpIniPhp5 'php-5.6.40'
 
 		configurePhpIni 'php-5.5.38'
 		configurePhpIniPhp5 'php-5.5.38'
@@ -511,11 +545,12 @@ phpBrewConfigure() {
 	fi;
 
 	# Configure PHP xDebug
-	configurePhpXdebug 'php-7.2.11'
-	configurePhpXdebug 'php-7.1.23'
-	configurePhpXdebug 'php-7.0.32'
+	configurePhpXdebug 'php-7.3.1'
+	configurePhpXdebug 'php-7.2.14'
+	configurePhpXdebug 'php-7.1.26'
+	configurePhpXdebug 'php-7.0.33'
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
-		configurePhpXdebug 'php-5.6.38'
+		configurePhpXdebug 'php-5.6.40'
 		configurePhpXdebug 'php-5.5.38'
 		configurePhpXdebug 'php-5.4.45'
 		configurePhpXdebug-php-5.4.45
@@ -523,11 +558,12 @@ phpBrewConfigure() {
 	/usr/local/bin/xdebug disable
 
 	# Configure PHP FPM
-	configurePhpFpm7 'php-7.2.11'
-	configurePhpFpm7 'php-7.1.23'
-	configurePhpFpm7 'php-7.0.32'
+	configurePhpFpm7 'php-7.3.1'
+	configurePhpFpm7 'php-7.2.14'
+	configurePhpFpm7 'php-7.1.26'
+	configurePhpFpm7 'php-7.0.33'
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
-		configurePhpFpm5 'php-5.6.38'
+		configurePhpFpm5 'php-5.6.40'
 		configurePhpFpm5 'php-5.5.38'
 		configurePhpFpm5 'php-5.4.45'
 	fi;
@@ -542,6 +578,9 @@ phpCleanNotUsed() {
 		rm /etc/apache2/conf-available/macro-php56.conf
 		rm /etc/apache2/conf-available/macro-php55.conf
 		rm /etc/apache2/conf-available/macro-php54.conf
+		rm /etc/apache2/conf-enabled/macro-php56.conf
+		rm /etc/apache2/conf-enabled/macro-php55.conf
+		rm /etc/apache2/conf-enabled/macro-php54.conf
 		rm /etc/nginx/snippets/php56.conf
 		rm /etc/nginx/snippets/php55.conf
 		rm /etc/nginx/snippets/php54.conf
@@ -549,7 +588,7 @@ phpCleanNotUsed() {
 		sed -i -e '/5\.6\.38\|5\.5\.38\|5\.4\.45/d' /etc/nginx/sites-available/*
 
 		# Check if defect
-		# grep -linrE '5.6.38|5.5.38|5.4.45' /etc/apache2 /etc/nginx
+		# grep -linrE '5.6.40|5.5.38|5.4.45' /etc/apache2 /etc/nginx
 	fi;
 }
 
@@ -557,24 +596,29 @@ testPhp() {
 	phpbrew list
 	pauseAnyKey
 
+	[[ -e ~/.phpbrew/bashrc ]] && source ~/.phpbrew/bashrc
+
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
 		phpbrew use php-5.4.45
 		php -v | grep PHP | grep -v Copyright
 		phpbrew use php-5.5.38
 		php -v | grep PHP | grep -v Copyright
-		phpbrew use php-5.6.38
+		phpbrew use php-5.6.40
 		php -v | grep PHP | grep -v Copyright
 	fi;
 
-	phpbrew use php-7.0.32
+	phpbrew use php-7.0.33
 	php -v | grep PHP | grep -v Copyright
-	phpbrew use php-7.1.23
+	phpbrew use php-7.1.26
 	php -v | grep PHP | grep -v Copyright
-	phpbrew use php-7.2.11
+	phpbrew use php-7.2.14
+	php -v | grep PHP | grep -v Copyright
+	phpbrew use php-7.3.1
 	php -v | grep PHP | grep -v Copyright
 }
 
 configureDatabase() {
+	set +e
 	mysql <<EOF
 DROP USER 'root'@'%';
 DROP USER 'root'@'localhost';
@@ -588,6 +632,7 @@ GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 SELECT host, user FROM mysql.user;
 EOF
+	set -e
 }
 
 installMySQL() {
@@ -790,7 +835,7 @@ runCleanup() {
 	sudo chown -R user:user /etc/nginx/sites-enabled
 
 	# rm -rf /home/user/dev-vm-linux
-
+	set +e
 	sudo rm -rd /var/www/html
 	sudo rm /home/user/.mysql_history
 	sudo rm /home/user/.bash_history
@@ -798,6 +843,7 @@ runCleanup() {
 	sudo rm /root/.mysql_history
 	sudo rm /root/.bash_history
 	sudo rm /root/.zsh_history
+	set -e
 }
 
 rebootRequired() {

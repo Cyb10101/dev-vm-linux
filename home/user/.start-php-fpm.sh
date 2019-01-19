@@ -18,9 +18,10 @@ if [ -f /home/user/.phpbrew/bashrc ]; then
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
 		startPhpFpm 5.4.45
 		startPhpFpm 5.5.38
-		startPhpFpm 5.6.38
+		startPhpFpm 5.6.40
 	fi;
-	startPhpFpm 7.0.32
-	startPhpFpm 7.1.23
-	startPhpFpm 7.2.11
+	startPhpFpm 7.0.33
+	startPhpFpm 7.1.26
+	startPhpFpm 7.2.14
+	startPhpFpm 7.3.1
 fi

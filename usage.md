@@ -332,10 +332,10 @@ Append to file /etc/fstab with your virtual machine IP:
 phpbrew list
 
 # Switch PHP version permanent
-phpbrew switch php-7.2.11
+phpbrew switch php-7.2.14
 
 # Switch PHP version temporary only for current enviroment in terminal
-phpbrew use php-7.2.11
+phpbrew use php-7.2.14
 
 # Show current PHP version
 php -v

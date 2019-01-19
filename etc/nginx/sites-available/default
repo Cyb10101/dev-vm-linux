@@ -28,6 +28,6 @@ server {
 
 	location ~ \.php(/|$) {
 		include snippets/fastcgi-php.conf;
-		include snippets/php72.conf;
+		include snippets/php73.conf;
 	}
 }
