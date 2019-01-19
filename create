@@ -612,6 +612,7 @@ testPhp() {
 }
 
 configureDatabase() {
+	set +e
 	mysql <<EOF
 DROP USER 'root'@'%';
 DROP USER 'root'@'localhost';
@@ -625,6 +626,7 @@ GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 SELECT host, user FROM mysql.user;
 EOF
+	set -e
 }
 
 installMySQL() {
