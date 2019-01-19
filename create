@@ -594,6 +594,8 @@ testPhp() {
 	phpbrew list
 	pauseAnyKey
 
+	[[ -e ~/.phpbrew/bashrc ]] && source ~/.phpbrew/bashrc
+
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
 		phpbrew use php-5.4.45
 		php -v | grep PHP | grep -v Copyright
@@ -608,6 +610,8 @@ testPhp() {
 	phpbrew use php-7.1.23
 	php -v | grep PHP | grep -v Copyright
 	phpbrew use php-7.2.11
+	php -v | grep PHP | grep -v Copyright
+	phpbrew use php-7.3.1
 	php -v | grep PHP | grep -v Copyright
 }
 
