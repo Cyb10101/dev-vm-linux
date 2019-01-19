@@ -286,7 +286,7 @@ installPhpBrewRequirements() {
 }
 
 phpBrewCompile-php72UpArgon2() {
-	phpbrew install -j $(nproc) php-7.3.1 \
+	phpbrew install -j $(nproc) ${1} \
 		+apxs2 +bcmath +bz2 +calendar +cli +ctype +curl +dom \
 		+fileinfo +filter +fpm +ftp +gd +gettext +iconv +intl +ipc +json +ldap \
 		+mbregex +mbstring +mhash +mcrypt +mysql +opcache +openssl \
