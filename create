@@ -482,23 +482,23 @@ phpBrewBuild() {
 
 	# PHP 7.2
 	if [[ $(lsb_release -rs) == '18.04' ]]; then
-		phpBrewCompile-php72UpArgon2 'php-7.2.11'
+		phpBrewCompile-php72UpArgon2 'php-7.2.14'
 	fi;
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
-		phpBrewCompile-php 'php-7.2.11'
+		phpBrewCompile-php 'php-7.2.14'
 	fi;
 
-	phpbrew use php-7.2.11
+	phpbrew use php-7.2.14
 	phpBrewExtension-php7
 
 	# PHP 7.1
-	phpBrewCompile-php 'php-7.1.23'
-	phpbrew use php-7.1.23
+	phpBrewCompile-php 'php-7.1.26'
+	phpbrew use php-7.1.26
 	phpBrewExtension-php7
 
 	# PHP 7.0
-	phpBrewCompile-php 'php-7.0.32'
-	phpbrew use php-7.0.32
+	phpBrewCompile-php 'php-7.0.33'
+	phpbrew use php-7.0.33
 	phpBrewExtension-php7
 
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
@@ -506,12 +506,12 @@ phpBrewBuild() {
 
 		# PHP 5.6
 		set +e
-		phpBrewCompile-php 'php-5.6.38'
+		phpBrewCompile-php 'php-5.6.40'
 		set -e
 		# @todo On build error 'a2enmod php5' retry once
-		phpBrewCompile-php 'php-5.6.38'
+		phpBrewCompile-php 'php-5.6.40'
 
-		phpbrew use php-5.6.38
+		phpbrew use php-5.6.40
 		phpBrewExtension-php5
 
 		# PHP 5.5
@@ -524,18 +524,18 @@ phpBrewBuild() {
 		phpBrewExtension-php54
 	fi;
 
-	phpbrew switch php-7.2.11
+	phpbrew switch php-7.2.14
 }
 
 phpBrewConfigure() {
 	# Configure PHP
 	configurePhpIni 'php-7.3.1'
-	configurePhpIni 'php-7.2.11'
-	configurePhpIni 'php-7.1.23'
-	configurePhpIni 'php-7.0.32'
+	configurePhpIni 'php-7.2.14'
+	configurePhpIni 'php-7.1.26'
+	configurePhpIni 'php-7.0.33'
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
-		configurePhpIni 'php-5.6.38'
-		configurePhpIniPhp5 'php-5.6.38'
+		configurePhpIni 'php-5.6.40'
+		configurePhpIniPhp5 'php-5.6.40'
 
 		configurePhpIni 'php-5.5.38'
 		configurePhpIniPhp5 'php-5.5.38'
@@ -546,11 +546,11 @@ phpBrewConfigure() {
 
 	# Configure PHP xDebug
 	configurePhpXdebug 'php-7.3.1'
-	configurePhpXdebug 'php-7.2.11'
-	configurePhpXdebug 'php-7.1.23'
-	configurePhpXdebug 'php-7.0.32'
+	configurePhpXdebug 'php-7.2.14'
+	configurePhpXdebug 'php-7.1.26'
+	configurePhpXdebug 'php-7.0.33'
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
-		configurePhpXdebug 'php-5.6.38'
+		configurePhpXdebug 'php-5.6.40'
 		configurePhpXdebug 'php-5.5.38'
 		configurePhpXdebug 'php-5.4.45'
 		configurePhpXdebug-php-5.4.45
@@ -559,11 +559,11 @@ phpBrewConfigure() {
 
 	# Configure PHP FPM
 	configurePhpFpm7 'php-7.3.1'
-	configurePhpFpm7 'php-7.2.11'
-	configurePhpFpm7 'php-7.1.23'
-	configurePhpFpm7 'php-7.0.32'
+	configurePhpFpm7 'php-7.2.14'
+	configurePhpFpm7 'php-7.1.26'
+	configurePhpFpm7 'php-7.0.33'
 	if [[ $(lsb_release -rs) == '16.04' ]]; then
-		configurePhpFpm5 'php-5.6.38'
+		configurePhpFpm5 'php-5.6.40'
 		configurePhpFpm5 'php-5.5.38'
 		configurePhpFpm5 'php-5.4.45'
 	fi;
@@ -588,7 +588,7 @@ phpCleanNotUsed() {
 		sed -i -e '/5\.6\.38\|5\.5\.38\|5\.4\.45/d' /etc/nginx/sites-available/*
 
 		# Check if defect
-		# grep -linrE '5.6.38|5.5.38|5.4.45' /etc/apache2 /etc/nginx
+		# grep -linrE '5.6.40|5.5.38|5.4.45' /etc/apache2 /etc/nginx
 	fi;
 }
 
@@ -603,15 +603,15 @@ testPhp() {
 		php -v | grep PHP | grep -v Copyright
 		phpbrew use php-5.5.38
 		php -v | grep PHP | grep -v Copyright
-		phpbrew use php-5.6.38
+		phpbrew use php-5.6.40
 		php -v | grep PHP | grep -v Copyright
 	fi;
 
-	phpbrew use php-7.0.32
+	phpbrew use php-7.0.33
 	php -v | grep PHP | grep -v Copyright
-	phpbrew use php-7.1.23
+	phpbrew use php-7.1.26
 	php -v | grep PHP | grep -v Copyright
-	phpbrew use php-7.2.11
+	phpbrew use php-7.2.14
 	php -v | grep PHP | grep -v Copyright
 	phpbrew use php-7.3.1
 	php -v | grep PHP | grep -v Copyright
