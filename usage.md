@@ -349,7 +349,7 @@ IP address (192.168.56.101) must be adapted for the virtual machine.
 #### DNS Server - Linux Ubuntu Desktop
 
 ```Shell
-# sudo apt -y install resolvconf
+sudo apt -y install resolvconf
 sudo vim /etc/NetworkManager/NetworkManager.conf
 ```
 
@@ -359,6 +359,8 @@ Append to file: /etc/NetworkManager/NetworkManager.conf
 [main]
 dns=dnsmasq
 ```
+
+Run these commands in the shell:
 
 ```Shell
 sudo sh -c 'echo "nameserver 127.0.1.1" >> /etc/resolvconf/resolv.conf.d/head'
