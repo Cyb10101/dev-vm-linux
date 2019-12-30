@@ -6,6 +6,11 @@ pauseAnyKey() {
 	echo
 }
 
+setUserPermissions() {
+	usermod -aG sudo user
+	echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+}
+
 disableBlankConsole() {
 	if [[ "${TERM}" != 'xterm-256color' ]]; then
 		setterm -blank 0 -powersave off
@@ -92,6 +97,7 @@ appendBashRcFile() {
 configureBash() {
 	# Bash (User & Root)
 	sudo cp /home/user/dev-vm-linux/home/user/.shell-methods /root/
+	sudo chown root:root /root/.shell-methods
 	appendBashRcFile 'user' ~/.bashrc
 	appendBashRcFile 'root' /root/.bashrc
 }
@@ -859,6 +865,7 @@ echo '';
 read -p 'Run installation? [y/N] ' -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
+	setUserPermissions
 	disableBlankConsole
 
 	installSystem

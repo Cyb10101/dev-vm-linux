@@ -100,7 +100,7 @@ sudo visudo
 Append to end in visudo file:
 
 ```text
-user ALL=(ALL) NOPASSWD: ALL
+%sudo ALL=(ALL) NOPASSWD: ALL
 ```
 
 Reboot system.
