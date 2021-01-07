@@ -1,3 +1,15 @@
+# Project archived
+
+A better and faster variant is to use Docker using [docker-global](https://github.com/Cyb10101/docker-global) and [php-dev](https://github.com/Cyb10101/php-dev).
+
+I recommend installing docker directly in Linux, virtually using Virtualbox or in Windows using WSL (Windows Subsystem for Linux).
+
+Notes:
+
+* [Docker](https://github.com/Cyb10101/notes/blob/master/Server/Docker)
+* [VirtualBox](https://github.com/Cyb10101/notes/blob/master/Software/VirtualBox)
+* [WSL - Windows Subsystem for Linux](https://github.com/Cyb10101/notes/tree/master/System/Windows/WSL)
+
 # Development environment as a virtual machine
 
 This tutorial will create a virtual machine that includes Linux with the Ubuntu Desktop distribution.
